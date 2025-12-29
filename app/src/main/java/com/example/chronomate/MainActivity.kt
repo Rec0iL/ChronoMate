@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,11 +69,12 @@ class MainActivity : ComponentActivity() {
                 }
 
                 LaunchedEffect(Unit) {
-                    val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        arrayOf(Manifest.permission.NEARBY_WIFI_DEVICES)
-                    } else {
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
+                    val requiredPermissions = arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.CHANGE_WIFI_STATE,
+                        Manifest.permission.CHANGE_NETWORK_STATE
+                    )
                     
                     val allGranted = requiredPermissions.all {
                         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
@@ -104,10 +106,13 @@ fun ChronoApp(viewModel: ChronoViewModel) {
     val data by viewModel.uiState.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Dashboard) }
-    val context = LocalContext.current
-
+    
+    var currentRoute by rememberSaveable { mutableStateOf(Screen.Dashboard.route) }
+    
     val screens = listOf(Screen.Dashboard, Screen.OrgaChrono, Screen.Trajectory, Screen.History, Screen.Settings)
+    val currentScreen = screens.find { it.route == currentRoute } ?: Screen.Dashboard
+    
+    val context = LocalContext.current
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -142,9 +147,9 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                         NavigationDrawerItem(
                             icon = { Icon(screen.icon, contentDescription = null) },
                             label = { Text(screen.title) },
-                            selected = currentScreen == screen,
+                            selected = currentRoute == screen.route,
                             onClick = {
-                                currentScreen = screen
+                                currentRoute = screen.route
                                 scope.launch { drawerState.close() }
                             },
                             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -184,6 +189,7 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                     actions = {
                         StatusBadge(
                             isConnected = data.isConnected,
+                            wifiStatus = data.wifiStatus,
                             onClick = { viewModel.connectToChronoWifi(context) }
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -195,7 +201,7 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                 when (currentScreen) {
                     Screen.Dashboard -> DashboardScreen(data, viewModel)
                     Screen.OrgaChrono -> OrgaChronoScreen(data, viewModel)
-                    Screen.Trajectory -> BallisticsScreen(data)
+                    Screen.Trajectory -> BallisticsScreen(data, viewModel)
                     Screen.History -> HistoryScreen(data)
                     Screen.Settings -> SettingsScreen(data, viewModel)
                 }

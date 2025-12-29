@@ -30,7 +30,8 @@ data class ChronoData(
     val currentEnergy: Float = 0f,
     val wifiStatus: String = "Disconnected",
     val isDarkMode: Boolean = true,
-    val maxAllowedJoule: Float = 1.5f
+    val maxAllowedJoule: Float = 1.5f,
+    val maxAllowedOverhopCm: Float = 15.0f
 )
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {

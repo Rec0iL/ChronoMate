@@ -48,17 +48,31 @@ fun LogoImage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StatusBadge(isConnected: Boolean, onClick: () -> Unit = {}) {
+fun StatusBadge(isConnected: Boolean, wifiStatus: String, onClick: () -> Unit = {}) {
     val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    
     val green = if (isLight) Color(0xFF1B5E20) else Color(0xFF88FF11)
     val red = if (isLight) Color(0xFFB71C1C) else Color.Red
+    val yellow = if (isLight) Color(0xFFFBC02D) else Color.Yellow
     
-    val badgeColor = if (isConnected) green else red
+    val isConnecting = wifiStatus == "Connecting..."
+    
+    val badgeColor = when {
+        isConnected -> green
+        isConnecting -> yellow
+        else -> red
+    }
+    
+    val statusText = when {
+        isConnected -> "LIVE"
+        isConnecting -> "CONNECTING..."
+        else -> "OFFLINE - TAP TO RECONNECT"
+    }
     
     Surface(
         color = badgeColor.copy(alpha = 0.15f),
         shape = CircleShape,
-        modifier = Modifier.clickable(enabled = !isConnected) { onClick() }
+        modifier = Modifier.clickable(enabled = !isConnected && !isConnecting) { onClick() }
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -74,7 +88,7 @@ fun StatusBadge(isConnected: Boolean, onClick: () -> Unit = {}) {
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = if (isConnected) "LIVE" else "OFFLINE",
+                text = statusText,
                 style = MaterialTheme.typography.labelSmall,
                 color = badgeColor,
                 fontWeight = FontWeight.Black

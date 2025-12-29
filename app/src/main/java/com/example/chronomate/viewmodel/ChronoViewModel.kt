@@ -29,7 +29,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private val _uiState = MutableStateFlow(ChronoData(
         selectedWeight = prefs.getFloat("default_weight", 0.20f),
         isDarkMode = prefs.getBoolean("is_dark_mode", true),
-        maxAllowedJoule = prefs.getFloat("max_allowed_joule", 1.5f)
+        maxAllowedJoule = prefs.getFloat("max_allowed_joule", 1.5f),
+        maxAllowedOverhopCm = prefs.getFloat("max_allowed_overhop", 15.0f)
     ))
     val uiState = _uiState.asStateFlow()
 
@@ -54,6 +55,11 @@ class ChronoViewModel(context: Context) : ViewModel() {
     fun setMaxAllowedJoule(joule: Float) {
         prefs.edit().putFloat("max_allowed_joule", joule).apply()
         _uiState.update { it.copy(maxAllowedJoule = joule) }
+    }
+
+    fun setMaxAllowedOverhop(cm: Float) {
+        prefs.edit().putFloat("max_allowed_overhop", cm).apply()
+        _uiState.update { it.copy(maxAllowedOverhopCm = cm) }
     }
 
     fun connectToChronoWifi(context: Context) {
@@ -159,6 +165,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 if (lastSeenRawShots.isEmpty()) {
                     newShotsToAdd = rawShots
                 } else {
+                    // Match suffix of lastSeen with prefix of rawShots to find new entries
                     for (i in rawShots.size downTo 0) {
                         val head = rawShots.take(i)
                         if (lastSeenRawShots.size >= i && lastSeenRawShots.takeLast(i) == head) {
