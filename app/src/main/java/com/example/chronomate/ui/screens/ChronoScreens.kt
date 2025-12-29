@@ -280,6 +280,10 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     var targetDistance by rememberSaveable { mutableStateOf(50.0) }
     var shooterHeight by rememberSaveable { mutableStateOf(1.5) }
     var targetHeight by rememberSaveable { mutableStateOf(1.5) }
+    
+    var shooterHeightText by remember { mutableStateOf("1.5") }
+    var targetHeightText by remember { mutableStateOf("1.5") }
+    
     var coupleHeights by rememberSaveable { mutableStateOf(true) }
     var sightHeight by rememberSaveable { mutableStateOf(5.0) }
     
@@ -521,25 +525,34 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Text("Target Distance: %.0f m".format(targetDistance), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
         Slider(value = targetDistance.toFloat(), onValueChange = { targetDistance = it.toDouble() }, valueRange = 5f..100f)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Shooter Height: %.1f m".format(shooterHeight), style = MaterialTheme.typography.labelMedium)
-                Slider(
-                    value = shooterHeight.toFloat(), 
-                    onValueChange = { 
-                        shooterHeight = it.toDouble()
-                        if (coupleHeights) targetHeight = shooterHeight
-                    }, 
-                    valueRange = 0.1f..2.5f
-                )
-            }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = shooterHeightText,
+                onValueChange = { 
+                    shooterHeightText = it
+                    it.toDoubleOrNull()?.let { h -> 
+                        shooterHeight = h
+                        if (coupleHeights) {
+                            targetHeight = h
+                            targetHeightText = it
+                        }
+                    }
+                },
+                label = { Text("Shooter H (m)") },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true
+            )
             
             IconButton(
                 onClick = { 
                     coupleHeights = !coupleHeights 
-                    if (coupleHeights) targetHeight = shooterHeight
+                    if (coupleHeights) {
+                        targetHeight = shooterHeight
+                        targetHeightText = shooterHeightText
+                    }
                 },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Icon(
                     imageVector = if (coupleHeights) Icons.Default.Link else Icons.Default.LinkOff,
@@ -548,18 +561,26 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 )
             }
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Target Height: %.1f m".format(targetHeight), style = MaterialTheme.typography.labelMedium)
-                Slider(
-                    value = targetHeight.toFloat(), 
-                    onValueChange = { 
-                        targetHeight = it.toDouble()
-                        if (coupleHeights) shooterHeight = targetHeight
-                    }, 
-                    valueRange = 0.1f..2.5f
-                )
-            }
+            OutlinedTextField(
+                value = targetHeightText,
+                onValueChange = { 
+                    targetHeightText = it
+                    it.toDoubleOrNull()?.let { h -> 
+                        targetHeight = h
+                        if (coupleHeights) {
+                            shooterHeight = h
+                            shooterHeightText = it
+                        }
+                    }
+                },
+                label = { Text("Target H (m)") },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true
+            )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
