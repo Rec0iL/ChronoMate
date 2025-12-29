@@ -41,6 +41,7 @@ import com.example.chronomate.ui.screens.HistoryScreen
 import com.example.chronomate.ui.screens.OrgaChronoScreen
 import com.example.chronomate.ui.screens.BallisticsScreen
 import com.example.chronomate.ui.screens.SettingsScreen
+import com.example.chronomate.ui.screens.ExportScreen
 import com.example.chronomate.ui.theme.ChronoMateTheme
 import com.example.chronomate.viewmodel.ChronoViewModel
 import kotlinx.coroutines.launch
@@ -109,7 +110,14 @@ fun ChronoApp(viewModel: ChronoViewModel) {
     
     var currentRoute by rememberSaveable { mutableStateOf(Screen.Dashboard.route) }
     
-    val screens = listOf(Screen.Dashboard, Screen.OrgaChrono, Screen.Trajectory, Screen.History, Screen.Settings)
+    val screens = listOf(
+        Screen.Dashboard, 
+        Screen.OrgaChrono, 
+        Screen.Trajectory, 
+        Screen.History, 
+        Screen.Export,
+        Screen.Settings
+    )
     val currentScreen = screens.find { it.route == currentRoute } ?: Screen.Dashboard
     
     val context = LocalContext.current
@@ -203,6 +211,7 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                     Screen.OrgaChrono -> OrgaChronoScreen(data, viewModel)
                     Screen.Trajectory -> BallisticsScreen(data, viewModel)
                     Screen.History -> HistoryScreen(data)
+                    Screen.Export -> ExportScreen(data, viewModel)
                     Screen.Settings -> SettingsScreen(data, viewModel)
                 }
             }

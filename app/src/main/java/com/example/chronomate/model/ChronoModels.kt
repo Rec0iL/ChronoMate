@@ -1,11 +1,7 @@
 package com.example.chronomate.model
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlin.math.pow
 
@@ -31,7 +27,15 @@ data class ChronoData(
     val wifiStatus: String = "Disconnected",
     val isDarkMode: Boolean = true,
     val maxAllowedJoule: Float = 1.5f,
-    val maxAllowedOverhopCm: Float = 15.0f
+    val maxAllowedOverhopCm: Float = 15.0f,
+    
+    // Ballistic Settings
+    val diameterMm: Float = 5.95f,
+    val airDensityRho: Float = 1.225f,
+    val dragCoefficientCw: Float = 0.35f,
+    val magnusCoefficientK: Float = 0.002f,
+    val spinDampingCr: Float = 0.01f,
+    val gravity: Float = 9.81f
 )
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
@@ -39,5 +43,6 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object OrgaChrono : Screen("orga_chrono", "Orga Chrono", Icons.Default.Shield)
     object Trajectory : Screen("trajectory", "Trajectory", Icons.Default.Timeline)
     object History : Screen("history", "History", Icons.Default.History)
+    object Export : Screen("export", "Export", Icons.Default.PictureAsPdf)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }

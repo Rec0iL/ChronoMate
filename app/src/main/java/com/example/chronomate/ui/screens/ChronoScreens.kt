@@ -16,13 +16,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +32,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -274,16 +272,16 @@ data class ProbeResult(
 
 @Composable
 fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
-    var speedMps by remember { mutableStateOf(data.velocity.toDoubleOrNull() ?: 100.0) }
+    var speedMps by rememberSaveable { mutableStateOf(data.velocity.toDoubleOrNull() ?: 100.0) }
     
     val currentJoule = 0.5 * (data.selectedWeight.toDouble() / 1000.0) * speedMps.pow(2.0)
     
-    var hopUp by remember { mutableStateOf(1000.0) }
-    var targetDistance by remember { mutableStateOf(50.0) }
-    var shooterHeight by remember { mutableStateOf(1.5) }
-    var targetHeight by remember { mutableStateOf(1.5) }
-    var coupleHeights by remember { mutableStateOf(true) }
-    var sightHeight by remember { mutableStateOf(5.0) }
+    var hopUp by rememberSaveable { mutableStateOf(1000.0) }
+    var targetDistance by rememberSaveable { mutableStateOf(50.0) }
+    var shooterHeight by rememberSaveable { mutableStateOf(1.5) }
+    var targetHeight by rememberSaveable { mutableStateOf(1.5) }
+    var coupleHeights by rememberSaveable { mutableStateOf(true) }
+    var sightHeight by rememberSaveable { mutableStateOf(5.0) }
     
     var probeResult by remember { mutableStateOf<ProbeResult?>(null) }
     
@@ -299,13 +297,23 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val aimAngleDeg = Math.toDegrees(atan2(targetHeight - eyeHeightM, targetDistance))
 
     val engine = remember { BallisticsEngine() }
-    val trajectory = remember(data.selectedWeight, speedMps, hopUp, shooterHeight, aimAngleDeg) {
+    val trajectory = remember(
+        data.selectedWeight, speedMps, hopUp, shooterHeight, aimAngleDeg,
+        data.diameterMm, data.airDensityRho, data.dragCoefficientCw, 
+        data.magnusCoefficientK, data.spinDampingCr, data.gravity
+    ) {
         engine.calculateTrajectory(BallisticParams(
             massGrams = data.selectedWeight.toDouble(),
             muzzleVelocityMps = speedMps,
             hopUpRadS = hopUp,
             startingHeightM = shooterHeight,
-            launchAngleDeg = aimAngleDeg
+            launchAngleDeg = aimAngleDeg,
+            diameterMm = data.diameterMm.toDouble(),
+            airDensityRho = data.airDensityRho.toDouble(),
+            dragCoefficientCw = data.dragCoefficientCw.toDouble(),
+            magnusCoefficientK = data.magnusCoefficientK.toDouble(),
+            spinDampingCr = data.spinDampingCr.toDouble(),
+            gravity = data.gravity.toDouble()
         ))
     }
 
@@ -380,14 +388,15 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                     colors = CardDefaults.cardColors(containerColor = Color.Black)
                 ) {
-                    Column(Modifier.padding(8.dp)) {
+                    Column(Modifier.padding(8.dp).fillMaxSize()) {
                         Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                         TrajectoryCanvas(
                             trajectory = trajectory, 
                             targetDistance = targetDistance,
                             eyeHeightM = eyeHeightM,
                             targetHeightM = targetHeight,
-                            onProbe = { probeResult = it }
+                            onProbe = { probeResult = it },
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
@@ -396,7 +405,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                     colors = CardDefaults.cardColors(containerColor = Color.Black)
                 ) {
-                    Column(Modifier.padding(8.dp)) {
+                    Column(Modifier.padding(8.dp).fillMaxSize()) {
                         Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                         TargetViewCanvas(trajectory = trajectory, targetDistance = targetDistance, targetHeightM = targetHeight)
                     }
@@ -407,61 +416,61 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 modifier = Modifier.fillMaxWidth().height(200.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Black)
             ) {
-                Column(Modifier.padding(8.dp)) {
+                Column(Modifier.padding(8.dp).fillMaxSize()) {
                     Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                     TrajectoryCanvas(
                         trajectory = trajectory, 
                         targetDistance = targetDistance,
                         eyeHeightM = eyeHeightM,
                         targetHeightM = targetHeight,
-                        onProbe = { probeResult = it }
+                        onProbe = { probeResult = it },
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
-            
-            // Probe result popup positioned right below the side view
-            AnimatedVisibility(
-                visible = probeResult != null,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                probeResult?.let { res ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Dist: %.1f m".format(res.distance), fontWeight = FontWeight.Bold)
-                                Text("Time: %.2f s".format(res.timeS))
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Height: %.1f cm".format(res.bbHeightCm), style = MaterialTheme.typography.bodySmall)
-                                Text("Energy: %.2f J".format(res.energyJ), style = MaterialTheme.typography.bodySmall)
-                            }
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Rel. Impact: %.1f cm".format(res.relativeImpactCm), color = if (res.relativeImpactCm < 0) Color.Red else Color.Unspecified)
-                                Text("Hold-over: %.1f cm".format(res.holdOverCm), fontWeight = FontWeight.Bold, color = if (res.holdOverCm > 0) Color.Red else Color.Cyan)
-                            }
-                        }
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
             Card(
                 modifier = Modifier.fillMaxWidth().height(250.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Black)
             ) {
-                Column(Modifier.padding(8.dp)) {
+                Column(Modifier.padding(8.dp).fillMaxSize()) {
                     Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                     TargetViewCanvas(trajectory = trajectory, targetDistance = targetDistance, targetHeightM = targetHeight)
                 }
             }
         }
         
+        // Probe result popup positioned below the charts in both orientations
+        AnimatedVisibility(
+            visible = probeResult != null,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            probeResult?.let { res ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Dist: %.1f m".format(res.distance), fontWeight = FontWeight.Bold)
+                            Text("Time: %.2f s".format(res.timeS))
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Height: %.1f cm".format(res.bbHeightCm), style = MaterialTheme.typography.bodySmall)
+                            Text("Energy: %.2f J".format(res.energyJ), style = MaterialTheme.typography.bodySmall)
+                        }
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Rel. Impact: %.1f cm".format(res.relativeImpactCm), color = if (res.relativeImpactCm < 0) Color.Red else Color.Unspecified)
+                            Text("Hold-over: %.1f cm".format(res.holdOverCm), fontWeight = FontWeight.Bold, color = if (res.holdOverCm > 0) Color.Red else Color.Cyan)
+                        }
+                    }
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Advanced Stats Grid
@@ -628,7 +637,13 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                         muzzleVelocityMps = speedMps,
                         hopUpRadS = h.toDouble(),
                         startingHeightM = shooterHeight,
-                        launchAngleDeg = aimAngleOptDeg
+                        launchAngleDeg = aimAngleOptDeg,
+                        diameterMm = data.diameterMm.toDouble(),
+                        airDensityRho = data.airDensityRho.toDouble(),
+                        dragCoefficientCw = data.dragCoefficientCw.toDouble(),
+                        magnusCoefficientK = data.magnusCoefficientK.toDouble(),
+                        spinDampingCr = data.spinDampingCr.toDouble(),
+                        gravity = data.gravity.toDouble()
                     ))
                     
                     val currentOverhop = traj.maxOfOrNull { pt ->
@@ -640,12 +655,12 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     
                     if (currentOverhop <= (data.maxAllowedOverhopCm / 100.0)) {
                         val crossIdx = traj.indexOfFirst { pt ->
-                            val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightOptM)
+                            val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightM)
                             pt.y > aimY
                         }
                         val currentEffRange = if (crossIdx != -1) {
                             traj.drop(crossIdx).firstOrNull { pt ->
-                                val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightOptM)
+                                val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightM)
                                 pt.y <= aimY
                             }?.x ?: 0.0
                         } else 0.0
@@ -683,6 +698,105 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 }
 
 @Composable
+fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
+    var shotCount by remember { mutableStateOf(data.shots.size.coerceAtMost(10).coerceAtLeast(1)) }
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Default.PictureAsPdf,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Export Session Report", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Text(
+            "Generate a professional PDF report of your current session.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "REPORT SETTINGS",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Shots to include", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = shotCount.toString(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                Slider(
+                    value = shotCount.toFloat(),
+                    onValueChange = { shotCount = it.toInt() },
+                    valueRange = 1f..data.shots.size.coerceAtLeast(1).toFloat(),
+                    steps = (data.shots.size - 1).coerceAtLeast(0)
+                )
+                
+                Text(
+                    "Includes: Full shot list, weight, velocity, energy, min/max/avg stats, and energy trend graph.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = { viewModel.exportToPdf(context, shotCount) },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            enabled = data.shots.isNotEmpty(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(Icons.Default.FileDownload, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("GENERATE PDF REPORT", fontWeight = FontWeight.Bold)
+        }
+
+        if (data.shots.isEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "No shots recorded in this session yet.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Composable
 fun StatItemSmall(label: String, value: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
@@ -696,7 +810,8 @@ fun TrajectoryCanvas(
     targetDistance: Double,
     eyeHeightM: Double,
     targetHeightM: Double,
-    onProbe: (ProbeResult) -> Unit
+    onProbe: (ProbeResult) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (trajectory.isEmpty()) return
     
@@ -704,7 +819,7 @@ fun TrajectoryCanvas(
     val gridColor = Color.White.copy(alpha = 0.15f)
     val aimLineColor = Color.Yellow.copy(alpha = 0.4f)
     
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = modifier) {
         Canvas(modifier = Modifier
             .fillMaxSize()
             .pointerInput(trajectory) {
@@ -891,8 +1006,7 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
                        else "HIT: %.1f cm BELOW".format(abs(relativeImpactCm)),
                 color = if (relativeImpactCm >= 0) chronoGreen else Color.Red,
                 style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold
-            )
+                fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -937,7 +1051,37 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         }
         
         Spacer(modifier = Modifier.height(32.dp))
+        
+        Text("Ballistics Engine Parameters", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text("Fine-tune the physics simulation constants", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        BallisticSettingField("Diameter (mm)", data.diameterMm.toString()) { viewModel.updateBallisticSettings(diameterMm = it) }
+        BallisticSettingField("Air Density (rho)", data.airDensityRho.toString()) { viewModel.updateBallisticSettings(airDensityRho = it) }
+        BallisticSettingField("Drag Coefficient (Cw)", data.dragCoefficientCw.toString()) { viewModel.updateBallisticSettings(dragCoefficientCw = it) }
+        BallisticSettingField("Magnus Coefficient (K)", data.magnusCoefficientK.toString()) { viewModel.updateBallisticSettings(magnusCoefficientK = it) }
+        BallisticSettingField("Spin Damping (Cr)", data.spinDampingCr.toString()) { viewModel.updateBallisticSettings(spinDampingCr = it) }
+        BallisticSettingField("Gravity (m/s²)", data.gravity.toString()) { viewModel.updateBallisticSettings(gravity = it) }
+
+        Spacer(modifier = Modifier.height(32.dp))
         Text("ChronoMate v1.0", modifier = Modifier.align(Alignment.CenterHorizontally), style = MaterialTheme.typography.labelSmall)
         Spacer(modifier = Modifier.height(16.dp))
     }
+}
+
+@Composable
+fun BallisticSettingField(label: String, value: String, onUpdate: (Float) -> Unit) {
+    var text by remember(value) { mutableStateOf(value) }
+    
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            it.toFloatOrNull()?.let { f -> onUpdate(f) }
+        },
+        label = { Text(label) },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        singleLine = true
+    )
 }
