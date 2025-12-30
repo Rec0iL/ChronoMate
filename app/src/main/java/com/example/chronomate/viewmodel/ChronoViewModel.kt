@@ -1,5 +1,6 @@
 package com.example.chronomate.viewmodel
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
@@ -8,7 +9,9 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.wifi.WifiNetworkSpecifier
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -227,7 +230,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
             lastSeenRawShots = updatedLastSeen
 
             val latestShot = currentSessionShots.lastOrNull()
-            val currentVelocity = latestShot?.velocity?.let { "%.2f".format(it) } ?: "0.00"
+            val currentVelocityString = latestShot?.velocity?.let { "%.2f".format(it) } ?: "0.00"
             val currentEnergy = latestShot?.energyJoules ?: 0f
 
             val velocities = currentSessionShots.map { it.velocity }
@@ -243,7 +246,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
             val sd = sqrt(varVal)
 
             current.copy(
-                velocity = currentVelocity,
+                velocity = currentVelocityString,
                 fireRate = fireRate,
                 shots = currentSessionShots,
                 averageVelocity = avg,
@@ -291,6 +294,10 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         textSize = 12f
                         color = Color.BLACK
                     }
+                    val labelPaint = Paint().apply {
+                        textSize = 10f
+                        color = Color.GRAY
+                    }
                     val accentPaint = Paint().apply {
                         color = Color.parseColor("#88FF11")
                     }
@@ -313,8 +320,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     
                     y += 30f
                     val col1 = 40f
-                    val col2 = 210f
-                    val col3 = 380f
+                    val col2 = 230f
+                    val col3 = 420f
                     
                     val velocities = shotsToExport.map { it.velocity }
                     val avg = velocities.average().toFloat()
@@ -325,23 +332,23 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     val varVal = if (velocities.size > 1) velocities.sumOf { (it - mean).pow(2.0) }.toFloat() / velocities.size else 0f
                     val sd = sqrt(varVal)
 
-                    canvas.drawText("AVG: %.1f m/s".format(avg), col1, y, bodyPaint)
+                    canvas.drawText("AVERAGE: %.1f m/s".format(avg), col1, y, bodyPaint)
                     canvas.drawText("MAX: %.1f m/s".format(max), col2, y, bodyPaint)
                     canvas.drawText("MIN: %.1f m/s".format(min), col3, y, bodyPaint)
                     
                     y += 25f
-                    canvas.drawText("ES: %.1f m/s".format(es), col1, y, bodyPaint)
-                    canvas.drawText("SD: %.2f m/s".format(sd), col2, y, bodyPaint)
+                    canvas.drawText("EXTREME SPREAD: %.1f m/s".format(es), col1, y, bodyPaint)
+                    canvas.drawText("STANDARD DEVIATION: %.2f m/s".format(sd), col2, y, bodyPaint)
                     canvas.drawText("ROF: ${data.fireRate} r/m", col3, y, bodyPaint)
 
                     // Graph Section
                     y += 50f
-                    canvas.drawText("ENERGY TREND (Joules)", 40f, y, headerPaint)
+                    canvas.drawText("VELOCITY TREND (m/s)", 40f, y, headerPaint)
                     y += 20f
                     
                     val graphHeight = 150f
-                    val graphWidth = 515f
-                    val graphLeft = 40f
+                    val graphWidth = 475f // Adjusted for labels
+                    val graphLeft = 80f // Shifted right for Y axis labels
                     val graphTop = y
                     
                     canvas.drawRect(graphLeft, graphTop, graphLeft + graphWidth, graphTop + graphHeight, Paint().apply {
@@ -350,10 +357,28 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         style = Paint.Style.FILL
                     })
 
-                    val energies = shotsToExport.map { it.energyJoules }
-                    val minE = energies.minOrNull() ?: 0f
-                    val maxE = energies.maxOrNull() ?: 0f
-                    val rangeE = (maxE - minE).coerceAtLeast(0.1f)
+                    val minV = velocities.minOrNull() ?: 0f
+                    val maxV = velocities.maxOrNull() ?: 0f
+                    val rangeV = (maxV - minV).coerceAtLeast(1f)
+                    val displayMin = (minV - rangeV * 0.2f).coerceAtLeast(0f)
+                    val displayMax = maxV + rangeV * 0.2f
+                    val displayRange = (displayMax - displayMin).coerceAtLeast(0.1f)
+
+                    // Draw Chart Axis Labels
+                    canvas.drawText("%.1f".format(displayMax), graphLeft - 5f, graphTop + 10f, labelPaint.apply { textAlign = Paint.Align.RIGHT })
+                    canvas.drawText("%.1f".format(displayMin), graphLeft - 5f, graphTop + graphHeight, labelPaint)
+                    canvas.drawText("m/s", graphLeft - 5f, graphTop - 5f, labelPaint)
+                    canvas.drawText("SHOT #", graphLeft + graphWidth/2, graphTop + graphHeight + 25f, labelPaint.apply { textAlign = Paint.Align.CENTER })
+
+                    // Draw Average Line (Yellow)
+                    val avgY = graphTop + graphHeight - ((avg - displayMin) / displayRange) * graphHeight
+                    val avgLinePaint = Paint().apply {
+                        color = Color.YELLOW
+                        strokeWidth = 1f
+                        pathEffect = DashPathEffect(floatArrayOf(5f, 5f), 0f)
+                        style = Paint.Style.STROKE
+                    }
+                    canvas.drawLine(graphLeft, avgY, graphLeft + graphWidth, avgY, avgLinePaint)
                     
                     val path = Path()
                     val graphPaint = Paint().apply {
@@ -364,15 +389,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
                     shotsToExport.forEachIndexed { index, shot ->
                         val x = graphLeft + (index.toFloat() / (shotsToExport.size - 1).coerceAtLeast(1)) * graphWidth
-                        val normY = (shot.energyJoules - minE) / rangeE
-                        val py = graphTop + graphHeight - (normY * graphHeight)
+                        val py = graphTop + graphHeight - ((shot.velocity - displayMin) / displayRange) * graphHeight
                         
                         if (index == 0) path.moveTo(x, py) else path.lineTo(x, py)
                         canvas.drawCircle(x, py, 3f, Paint().apply { color = Color.parseColor("#2E7D32") })
                     }
                     canvas.drawPath(path, graphPaint)
                     
-                    y += graphHeight + 40f
+                    y += graphHeight + 45f
                     
                     // Table Header
                     canvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
@@ -382,29 +406,54 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     canvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
                     
                     y += 35f
-                    shotsToExport.asReversed().forEachIndexed { index, shot ->
-                        if (y > 780f) { // Simple page overflow handling
-                            pdfDocument.finishPage(page)
-                            // In a real app, we'd start a new page here. For brevity, we'll stop.
-                            return@forEachIndexed 
-                        }
+                    var pageFinished = false
+                    val reversedShots = shotsToExport.asReversed()
+                    for (index in reversedShots.indices) {
+                        val shot = reversedShots[index]
                         val shotNum = shotsToExport.size - index
                         canvas.drawText("%02d".format(shotNum), 50f, y, bodyPaint)
                         canvas.drawText("%.2f".format(shot.weightGrams), 100f, y, bodyPaint)
                         canvas.drawText("%.1f".format(shot.velocity), 250f, y, bodyPaint)
                         canvas.drawText("%.2f".format(shot.energyJoules), 450f, y, bodyPaint)
                         y += 20f
+                        
+                        if (y > 780f && index < shotsToExport.size - 1) {
+                            pdfDocument.finishPage(page)
+                            pageFinished = true
+                            break
+                        }
                     }
 
-                    pdfDocument.finishPage(page)
+                    if (!pageFinished) {
+                        pdfDocument.finishPage(page)
+                    }
 
                     val fileName = "ChronoMate_Report_${System.currentTimeMillis()}.pdf"
-                    val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
-                    pdfDocument.writeTo(FileOutputStream(file))
-                    pdfDocument.close()
+                    
+                    val resolver = context.contentResolver
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/ChronoMate")
+                    }
 
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Report saved to Documents: $fileName", Toast.LENGTH_LONG).show()
+                    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                    if (uri != null) {
+                        resolver.openOutputStream(uri)?.use { outputStream ->
+                            pdfDocument.writeTo(outputStream)
+                        }
+                        pdfDocument.close()
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Report saved to Downloads/ChronoMate", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        // Fallback to app-specific if MediaStore fails
+                        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
+                        pdfDocument.writeTo(FileOutputStream(file))
+                        pdfDocument.close()
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Saved to app folder (Downloads failed)", Toast.LENGTH_LONG).show()
+                        }
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {

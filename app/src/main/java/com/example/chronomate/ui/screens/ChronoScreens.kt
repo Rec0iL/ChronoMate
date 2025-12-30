@@ -1,10 +1,13 @@
 package com.example.chronomate.ui.screens
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,8 +36,12 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronomate.ballistics.BallisticsEngine
@@ -133,9 +140,10 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val weights = listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
     
-    val velocity = data.velocity.toFloatOrNull() ?: 0f
+    // We get the raw velocity float from the latest shot for precision
+    val latestVelocity = data.shots.lastOrNull()?.velocity ?: 0f
     
-    val maxWeightKg = if (velocity > 0) (2 * data.maxAllowedJoule) / velocity.pow(2) else 0f
+    val maxWeightKg = if (latestVelocity > 0f) (2f * data.maxAllowedJoule) / latestVelocity.pow(2) else 0f
     val maxWeightGrams = maxWeightKg * 1000f
 
     val scrollState = rememberScrollState()
@@ -152,7 +160,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Column(modifier = Modifier.weight(2.5f)) { 
                     Text("Joule Reference Grid", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    JouleGridStatic(velocity = velocity, weights = weights, columns = 4)
+                    JouleGridStatic(velocity = latestVelocity, weights = weights, columns = 4)
                 }
             }
         } else {
@@ -160,7 +168,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
             Spacer(modifier = Modifier.height(24.dp))
             Text("Joule Reference Grid", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
-            JouleGridStatic(velocity = velocity, weights = weights, columns = 2)
+            JouleGridStatic(velocity = latestVelocity, weights = weights, columns = 2)
             Spacer(modifier = Modifier.height(24.dp))
             OrgaSettingsSection(data = data, viewModel = viewModel)
         }
@@ -371,6 +379,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val scrollState = rememberScrollState()
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val context = LocalContext.current
 
     val rainbowBrush = remember {
         Brush.linearGradient(
@@ -713,6 +722,35 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Text("OPTIMIZE HOP-UP", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val annotatedString = buildAnnotatedString {
+            append("Ballistic calculator powered by GWC Airsoft Team Leipzig.\n")
+            pushStringAnnotation(tag = "URL", annotation = "https://gwc-leipzig.de/")
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline)) {
+                append("https://gwc-leipzig.de/")
+            }
+            pop()
+            append("\n(Ghost Warrior Commando Airsoft-Team Leipzig)")
+        }
+
+        Text(
+            text = annotatedString,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .clickable {
+                    annotatedString.getStringAnnotations(tag = "URL", start = 0, end = annotatedString.length)
+                        .firstOrNull()?.let { annotation ->
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                            context.startActivity(intent)
+                        }
+                }
+        )
         
         Spacer(modifier = Modifier.height(32.dp))
     }

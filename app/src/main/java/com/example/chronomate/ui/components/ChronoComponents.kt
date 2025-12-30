@@ -16,11 +16,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronomate.model.ChronoData
@@ -100,8 +102,19 @@ fun StatusBadge(isConnected: Boolean, wifiStatus: String, onClick: () -> Unit = 
 @Composable
 fun StatItem(label: String, value: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(
+            text = label, 
+            style = MaterialTheme.typography.labelSmall, 
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            lineHeight = 12.sp
+        )
+        Text(
+            text = value, 
+            style = MaterialTheme.typography.titleMedium, 
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -111,19 +124,21 @@ fun ShotChart(shots: List<Shot>, modifier: Modifier = Modifier) {
     
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val velocities = shots.map { it.velocity }
+    val avgVel = velocities.average().toFloat()
     val minVel = velocities.minOrNull() ?: 0f
     val maxVel = velocities.maxOrNull() ?: 0f
     val range = (maxVel - minVel).coerceAtLeast(1f)
     
-    val padding = range * 0.2f
-    val displayMin = minVel - padding
+    val padding = range * 0.3f
+    val displayMin = (minVel - padding).coerceAtLeast(0f)
     val displayMax = maxVel + padding
     val displayRange = (displayMax - displayMin).coerceAtLeast(0.1f)
     
     val primaryColor = MaterialTheme.colorScheme.primary
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    val labelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.padding(start = 40.dp, bottom = 20.dp, top = 10.dp, end = 10.dp)) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -136,6 +151,60 @@ fun ShotChart(shots: List<Shot>, modifier: Modifier = Modifier) {
                 }
         ) {
             val xStep = if (shots.size > 1) size.width.toFloat() / (shots.size - 1) else 0f
+            
+            // Draw Axis Labels
+            drawContext.canvas.nativeCanvas.drawText(
+                "m/s",
+                -35.dp.toPx(),
+                -5.dp.toPx(),
+                android.graphics.Paint().apply {
+                    color = android.graphics.Color.GRAY
+                    textSize = 10.sp.toPx()
+                }
+            )
+            
+            drawContext.canvas.nativeCanvas.drawText(
+                "%.1f".format(displayMax),
+                -35.dp.toPx(),
+                10.dp.toPx(),
+                android.graphics.Paint().apply {
+                    color = android.graphics.Color.GRAY
+                    textSize = 10.sp.toPx()
+                }
+            )
+            
+            drawContext.canvas.nativeCanvas.drawText(
+                "%.1f".format(displayMin),
+                -35.dp.toPx(),
+                size.height,
+                android.graphics.Paint().apply {
+                    color = android.graphics.Color.GRAY
+                    textSize = 10.sp.toPx()
+                }
+            )
+
+            drawContext.canvas.nativeCanvas.drawText(
+                "SHOT #",
+                size.width / 2,
+                size.height + 18.dp.toPx(),
+                android.graphics.Paint().apply {
+                    color = android.graphics.Color.GRAY
+                    textSize = 10.sp.toPx()
+                    textAlign = android.graphics.Paint.Align.CENTER
+                }
+            )
+
+            // Draw Average Line (Yellow)
+            val normalizedAvgY = (avgVel - displayMin) / displayRange
+            val avgY = size.height - (normalizedAvgY * size.height)
+            drawLine(
+                color = Color.Yellow.copy(alpha = 0.6f),
+                start = Offset(0f, avgY),
+                end = Offset(size.width, avgY),
+                strokeWidth = 1.dp.toPx(),
+                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+            )
+
             val points = shots.mapIndexed { index, shot ->
                 val x = index * xStep
                 val normalizedY = (shot.velocity - displayMin) / displayRange
@@ -305,7 +374,7 @@ fun StatsGrid(data: ChronoData) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
-                StatItem("AVG", "%.1f".format(data.averageVelocity), Modifier.weight(1f))
+                StatItem("AVERAGE", "%.1f".format(data.averageVelocity), Modifier.weight(1f))
                 StatItem("MAX", "%.1f".format(data.maxVelocity), Modifier.weight(1f))
                 StatItem("MIN", "%.1f".format(data.minVelocity), Modifier.weight(1f))
             }
@@ -314,8 +383,8 @@ fun StatsGrid(data: ChronoData) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
             )
             Row(modifier = Modifier.fillMaxWidth()) {
-                StatItem("ES", "%.1f".format(data.extremeSpread), Modifier.weight(1f))
-                StatItem("SD", "%.2f".format(data.standardDeviation), Modifier.weight(1f))
+                StatItem("EXTREME SPREAD", "%.1f".format(data.extremeSpread), Modifier.weight(1f))
+                StatItem("STANDARD DEVIATION", "%.2f".format(data.standardDeviation), Modifier.weight(1f))
                 StatItem("ROF", "${data.fireRate} r/m", Modifier.weight(1f))
             }
         }
