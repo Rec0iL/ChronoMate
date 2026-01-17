@@ -15,8 +15,9 @@
 
 ### 🛡️ Orga Chrono Mode
 - **Marshaling Power**: Designed for field organizers to speed up the chrono station.
-- **Joule Reference Grid**: Displays calculated kinetic energy for all standard BB weights (0.20g to 0.45g) simultaneously.
-- **Dynamic Limits**: Set your field's Joule limit and see the "Max Allowed BB Weight" for any given setup instantly.
+- **Color-Coded Joule Grid**: Visual reference grid for all standard BB weights. Green (Safe), Orange (Limit), and Red (Illegal) coding based on field limits.
+- **Practical Weight Analysis**: Automatically identifies the highest standard BB weight a player can use while remaining legal.
+- **Safety Margin**: Displays the exact percentage of "room" left to the Joule limit for better decision-making.
 
 ### 🏹 Trajectory Simulation
 - **Physics Engine**: Advanced ballistic simulation accounting for Gravity, Air Resistance, and the Magnus Effect.
@@ -31,7 +32,7 @@
 ### ⚙️ Customization & Persistence
 - **Ballistic Parameters**: Fine-tune physics constants like air density, drag coefficients, and BB diameter.
 - **Persistent Preferences**: Saves your default BB weight, Joule limits, and ballistic engine tweaks.
-- **Dark Mode Support**: High-contrast dark theme optimized for field use.
+- **Dark and Light Mode Support**: High-contrast theme optimized for both day and night field use.
 
 ## 📸 Screenshots
 
