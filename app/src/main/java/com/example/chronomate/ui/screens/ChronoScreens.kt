@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -206,9 +207,15 @@ fun JouleGridStatic(velocity: Float, weights: List<Float>, columns: Int) {
 
 @Composable
 fun OrgaHeroSection(data: ChronoData, maxWeightGrams: Float) {
+    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    val chronoGreen = Color(0xFF88FF11)
+    val contentColor = if (isLight) MaterialTheme.colorScheme.onPrimaryContainer else chronoGreen
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.Black)
+        colors = CardDefaults.cardColors(
+            containerColor = if (isLight) MaterialTheme.colorScheme.primaryContainer else Color.Black
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -217,24 +224,27 @@ fun OrgaHeroSection(data: ChronoData, maxWeightGrams: Float) {
             Text(
                 text = "LATEST SHOT",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFF88FF11).copy(alpha = 0.6f)
+                color = contentColor.copy(alpha = 0.6f)
             )
             Text(
                 text = data.velocity + " m/s",
                 fontSize = 48.sp,
-                color = Color(0xFF88FF11),
+                color = contentColor,
                 fontWeight = FontWeight.Black
             )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.White.copy(alpha = 0.1f))
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp), 
+                color = contentColor.copy(alpha = 0.1f)
+            )
             Text(
                 text = "MAX BB WEIGHT FOR LIMIT",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.6f)
+                color = contentColor.copy(alpha = 0.6f)
             )
             Text(
                 text = "%.2f g".format(maxWeightGrams),
                 fontSize = 32.sp,
-                color = if (maxWeightGrams >= 0.20f) Color(0xFF88FF11) else Color.Red,
+                color = if (maxWeightGrams >= 0.20f) contentColor else (if (isLight) Color(0xFFB71C1C) else Color.Red),
                 fontWeight = FontWeight.Bold
             )
         }
@@ -280,6 +290,8 @@ data class ProbeResult(
 
 @Composable
 fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
+    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    
     var speedMps by rememberSaveable { mutableStateOf(data.velocity.toDoubleOrNull() ?: 100.0) }
     
     val currentJoule = 0.5 * (data.selectedWeight.toDouble() / 1000.0) * speedMps.pow(2.0)
@@ -387,6 +399,13 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         )
     }
 
+    val chartBgColor = if (isLight) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.Black
+    val greenColor = if (isLight) Color(0xFF1B5E20) else Color(0xFF88FF11)
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val redColor = if (isLight) Color(0xFFB71C1C) else Color.Red
+    val cyanColor = if (isLight) Color(0xFF006064) else Color.Cyan
+    val yellowColor = if (isLight) Color(0xFFFBC02D) else Color.Yellow
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -399,10 +418,10 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             Row(modifier = Modifier.fillMaxWidth().height(300.dp)) {
                 Card(
                     modifier = Modifier.weight(1f).fillMaxHeight(),
-                    colors = CardDefaults.cardColors(containerColor = Color.Black)
+                    colors = CardDefaults.cardColors(containerColor = chartBgColor)
                 ) {
                     Column(Modifier.padding(8.dp).fillMaxSize()) {
-                        Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         TrajectoryCanvas(
                             trajectory = trajectory, 
                             targetDistance = targetDistance,
@@ -416,10 +435,10 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Card(
                     modifier = Modifier.weight(1f).fillMaxHeight(),
-                    colors = CardDefaults.cardColors(containerColor = Color.Black)
+                    colors = CardDefaults.cardColors(containerColor = chartBgColor)
                 ) {
                     Column(Modifier.padding(8.dp).fillMaxSize()) {
-                        Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         TargetViewCanvas(trajectory = trajectory, targetDistance = targetDistance, targetHeightM = targetHeight)
                     }
                 }
@@ -427,10 +446,10 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         } else {
             Card(
                 modifier = Modifier.fillMaxWidth().height(200.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Black)
+                colors = CardDefaults.cardColors(containerColor = chartBgColor)
             ) {
                 Column(Modifier.padding(8.dp).fillMaxSize()) {
-                    Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                    Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     TrajectoryCanvas(
                         trajectory = trajectory, 
                         targetDistance = targetDistance,
@@ -444,10 +463,10 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             Spacer(modifier = Modifier.height(16.dp))
             Card(
                 modifier = Modifier.fillMaxWidth().height(250.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Black)
+                colors = CardDefaults.cardColors(containerColor = chartBgColor)
             ) {
                 Column(Modifier.padding(8.dp).fillMaxSize()) {
-                    Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                    Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     TargetViewCanvas(trajectory = trajectory, targetDistance = targetDistance, targetHeightM = targetHeight)
                 }
             }
@@ -476,8 +495,8 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                         }
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Rel. Impact: %.1f cm".format(res.relativeImpactCm), color = if (res.relativeImpactCm < 0) Color.Red else Color.Unspecified)
-                            Text("Hold-over: %.1f cm".format(res.holdOverCm), fontWeight = FontWeight.Bold, color = if (res.holdOverCm > 0) Color.Red else Color.Cyan)
+                            Text("Rel. Impact: %.1f cm".format(res.relativeImpactCm), color = if (res.relativeImpactCm < 0) redColor else Color.Unspecified)
+                            Text("Hold-over: %.1f cm".format(res.holdOverCm), fontWeight = FontWeight.Bold, color = if (res.holdOverCm > 0) redColor else cyanColor)
                         }
                     }
                 }
@@ -493,15 +512,15 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    StatItemSmall("Eff. Range", "%.1f m".format(effectiveRange), Color(0xFF88FF11))
-                    StatItemSmall("Max Range", "%.1f m".format(maxRange), Color.White)
-                    StatItemSmall("Hold-over", "%.1f cm".format(currentHoldOverCm), if (currentHoldOverCm > 0) Color.Red else Color.Cyan)
+                    StatItemSmall("Eff. Range", "%.1f m".format(effectiveRange), greenColor)
+                    StatItemSmall("Max Range", "%.1f m".format(maxRange), onSurfaceColor)
+                    StatItemSmall("Hold-over", "%.1f cm".format(currentHoldOverCm), if (currentHoldOverCm > 0) redColor else cyanColor)
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    StatItemSmall("Target E", "%.2f J".format(energyAtTarget), Color.White)
-                    StatItemSmall("Max Overhop", "%.1f cm".format(overhop * 100), Color.Yellow)
-                    StatItemSmall("OH Dist.", "%.1f m".format(overhopDist), Color.Cyan)
+                    StatItemSmall("Target E", "%.2f J".format(energyAtTarget), onSurfaceColor)
+                    StatItemSmall("Max Overhop", "%.1f cm".format(overhop * 100), onSurfaceColor)
+                    StatItemSmall("OH Dist.", "%.1f m".format(overhopDist), cyanColor)
                 }
             }
         }
@@ -566,7 +585,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Icon(
                     imageVector = if (coupleHeights) Icons.Default.Link else Icons.Default.LinkOff,
                     contentDescription = "Couple Heights",
-                    tint = if (coupleHeights) Color(0xFF88FF11) else Color.Gray
+                    tint = if (coupleHeights) greenColor else Color.Gray
                 )
             }
 
@@ -858,8 +877,17 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
 @Composable
 fun StatItemSmall(label: String, value: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        Text(text = value, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = color)
+        Text(
+            text = label, 
+            style = MaterialTheme.typography.labelSmall, 
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = value, 
+            style = MaterialTheme.typography.titleSmall, 
+            fontWeight = FontWeight.Bold, 
+            color = color
+        )
     }
 }
 
@@ -874,9 +902,13 @@ fun TrajectoryCanvas(
 ) {
     if (trajectory.isEmpty()) return
     
-    val chronoGreen = Color(0xFF88FF11)
-    val gridColor = Color.White.copy(alpha = 0.15f)
-    val aimLineColor = Color.Yellow.copy(alpha = 0.4f)
+    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    
+    val greenColor = if (isLight) Color(0xFF1B5E20) else Color(0xFF88FF11)
+    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    val labelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    val aimLineColor = if (isLight) Color(0xFFE55A16).copy(alpha = 0.6f) else Color.Yellow.copy(alpha = 0.4f)
+    val labelArgb = labelColor.toArgb()
     
     BoxWithConstraints(modifier = modifier) {
         Canvas(modifier = Modifier
@@ -934,8 +966,7 @@ fun TrajectoryCanvas(
                     xPos,
                     topMargin + graphHeight + 20.dp.toPx(),
                     android.graphics.Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        alpha = 150
+                        color = labelArgb
                         textSize = 10.sp.toPx()
                         textAlign = android.graphics.Paint.Align.CENTER
                     }
@@ -953,8 +984,7 @@ fun TrajectoryCanvas(
                     leftMargin - 10.dp.toPx(),
                     yPos + 4.dp.toPx(),
                     android.graphics.Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        alpha = 150
+                        color = labelArgb
                         textSize = 10.sp.toPx()
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
@@ -967,8 +997,7 @@ fun TrajectoryCanvas(
                 leftMargin - 10.dp.toPx(),
                 topMargin - 4.dp.toPx(),
                 android.graphics.Paint().apply {
-                    color = android.graphics.Color.WHITE
-                    alpha = 150
+                    color = labelArgb
                     textSize = 9.sp.toPx()
                     textAlign = android.graphics.Paint.Align.RIGHT
                 }
@@ -998,28 +1027,32 @@ fun TrajectoryCanvas(
                     }
                 }
             }
-            drawPath(path = path, color = chronoGreen, style = Stroke(width = 2.dp.toPx()))
+            drawPath(path = path, color = greenColor, style = Stroke(width = 2.dp.toPx()))
             
             val tx = leftMargin + (targetDistance.toFloat() / maxX) * graphWidth
             drawLine(Color.Red.copy(alpha = 0.3f), Offset(tx, topMargin), Offset(tx, topMargin + graphHeight), 1.dp.toPx())
             
             val ty = topMargin + graphHeight - (targetHeightM.toFloat() / rangeY) * graphHeight
             drawLine(
-                color = Color.Red,
+                color = if (isLight) Color(0xFFB71C1C) else Color.Red,
                 start = Offset(tx - 10.dp.toPx(), ty),
                 end = Offset(tx + 10.dp.toPx(), ty),
                 strokeWidth = 3.dp.toPx()
             )
             
-            drawLine(Color.White.copy(alpha = 0.3f), Offset(leftMargin, topMargin + graphHeight), Offset(leftMargin + graphWidth, topMargin + graphHeight), 1.dp.toPx())
+            drawLine(labelColor.copy(alpha = 0.3f), Offset(leftMargin, topMargin + graphHeight), Offset(leftMargin + graphWidth, topMargin + graphHeight), 1.dp.toPx())
         }
     }
 }
 
 @Composable
 fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, targetHeightM: Double) {
-    val chronoGreen = Color(0xFF88FF11)
-    val gridColor = Color.White.copy(alpha = 0.1f)
+    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    
+    val chronoGreen = if (isLight) Color(0xFF1B5E20) else Color(0xFF88FF11)
+    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
+    val crosshairColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+    val surfaceColor = MaterialTheme.colorScheme.surface
     
     val ptAtDist = trajectory.minByOrNull { abs(it.x - targetDistance) }
     val bbHeightM = ptAtDist?.y ?: 0.0
@@ -1031,7 +1064,7 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
         Surface(
             modifier = Modifier.size(200.dp).clip(CircleShape),
             color = Color.Transparent,
-            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.3f))
+            border = BorderStroke(2.dp, crosshairColor)
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val center = Offset(size.width / 2, size.height / 2)
@@ -1043,15 +1076,15 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
                     drawLine(gridColor, Offset(pos, 0f), Offset(pos, size.height), 1.dp.toPx())
                 }
 
-                drawLine(Color.White, Offset(0f, center.y), Offset(size.width, center.y), 1.dp.toPx())
-                drawLine(Color.White, Offset(center.x, 0f), Offset(center.x, size.height), 1.dp.toPx())
+                drawLine(crosshairColor, Offset(0f, center.y), Offset(size.width, center.y), 1.dp.toPx())
+                drawLine(crosshairColor, Offset(center.x, 0f), Offset(center.x, size.height), 1.dp.toPx())
                 
                 val scale = 5f 
                 val impactY = center.y - (relativeImpactCm.toFloat() * scale)
                 
                 if (impactY in 0f..size.height) {
                     drawCircle(chronoGreen, 6.dp.toPx(), Offset(center.x, impactY))
-                    drawCircle(Color.White, 2.dp.toPx(), Offset(center.x, impactY))
+                    drawCircle(surfaceColor, 2.dp.toPx(), Offset(center.x, impactY))
                 }
             }
         }
@@ -1060,10 +1093,11 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val redColor = if (isLight) Color(0xFFB71C1C) else Color.Red
             Text(
                 text = if (relativeImpactCm >= 0) "HIT: %.1f cm ABOVE".format(relativeImpactCm) 
                        else "HIT: %.1f cm BELOW".format(abs(relativeImpactCm)),
-                color = if (relativeImpactCm >= 0) chronoGreen else Color.Red,
+                color = if (relativeImpactCm >= 0) chronoGreen else redColor,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold)
         }

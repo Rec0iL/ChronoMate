@@ -370,10 +370,10 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     canvas.drawText("m/s", graphLeft - 5f, graphTop - 5f, labelPaint)
                     canvas.drawText("SHOT #", graphLeft + graphWidth/2, graphTop + graphHeight + 25f, labelPaint.apply { textAlign = Paint.Align.CENTER })
 
-                    // Draw Average Line (Yellow)
+                    // Draw Average Line (Orange)
                     val avgY = graphTop + graphHeight - ((avg - displayMin) / displayRange) * graphHeight
                     val avgLinePaint = Paint().apply {
-                        color = Color.YELLOW
+                        color = Color.parseColor("#E55A16")
                         strokeWidth = 1f
                         pathEffect = DashPathEffect(floatArrayOf(5f, 5f), 0f)
                         style = Paint.Style.STROKE
