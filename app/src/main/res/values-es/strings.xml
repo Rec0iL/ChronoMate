@@ -1,0 +1,85 @@
+<resources>
+    <string name="app_name">ChronoMate</string>
+    <string name="dashboard">Panel</string>
+    <string name="orga_chrono">Chrono Orga</string>
+    <string name="trajectory">Trayectoria</string>
+    <string name="history">Historial</string>
+    <string name="export">Exportar</string>
+    <string name="settings">Ajustes</string>
+    
+    <string name="bb_weight_label">PESO BB (g)</string>
+    <string name="velocity_trend">TENDENCIA VELOCIDAD</string>
+    <string name="no_shots_yet">No hay disparos registrados</string>
+    
+    <string name="joule_grid_title">Tabla de Referencia Joule</string>
+    <string name="latest_shot">ÚLTIMO DISPARO</string>
+    <string name="max_practical_weight">PESO PRÁCTICO MÁXIMO PERMITIDO</string>
+    <string name="room_to_limit">con %.1f%% de margen al límite</string>
+    <string name="over_limit">FUERA DE LÍMITE</string>
+    <string name="too_hot_for_20">Demasiado potente incluso para 0.20g</string>
+    <string name="orga_limits">Límites Orga</string>
+    <string name="max_allowed_joule_label">Julios Máximos Permitidos (J)</string>
+    
+    <string name="trajectory_sim">Simulación de Trayectoria</string>
+    <string name="side_view_label">VISTA LATERAL (m/cm) - TOCA PARA INFO</string>
+    <string name="target_view_label">VISTA OBJETIVO (@ %.0f m)</string>
+    <string name="optimization_limit">Límite de Optimización</string>
+    <string name="max_overhop">Overhop Máx: %.0f cm</string>
+    <string name="optimize_hopup">OPTIMIZAR HOP-UP</string>
+    <string name="powered_by">Calculadora balística proporcionada por GWC Airsoft Team Leipzig.</string>
+    
+    <string name="export_session">Exportar Informe de Sesión</string>
+    <string name="export_desc">Genera un informe PDF profesional de tu sesión actual.</string>
+    <string name="report_settings">AJUSTES DEL INFORME</string>
+    <string name="shots_to_include">Disparos a incluir</string>
+    <string name="includes_desc">Incluye: Lista de disparos, peso, velocidad, energía, estadísticas min/max/avg y gráfico de tendencia.</string>
+    <string name="generate_pdf">GENERAR INFORME PDF</string>
+    <string name="no_shots_session">No hay disparos registrados en esta sesión.</string>
+    
+    <string name="no_history">Historial no disponible</string>
+    
+    <string name="general_settings">Ajustes Generales</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="dark_mode_desc">Cambiar entre tema claro y oscuro</string>
+    <string name="language">Idioma</string>
+    <string name="restart_required_desc">Reinicio requerido para aplicar el idioma</string>
+    <string name="ballistics_engine_params">Parámetros del Motor Balístico</string>
+    <string name="fine_tune_physics">Ajuste fino de las constantes físicas</string>
+
+    <string name="stat_average">PROMEDIO</string>
+    <string name="stat_max">MÁX</string>
+    <string name="stat_min">MÍN</string>
+    <string name="stat_es">DIFERENCIA MÁX (ES)</string>
+    <string name="stat_sd">DESVIACIÓN ESTÁNDAR</string>
+    <string name="stat_rof">CADENCIA (ROF)</string>
+    <string name="stat_eff_range">Alcance Efec.</string>
+    <string name="stat_max_range">Alcance Máx.</string>
+    <string name="stat_hold_over">Compensación (Hold-over)</string>
+    <string name="stat_target_e">Energía en Objetivo</string>
+    <string name="stat_max_oh">Overhop Máx.</string>
+    <string name="stat_oh_dist">Distancia OH</string>
+
+    <string name="ballistic_diameter">Diámetro (mm)</string>
+    <string name="ballistic_air_density">Densidad Aire (rho)</string>
+    <string name="ballistic_drag_coeff">Coef. Resistencia (Cw)</string>
+    <string name="ballistic_magnus_coeff">Coef. Magnus (K)</string>
+    <string name="ballistic_spin_damping">Amortiguación Rotación (Cr)</string>
+    <string name="ballistic_gravity">Gravedad (m/s²)</string>
+
+    <string name="target_distance_label">Distancia al Objetivo: %.0f m</string>
+    <string name="shooter_h_label">Altura Tirador (m)</string>
+    <string name="target_h_label">Altura Objetivo (m)</string>
+    <string name="speed_label">Velocidad: %.1f m/s</string>
+    <string name="energy_label">Energía: %.2f J</string>
+    <string name="hopup_label">Hop-Up: %.0f rad/s</string>
+    <string name="sight_h_label">Altura de Miras: %.1f cm</string>
+
+    <string name="hit_above">IMPACTO: %.1f cm ARRIBA</string>
+    <string name="hit_below">IMPACTO: %.1f cm ABAJO</string>
+    <string name="probe_dist">Dist: %.1f m</string>
+    <string name="probe_time">Tiempo: %.2f s</string>
+    <string name="probe_height">Altura: %.1f cm</string>
+    <string name="probe_energy">Energía: %.2f J</string>
+    <string name="probe_rel_impact">Impacto Rel.: %.1f cm</string>
+    <string name="probe_holdover">Compensación: %.1f cm</string>
+</resources>

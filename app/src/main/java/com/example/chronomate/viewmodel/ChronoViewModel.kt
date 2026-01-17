@@ -1,6 +1,5 @@
 package com.example.chronomate.viewmodel
 
-import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
@@ -8,10 +7,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.net.wifi.WifiNetworkSpecifier
-import android.os.Build
 import android.os.Environment
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,52 +27,72 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 class ChronoViewModel(context: Context) : ViewModel() {
-    private val prefs = context.getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
-    
-    private val _uiState = MutableStateFlow(ChronoData(
-        selectedWeight = prefs.getFloat("default_weight", 0.20f),
-        isDarkMode = prefs.getBoolean("is_dark_mode", true),
-        maxAllowedJoule = prefs.getFloat("max_allowed_joule", 1.5f),
-        maxAllowedOverhopCm = prefs.getFloat("max_allowed_overhop", 15.0f),
-        diameterMm = prefs.getFloat("diameterMm", 5.95f),
-        airDensityRho = prefs.getFloat("airDensityRho", 1.225f),
-        dragCoefficientCw = prefs.getFloat("dragCoefficientCw", 0.35f),
-        magnusCoefficientK = prefs.getFloat("magnusCoefficientK", 0.002f),
-        spinDampingCr = prefs.getFloat("spinDampingCr", 0.01f),
-        gravity = prefs.getFloat("gravity", 9.81f)
-    ))
+    private val _uiState = MutableStateFlow(ChronoData())
     val uiState = _uiState.asStateFlow()
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(3, TimeUnit.SECONDS)
-        .readTimeout(3, TimeUnit.SECONDS)
+        .connectTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
         .build()
-    private val url = "http://8.8.8.8/"
 
     private var lastSeenRawShots = emptyList<Float>()
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private val url = "http://192.168.1.1"
 
     init {
         startPolling()
+        loadPreferences(context)
+    }
+
+    private fun loadPreferences(context: Context) {
+        val prefs = context.getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
+        _uiState.update { it.copy(
+            isDarkMode = prefs.getBoolean("dark_mode", true),
+            language = prefs.getString("language", "en") ?: "en",
+            maxAllowedJoule = prefs.getFloat("max_joule", 1.5f),
+            maxAllowedOverhopCm = prefs.getFloat("max_overhop", 15f),
+            diameterMm = prefs.getFloat("diameter", 5.95f),
+            airDensityRho = prefs.getFloat("air_density", 1.225f),
+            dragCoefficientCw = prefs.getFloat("drag_coeff", 0.35f),
+            magnusCoefficientK = prefs.getFloat("magnus_coeff", 0.002f),
+            spinDampingCr = prefs.getFloat("spin_damping", 0.01f),
+            gravity = prefs.getFloat("gravity", 9.81f)
+        ) }
+    }
+
+    private fun savePreference(context: Context, key: String, value: Any) {
+        val prefs = context.getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
+        with(prefs.edit()) {
+            when (value) {
+                is Boolean -> putBoolean(key, value)
+                is Float -> putFloat(key, value)
+                is String -> putString(key, value)
+            }
+            apply()
+        }
     }
 
     fun toggleDarkMode(enabled: Boolean) {
-        prefs.edit().putBoolean("is_dark_mode", enabled).apply()
         _uiState.update { it.copy(isDarkMode = enabled) }
     }
 
+    fun setLanguage(context: Context, langCode: String) {
+        _uiState.update { it.copy(language = langCode) }
+        savePreference(context, "language", langCode)
+    }
+
+    fun setWeight(weight: Float) {
+        _uiState.update { it.copy(selectedWeight = weight) }
+    }
+
     fun setMaxAllowedJoule(joule: Float) {
-        prefs.edit().putFloat("max_allowed_joule", joule).apply()
         _uiState.update { it.copy(maxAllowedJoule = joule) }
     }
 
     fun setMaxAllowedOverhop(cm: Float) {
-        prefs.edit().putFloat("max_allowed_overhop", cm).apply()
         _uiState.update { it.copy(maxAllowedOverhopCm = cm) }
     }
 
@@ -88,9 +104,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
         spinDampingCr: Float? = null,
         gravity: Float? = null
     ) {
-        val editor = prefs.edit()
         _uiState.update { current ->
-            val newState = current.copy(
+            current.copy(
                 diameterMm = diameterMm ?: current.diameterMm,
                 airDensityRho = airDensityRho ?: current.airDensityRho,
                 dragCoefficientCw = dragCoefficientCw ?: current.dragCoefficientCw,
@@ -98,69 +113,26 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 spinDampingCr = spinDampingCr ?: current.spinDampingCr,
                 gravity = gravity ?: current.gravity
             )
-            
-            diameterMm?.let { editor.putFloat("diameterMm", it) }
-            airDensityRho?.let { editor.putFloat("airDensityRho", it) }
-            dragCoefficientCw?.let { editor.putFloat("dragCoefficientCw", it) }
-            magnusCoefficientK?.let { editor.putFloat("magnusCoefficientK", it) }
-            spinDampingCr?.let { editor.putFloat("spinDampingCr", it) }
-            gravity?.let { editor.putFloat("gravity", it) }
-            editor.apply()
-            
-            newState
         }
     }
 
     fun connectToChronoWifi(context: Context) {
-        try {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            
-            networkCallback?.let { 
-                try { connectivityManager.unregisterNetworkCallback(it) } catch (e: Exception) {}
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val request = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
+
+        connectivityManager.requestNetwork(request, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                connectivityManager.bindProcessToNetwork(network)
+                _uiState.update { it.copy(wifiStatus = "Connected to Chrono") }
             }
 
-            val specifier = WifiNetworkSpecifier.Builder()
-                .setSsid("HT-X3000")
-                .setWpa2Passphrase("88888888")
-                .build()
-
-            val request = NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .setNetworkSpecifier(specifier)
-                .build()
-
-            _uiState.update { it.copy(wifiStatus = "Connecting...") }
-
-            val callback = object : ConnectivityManager.NetworkCallback() {
-                override fun onAvailable(network: Network) {
-                    connectivityManager.bindProcessToNetwork(network)
-                    _uiState.update { it.copy(wifiStatus = "Connected to Chrono") }
-                }
-
-                override fun onLost(network: Network) {
-                    connectivityManager.bindProcessToNetwork(null)
-                    _uiState.update { it.copy(wifiStatus = "Disconnected") }
-                }
-
-                override fun onUnavailable() {
-                    _uiState.update { it.copy(wifiStatus = "Connection Failed") }
-                }
+            override fun onLost(network: Network) {
+                connectivityManager.bindProcessToNetwork(null)
+                _uiState.update { it.copy(wifiStatus = "Disconnected", isConnected = false) }
             }
-            
-            networkCallback = callback
-            connectivityManager.requestNetwork(request, callback)
-        } catch (e: Exception) {
-            _uiState.update { it.copy(wifiStatus = "Error: ${e.message}") }
-        }
-    }
-
-    fun setWeight(weight: Float) {
-        _uiState.update { it.copy(selectedWeight = weight) }
-    }
-
-    fun saveDefaultWeight(weight: Float) {
-        prefs.edit().putFloat("default_weight", weight).apply()
-        setWeight(weight)
+        })
     }
 
     private fun startPolling() {
@@ -217,6 +189,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         if (lastSeenRawShots.size >= i && lastSeenRawShots.takeLast(i) == head) {
                             newShotsToAdd = rawShots.drop(i)
                             break
+                        } else if (head.isEmpty() && i == 0) {
+                            newShotsToAdd = rawShots
                         }
                     }
                 }
@@ -406,7 +380,6 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     canvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
                     
                     y += 35f
-                    var pageFinished = false
                     val reversedShots = shotsToExport.asReversed()
                     for (index in reversedShots.indices) {
                         val shot = reversedShots[index]
@@ -416,44 +389,19 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         canvas.drawText("%.1f".format(shot.velocity), 250f, y, bodyPaint)
                         canvas.drawText("%.2f".format(shot.energyJoules), 450f, y, bodyPaint)
                         y += 20f
-                        
-                        if (y > 780f && index < shotsToExport.size - 1) {
-                            pdfDocument.finishPage(page)
-                            pageFinished = true
-                            break
-                        }
                     }
 
-                    if (!pageFinished) {
-                        pdfDocument.finishPage(page)
-                    }
+                    pdfDocument.finishPage(page)
 
-                    val fileName = "ChronoMate_Report_${System.currentTimeMillis()}.pdf"
-                    
-                    val resolver = context.contentResolver
-                    val contentValues = ContentValues().apply {
-                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
-                        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/ChronoMate")
-                    }
+                    val file = File(
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                        "ChronoMate_Report_${System.currentTimeMillis()}.pdf"
+                    )
+                    pdfDocument.writeTo(FileOutputStream(file))
+                    pdfDocument.close()
 
-                    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-                    if (uri != null) {
-                        resolver.openOutputStream(uri)?.use { outputStream ->
-                            pdfDocument.writeTo(outputStream)
-                        }
-                        pdfDocument.close()
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Report saved to Downloads/ChronoMate", Toast.LENGTH_LONG).show()
-                        }
-                    } else {
-                        // Fallback to app-specific if MediaStore fails
-                        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
-                        pdfDocument.writeTo(FileOutputStream(file))
-                        pdfDocument.close()
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Saved to app folder (Downloads failed)", Toast.LENGTH_LONG).show()
-                        }
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "PDF saved to Downloads", Toast.LENGTH_LONG).show()
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
@@ -462,10 +410,5 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 }
             }
         }
-    }
-    
-    override fun onCleared() {
-        super.onCleared()
-        networkCallback = null
     }
 }

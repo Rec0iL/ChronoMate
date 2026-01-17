@@ -6,15 +6,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.ui.components.HeroSection
 import com.example.chronomate.ui.components.ShotChart
@@ -34,7 +34,7 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
             .verticalScroll(scrollState)
     ) {
         Text(
-            text = "BB WEIGHT (g)",
+            text = stringResource(R.string.bb_weight_label),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
@@ -64,7 +64,7 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1.2f)) {
                     Text(
-                        text = "VELOCITY TREND",
+                        text = stringResource(R.string.velocity_trend),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
@@ -81,7 +81,7 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
                 if (data.shots.isNotEmpty()) {
                     Text(
-                        text = "VELOCITY TREND",
+                        text = stringResource(R.string.velocity_trend),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
@@ -90,7 +90,7 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     ShotChart(shots = data.shots, modifier = Modifier.height(200.dp).fillMaxWidth())
                 } else {
                     Box(modifier = Modifier.height(100.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("No shots recorded yet", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.no_shots_yet), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

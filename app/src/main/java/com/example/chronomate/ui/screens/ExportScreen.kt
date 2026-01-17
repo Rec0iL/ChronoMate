@@ -12,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.viewmodel.ChronoViewModel
 
@@ -38,9 +40,9 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Export Session Report", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.export_session), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         Text(
-            "Generate a professional PDF report of your current session.",
+            stringResource(R.string.export_desc),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -55,7 +57,7 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    "REPORT SETTINGS",
+                    stringResource(R.string.report_settings),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -67,7 +69,7 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Shots to include", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.shots_to_include), style = MaterialTheme.typography.bodyLarge)
                     Text(
                         text = shotCount.toString(),
                         style = MaterialTheme.typography.titleLarge,
@@ -84,7 +86,7 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 )
                 
                 Text(
-                    "Includes: Full shot list, weight, velocity, energy, min/max/avg stats, and energy trend graph.",
+                    stringResource(R.string.includes_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -101,13 +103,13 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
         ) {
             Icon(Icons.Default.FileDownload, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("GENERATE PDF REPORT", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.generate_pdf), fontWeight = FontWeight.Bold)
         }
 
         if (data.shots.isEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "No shots recorded in this session yet.",
+                stringResource(R.string.no_shots_session),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.error
             )

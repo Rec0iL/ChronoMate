@@ -3,6 +3,7 @@ package com.example.chronomate.model
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.chronomate.R
 import kotlin.math.pow
 
 data class Shot(
@@ -26,6 +27,7 @@ data class ChronoData(
     val currentEnergy: Float = 0f,
     val wifiStatus: String = "Disconnected",
     val isDarkMode: Boolean = true,
+    val language: String = "en",
     val maxAllowedJoule: Float = 1.5f,
     val maxAllowedOverhopCm: Float = 15.0f,
     
@@ -38,11 +40,11 @@ data class ChronoData(
     val gravity: Float = 9.81f
 )
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    object Dashboard : Screen("dashboard", "Dashboard", Icons.Default.Home)
-    object OrgaChrono : Screen("orga_chrono", "Orga Chrono", Icons.Default.Shield)
-    object Trajectory : Screen("trajectory", "Trajectory", Icons.Default.Timeline)
-    object History : Screen("history", "History", Icons.Default.History)
-    object Export : Screen("export", "Export", Icons.Default.PictureAsPdf)
-    object Settings : Screen("settings", "Settings", Icons.Default.Settings)
+sealed class Screen(val route: String, val titleResId: Int, val icon: ImageVector) {
+    object Dashboard : Screen("dashboard", R.string.dashboard, Icons.Default.Home)
+    object OrgaChrono : Screen("orga_chrono", R.string.orga_chrono, Icons.Default.Shield)
+    object Trajectory : Screen("trajectory", R.string.trajectory, Icons.Default.Timeline)
+    object History : Screen("history", R.string.history, Icons.Default.History)
+    object Export : Screen("export", R.string.export, Icons.Default.PictureAsPdf)
+    object Settings : Screen("settings", R.string.settings, Icons.Default.Settings)
 }

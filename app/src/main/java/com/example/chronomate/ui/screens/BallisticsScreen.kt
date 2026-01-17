@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chronomate.R
 import com.example.chronomate.ballistics.BallisticsEngine
 import com.example.chronomate.model.BallisticParams
 import com.example.chronomate.model.ChronoData
@@ -186,7 +188,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             .padding(horizontal = 16.dp)
             .verticalScroll(scrollState)
     ) {
-        Text("Trajectory Simulation", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 16.dp))
+        Text(stringResource(R.string.trajectory_sim), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 16.dp))
         
         if (isLandscape) {
             Row(modifier = Modifier.fillMaxWidth().height(300.dp)) {
@@ -195,7 +197,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     colors = CardDefaults.cardColors(containerColor = chartBgColor)
                 ) {
                     Column(Modifier.padding(8.dp).fillMaxSize()) {
-                        Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.side_view_label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         TrajectoryCanvas(
                             trajectory = trajectory, 
                             targetDistance = targetDistance,
@@ -212,7 +214,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     colors = CardDefaults.cardColors(containerColor = chartBgColor)
                 ) {
                     Column(Modifier.padding(8.dp).fillMaxSize()) {
-                        Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.target_view_label).format(targetDistance), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         TargetViewCanvas(trajectory = trajectory, targetDistance = targetDistance, targetHeightM = targetHeight)
                     }
                 }
@@ -223,7 +225,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 colors = CardDefaults.cardColors(containerColor = chartBgColor)
             ) {
                 Column(Modifier.padding(8.dp).fillMaxSize()) {
-                    Text("SIDE VIEW (m/cm) - TAP TO PROBE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.side_view_label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     TrajectoryCanvas(
                         trajectory = trajectory, 
                         targetDistance = targetDistance,
@@ -240,7 +242,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 colors = CardDefaults.cardColors(containerColor = chartBgColor)
             ) {
                 Column(Modifier.padding(8.dp).fillMaxSize()) {
-                    Text("TARGET VIEW (@ %.0f m)".format(targetDistance), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.target_view_label).format(targetDistance), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     TargetViewCanvas(trajectory = trajectory, targetDistance = targetDistance, targetHeightM = targetHeight)
                 }
             }
@@ -259,18 +261,18 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Dist: %.1f m".format(res.distance), fontWeight = FontWeight.Bold)
-                            Text("Time: %.2f s".format(res.timeS))
+                            Text(stringResource(R.string.probe_dist).format(res.distance), fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.probe_time).format(res.timeS))
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Height: %.1f cm".format(res.bbHeightCm), style = MaterialTheme.typography.bodySmall)
-                            Text("Energy: %.2f J".format(res.energyJ), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.probe_height).format(res.bbHeightCm), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.probe_energy).format(res.energyJ), style = MaterialTheme.typography.bodySmall)
                         }
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Rel. Impact: %.1f cm".format(res.relativeImpactCm), color = if (res.relativeImpactCm < 0) redColor else Color.Unspecified)
-                            Text("Hold-over: %.1f cm".format(res.holdOverCm), fontWeight = FontWeight.Bold, color = if (res.holdOverCm > 0) redColor else cyanColor)
+                            Text(stringResource(R.string.probe_rel_impact).format(res.relativeImpactCm), color = if (res.relativeImpactCm < 0) redColor else Color.Unspecified)
+                            Text(stringResource(R.string.probe_holdover).format(res.holdOverCm), fontWeight = FontWeight.Bold, color = if (res.holdOverCm > 0) redColor else cyanColor)
                         }
                     }
                 }
@@ -286,15 +288,15 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    StatItemSmall("Eff. Range", "%.1f m".format(effectiveRange), greenColor)
-                    StatItemSmall("Max Range", "%.1f m".format(maxRange), onSurfaceColor)
-                    StatItemSmall("Hold-over", "%.1f cm".format(currentHoldOverCm), if (currentHoldOverCm > 0) redColor else cyanColor)
+                    StatItemSmall(stringResource(R.string.stat_eff_range), "%.1f m".format(effectiveRange), greenColor)
+                    StatItemSmall(stringResource(R.string.stat_max_range), "%.1f m".format(maxRange), onSurfaceColor)
+                    StatItemSmall(stringResource(R.string.stat_hold_over), "%.1f cm".format(currentHoldOverCm), if (currentHoldOverCm > 0) redColor else cyanColor)
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    StatItemSmall("Target E", "%.2f J".format(energyAtTarget), onSurfaceColor)
-                    StatItemSmall("Max Overhop", "%.1f cm".format(overhop * 100), onSurfaceColor)
-                    StatItemSmall("OH Dist.", "%.1f m".format(overhopDist), cyanColor)
+                    StatItemSmall(stringResource(R.string.stat_target_e), "%.2f J".format(energyAtTarget), onSurfaceColor)
+                    StatItemSmall(stringResource(R.string.stat_max_oh), "%.1f cm".format(overhop * 100), onSurfaceColor)
+                    StatItemSmall(stringResource(R.string.stat_oh_dist), "%.1f m".format(overhopDist), cyanColor)
                 }
             }
         }
@@ -302,7 +304,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "BB WEIGHT (g)",
+            text = stringResource(R.string.bb_weight_label),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
@@ -324,7 +326,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Target Distance: %.0f m".format(targetDistance), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.target_distance_label).format(targetDistance), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
         Slider(value = targetDistance.toFloat(), onValueChange = { targetDistance = it.toDouble() }, valueRange = 5f..100f)
 
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -340,7 +342,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                         }
                     }
                 },
-                label = { Text("Shooter H (m)") },
+                label = { Text(stringResource(R.string.shooter_h_label)) },
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true
@@ -375,7 +377,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                         }
                     }
                 },
-                label = { Text("Target H (m)") },
+                label = { Text(stringResource(R.string.target_h_label)) },
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true
@@ -386,7 +388,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Speed: %.1f m/s".format(speedMps), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.speed_label).format(speedMps), style = MaterialTheme.typography.labelMedium)
                 Slider(
                     value = speedMps.toFloat(), 
                     onValueChange = { speedMps = it.toDouble() }, 
@@ -395,7 +397,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text("Energy: %.2f J".format(currentJoule), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.energy_label).format(currentJoule), style = MaterialTheme.typography.labelMedium)
                 Slider(
                     value = currentJoule.toFloat(),
                     onValueChange = { newJoule ->
@@ -408,12 +410,12 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Hop-Up: %.0f rad/s".format(hopUp), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.hopup_label).format(hopUp), style = MaterialTheme.typography.labelMedium)
                 Slider(value = hopUp.toFloat(), onValueChange = { hopUp = it.toDouble() }, valueRange = 0f..2000f)
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text("Sight Height: %.1f cm".format(sightHeight), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.sight_h_label).format(sightHeight), style = MaterialTheme.typography.labelMedium)
                 Slider(value = sightHeight.toFloat(), onValueChange = { sightHeight = it.toDouble() }, valueRange = 0f..10f)
             }
         }
@@ -430,8 +432,8 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Optimization Limit", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-                    Text("Max Overhop: %.0f cm".format(data.maxAllowedOverhopCm), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.optimization_limit), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.max_overhop).format(data.maxAllowedOverhopCm), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 Row {
                     IconButton(onClick = { viewModel.setMaxAllowedOverhop((data.maxAllowedOverhopCm - 1).coerceAtLeast(1f)) }) {
@@ -512,14 +514,15 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             ) {
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("OPTIMIZE HOP-UP", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.optimize_hopup), color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         val annotatedString = buildAnnotatedString {
-            append("Ballistic calculator powered by GWC Airsoft Team Leipzig.\n")
+            append(stringResource(R.string.powered_by))
+            append("\n")
             pushStringAnnotation(tag = "URL", annotation = "https://gwc-leipzig.de/")
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline)) {
                 append("https://gwc-leipzig.de/")
@@ -769,9 +772,10 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val redColor = if (isLight) Color(0xFFB71C1C) else Color.Red
+            val hitText = if (relativeImpactCm >= 0) stringResource(R.string.hit_above).format(relativeImpactCm) 
+                          else stringResource(R.string.hit_below).format(abs(relativeImpactCm))
             Text(
-                text = if (relativeImpactCm >= 0) "HIT: %.1f cm ABOVE".format(relativeImpactCm) 
-                       else "HIT: %.1f cm BELOW".format(abs(relativeImpactCm)),
+                text = hitText,
                 color = if (relativeImpactCm >= 0) chronoGreen else redColor,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold)

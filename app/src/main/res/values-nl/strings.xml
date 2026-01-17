@@ -1,0 +1,85 @@
+<resources>
+    <string name="app_name">ChronoMate</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="orga_chrono">Orga Chrono</string>
+    <string name="trajectory">Traject</string>
+    <string name="history">Geschiedenis</string>
+    <string name="export">Exporteren</string>
+    <string name="settings">Instellingen</string>
+    
+    <string name="bb_weight_label">BB GEWICHT (g)</string>
+    <string name="velocity_trend">SNELHEIDSTREND</string>
+    <string name="no_shots_yet">Nog geen schoten geregistreerd</string>
+    
+    <string name="joule_grid_title">Joule Referentie Overzicht</string>
+    <string name="latest_shot">LAATSTE SCHOT</string>
+    <string name="max_practical_weight">MAXIMAAL TOEGESTAAN PRAKTISCH GEWICHT</string>
+    <string name="room_to_limit">met %.1f%% ruimte tot limiet</string>
+    <string name="over_limit">BOVEN LIMIET</string>
+    <string name="too_hot_for_20">Te krachtig, zelfs voor 0.20g</string>
+    <string name="orga_limits">Orga Limieten</string>
+    <string name="max_allowed_joule_label">Max Toegestane Joule (J)</string>
+    
+    <string name="trajectory_sim">Traject Simulatie</string>
+    <string name="side_view_label">ZIJAANZICHT (m/cm) - TIK VOOR DETAILS</string>
+    <string name="target_view_label">DOELAANZICHT (@ %.0f m)</string>
+    <string name="optimization_limit">Optimalisatie Limiet</string>
+    <string name="max_overhop">Max Overhop: %.0f cm</string>
+    <string name="optimize_hopup">OPTIMALISEER HOP-UP</string>
+    <string name="powered_by">Ballistische calculator mede mogelijk gemaakt door GWC Airsoft Team Leipzig.</string>
+    
+    <string name="export_session">Sessierapport Exporteren</string>
+    <string name="export_desc">Genereer een professioneel PDF-rapport van uw huidige sessie.</string>
+    <string name="report_settings">RAPPORT INSTELLINGEN</string>
+    <string name="shots_to_include">Aantal schoten</string>
+    <string name="includes_desc">Inclusief: Volledige schotenlijst, gewicht, snelheid, energie, min/max/gem stats en energiegrafiek.</string>
+    <string name="generate_pdf">GENEREER PDF RAPPORT</string>
+    <string name="no_shots_session">Nog geen schoten geregistreerd in deze sessie.</string>
+    
+    <string name="no_history">Geen geschiedenis beschikbaar</string>
+    
+    <string name="general_settings">Algemene Instellingen</string>
+    <string name="dark_mode">Donkere Modus</string>
+    <string name="dark_mode_desc">Wissel tussen licht en donker thema</string>
+    <string name="language">Taal</string>
+    <string name="restart_required_desc">Herstart vereist om taalwijziging toe te passen</string>
+    <string name="ballistics_engine_params">Ballistiek Engine Parameters</string>
+    <string name="fine_tune_physics">Fijnafstelling van de natuurkundige constanten</string>
+
+    <string name="stat_average">GEMIDDELDE</string>
+    <string name="stat_max">MAX</string>
+    <string name="stat_min">MIN</string>
+    <string name="stat_es">EXTREME SPREAD</string>
+    <string name="stat_sd">STANDAARDDEVIATIE</string>
+    <string name="stat_rof">ROF</string>
+    <string name="stat_eff_range">Eff. Bereik</string>
+    <string name="stat_max_range">Max Bereik</string>
+    <string name="stat_hold_over">Correctie</string>
+    <string name="stat_target_e">Doel Energie</string>
+    <string name="stat_max_oh">Max Overhop</string>
+    <string name="stat_oh_dist">OH Afstand</string>
+
+    <string name="ballistic_diameter">Diameter (mm)</string>
+    <string name="ballistic_air_density">Luchtdichtheid (rho)</string>
+    <string name="ballistic_drag_coeff">Luchtweerstand (Cw)</string>
+    <string name="ballistic_magnus_coeff">Magnus Coëfficiënt (K)</string>
+    <string name="ballistic_spin_damping">Spin Damping (Cr)</string>
+    <string name="ballistic_gravity">Zwaartekracht (m/s²)</string>
+
+    <string name="target_distance_label">Doelafstand: %.0f m</string>
+    <string name="shooter_h_label">Schutter Hoogte (m)</string>
+    <string name="target_h_label">Doelhoogte (m)</string>
+    <string name="speed_label">Snelheid: %.1f m/s</string>
+    <string name="energy_label">Energie: %.2f J</string>
+    <string name="hopup_label">Hop-Up: %.0f rad/s</string>
+    <string name="sight_h_label">Vizierhoogte: %.1f cm</string>
+
+    <string name="hit_above">RAAK: %.1f cm BOVEN</string>
+    <string name="hit_below">RAAK: %.1f cm ONDER</string>
+    <string name="probe_dist">Afst: %.1f m</string>
+    <string name="probe_time">Tijd: %.2f s</string>
+    <string name="probe_height">Hoogte: %.1f cm</string>
+    <string name="probe_energy">Energie: %.2f J</string>
+    <string name="probe_rel_impact">Rel. Impact: %.1f cm</string>
+    <string name="probe_holdover">Correctie: %.1f cm</string>
+</resources>

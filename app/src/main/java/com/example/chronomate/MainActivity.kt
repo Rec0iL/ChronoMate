@@ -3,7 +3,6 @@ package com.example.chronomate
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,9 +45,19 @@ import com.example.chronomate.ui.screens.ExportScreen
 import com.example.chronomate.ui.theme.ChronoMateTheme
 import com.example.chronomate.viewmodel.ChronoViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Load and apply language before super.onCreate and setContent
+        val prefs = getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
+        val lang = prefs.getString("language", "en") ?: "en"
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -154,7 +164,7 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                     screens.forEach { screen ->
                         NavigationDrawerItem(
                             icon = { Icon(screen.icon, contentDescription = null) },
-                            label = { Text(screen.title) },
+                            label = { Text(stringResource(screen.titleResId)) },
                             selected = currentRoute == screen.route,
                             onClick = {
                                 currentRoute = screen.route
@@ -184,7 +194,7 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                             }
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text(currentScreen.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Text(stringResource(currentScreen.titleResId), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                                 Text(data.wifiStatus, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                             }
                         }

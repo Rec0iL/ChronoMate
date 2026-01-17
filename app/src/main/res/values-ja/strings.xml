@@ -1,0 +1,85 @@
+<resources>
+    <string name="app_name">ChronoMate</string>
+    <string name="dashboard">ダッシュボード</string>
+    <string name="orga_chrono">運営用弾速計</string>
+    <string name="trajectory">弾道</string>
+    <string name="history">履歴</string>
+    <string name="export">書き出し</string>
+    <string name="settings">設定</string>
+    
+    <string name="bb_weight_label">BB弾重量 (g)</string>
+    <string name="velocity_trend">初速トレンド</string>
+    <string name="no_shots_yet">記録されたショットはありません</string>
+    
+    <string name="joule_grid_title">ジュール参照表</string>
+    <string name="latest_shot">最新のショット</string>
+    <string name="max_practical_weight">最大許容実用重量</string>
+    <string name="room_to_limit">制限まで %.1f%% の余裕</string>
+    <string name="over_limit">制限超過</string>
+    <string name="too_hot_for_20">0.20gでもオーバーです</string>
+    <string name="orga_limits">運営制限</string>
+    <string name="max_allowed_joule_label">最大許容ジュール (J)</string>
+    
+    <string name="trajectory_sim">弾道シミュレーション</string>
+    <string name="side_view_label">側面図 (m/cm) - タップして詳細確認</string>
+    <string name="target_view_label">ターゲット図 (@ %.0f m)</string>
+    <string name="optimization_limit">最適化制限</string>
+    <string name="max_overhop">最大オーバーホップ: %.0f cm</string>
+    <string name="optimize_hopup">ホップアップ最適化</string>
+    <string name="powered_by">弾道計算提供：GWC Airsoft Team Leipzig</string>
+    
+    <string name="export_session">セッションレポートを書き出す</string>
+    <string name="export_desc">現在のセッションの専門的なPDFレポートを生成します。</string>
+    <string name="report_settings">レポート設定</string>
+    <string name="shots_to_include">含めるショット数</string>
+    <string name="includes_desc">内容：全ショットリスト、重量、初速、エネルギー、統計（最小/最大/平均）、トレンドグラフ</string>
+    <string name="generate_pdf">PDFレポートを生成</string>
+    <string name="no_shots_session">このセッションには記録されたショットがありません。</string>
+    
+    <string name="no_history">履歴はありません</string>
+    
+    <string name="general_settings">全般設定</string>
+    <string name="dark_mode">ダークモード</string>
+    <string name="dark_mode_desc">ライトテーマとダークテーマを切り替えます</string>
+    <string name="language">言語</string>
+    <string name="restart_required_desc">言語設定を適用するには再起動が必要です</string>
+    <string name="ballistics_engine_params">弾道エンジンパラメータ</string>
+    <string name="fine_tune_physics">物理シミュレーション定数の微調整</string>
+
+    <string name="stat_average">平均</string>
+    <string name="stat_max">最大</string>
+    <string name="stat_min">最小</string>
+    <string name="stat_es">ES (最大差)</string>
+    <string name="stat_sd">標準偏差</string>
+    <string name="stat_rof">連射速度</string>
+    <string name="stat_eff_range">有効射程</string>
+    <string name="stat_max_range">最大射程</string>
+    <string name="stat_hold_over">ホールドオーバー</string>
+    <string name="stat_target_e">標的エネルギー</string>
+    <string name="stat_max_oh">最大オーバーホップ</string>
+    <string name="stat_oh_dist">OH距離</string>
+
+    <string name="ballistic_diameter">直径 (mm)</string>
+    <string name="ballistic_air_density">空気密度 (rho)</string>
+    <string name="ballistic_drag_coeff">抗力係数 (Cw)</string>
+    <string name="ballistic_magnus_coeff">マグヌス係数 (K)</string>
+    <string name="ballistic_spin_damping">回転減衰 (Cr)</string>
+    <string name="ballistic_gravity">重力 (m/s²)</string>
+
+    <string name="target_distance_label">標的距離: %.0f m</string>
+    <string name="shooter_h_label">射手高度 (m)</string>
+    <string name="target_h_label">標的高さ (m)</string>
+    <string name="speed_label">速度: %.1f m/s</string>
+    <string name="energy_label">エネルギー: %.2f J</string>
+    <string name="hopup_label">ホップアップ: %.0f rad/s</string>
+    <string name="sight_h_label">照準器高さ: %.1f cm</string>
+
+    <string name="hit_above">命中: %.1f cm 上</string>
+    <string name="hit_below">命中: %.1f cm 下</string>
+    <string name="probe_dist">距離: %.1f m</string>
+    <string name="probe_time">時間: %.2f s</string>
+    <string name="probe_height">高度: %.1f cm</string>
+    <string name="probe_energy">エネルギー: %.2f J</string>
+    <string name="probe_rel_impact">相対弾着: %.1f cm</string>
+    <string name="probe_holdover">ホールドオーバー: %.1f cm</string>
+</resources>

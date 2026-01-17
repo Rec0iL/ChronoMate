@@ -9,6 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.ui.components.ShotRow
 
@@ -16,7 +18,7 @@ import com.example.chronomate.ui.components.ShotRow
 fun HistoryScreen(data: ChronoData) {
     if (data.shots.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No history available", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.no_history), style = MaterialTheme.typography.bodyLarge)
         }
     } else {
         LazyColumn(modifier = Modifier.fillMaxSize()) {

@@ -21,10 +21,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.Shot
 
@@ -336,7 +338,7 @@ fun HeroSection(data: ChronoData) {
             val contentColor = if (isLight) MaterialTheme.colorScheme.onPrimaryContainer else chronoGreen
             
             Text(
-                text = "LATEST SHOT",
+                text = stringResource(R.string.latest_shot),
                 style = MaterialTheme.typography.labelMedium,
                 color = contentColor.copy(alpha = 0.6f),
                 letterSpacing = 1.sp
@@ -374,18 +376,18 @@ fun StatsGrid(data: ChronoData) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
-                StatItem("AVERAGE", "%.1f".format(data.averageVelocity), Modifier.weight(1f))
-                StatItem("MAX", "%.1f".format(data.maxVelocity), Modifier.weight(1f))
-                StatItem("MIN", "%.1f".format(data.minVelocity), Modifier.weight(1f))
+                StatItem(stringResource(R.string.stat_average), "%.1f".format(data.averageVelocity), Modifier.weight(1f))
+                StatItem(stringResource(R.string.stat_max), "%.1f".format(data.maxVelocity), Modifier.weight(1f))
+                StatItem(stringResource(R.string.stat_min), "%.1f".format(data.minVelocity), Modifier.weight(1f))
             }
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
             )
             Row(modifier = Modifier.fillMaxWidth()) {
-                StatItem("EXTREME SPREAD", "%.1f".format(data.extremeSpread), Modifier.weight(1f))
-                StatItem("STANDARD DEVIATION", "%.2f".format(data.standardDeviation), Modifier.weight(1f))
-                StatItem("ROF", "${data.fireRate} r/m", Modifier.weight(1f))
+                StatItem(stringResource(R.string.stat_es), "%.1f".format(data.extremeSpread), Modifier.weight(1f))
+                StatItem(stringResource(R.string.stat_sd), "%.2f".format(data.standardDeviation), Modifier.weight(1f))
+                StatItem(stringResource(R.string.stat_rof), "${data.fireRate} r/m", Modifier.weight(1f))
             }
         }
     }

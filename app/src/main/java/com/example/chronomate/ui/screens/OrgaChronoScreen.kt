@@ -12,10 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.viewmodel.ChronoViewModel
 import kotlin.math.pow
@@ -50,7 +52,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(2.5f)) { 
-                    Text("Joule Reference Grid", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.joule_grid_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 4)
                 }
@@ -58,7 +60,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
         } else {
             OrgaHeroSection(data = data, practicalWeight = practicalWeight, sparePercentage = sparePercentage)
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Joule Reference Grid", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.joule_grid_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 2)
             Spacer(modifier = Modifier.height(24.dp))
@@ -142,7 +144,7 @@ fun OrgaHeroSection(data: ChronoData, practicalWeight: Float, sparePercentage: F
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "LATEST SHOT",
+                text = stringResource(R.string.latest_shot),
                 style = MaterialTheme.typography.labelMedium,
                 color = contentColor.copy(alpha = 0.6f)
             )
@@ -157,7 +159,7 @@ fun OrgaHeroSection(data: ChronoData, practicalWeight: Float, sparePercentage: F
                 color = contentColor.copy(alpha = 0.1f)
             )
             Text(
-                text = "MAX ALLOWED PRACTICAL WEIGHT",
+                text = stringResource(R.string.max_practical_weight),
                 style = MaterialTheme.typography.labelSmall,
                 color = contentColor.copy(alpha = 0.6f)
             )
@@ -169,19 +171,19 @@ fun OrgaHeroSection(data: ChronoData, practicalWeight: Float, sparePercentage: F
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "with %.1f%% room to limit".format(sparePercentage),
+                    text = stringResource(R.string.room_to_limit).format(sparePercentage),
                     style = MaterialTheme.typography.labelMedium,
                     color = contentColor.copy(alpha = 0.8f)
                 )
             } else {
                 Text(
-                    text = "OVER LIMIT",
+                    text = stringResource(R.string.over_limit),
                     fontSize = 32.sp,
                     color = if (isLight) Color(0xFFB71C1C) else Color.Red,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Too hot for even 0.20g",
+                    text = stringResource(R.string.too_hot_for_20),
                     style = MaterialTheme.typography.labelSmall,
                     color = (if (isLight) Color(0xFFB71C1C) else Color.Red).copy(alpha = 0.7f)
                 )
@@ -199,7 +201,7 @@ fun OrgaSettingsSection(data: ChronoData, viewModel: ChronoViewModel) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Orga Limits", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.orga_limits), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
                 value = textValue,
@@ -209,7 +211,7 @@ fun OrgaSettingsSection(data: ChronoData, viewModel: ChronoViewModel) {
                         viewModel.setMaxAllowedJoule(joule)
                     }
                 },
-                label = { Text("Max Allowed Joule (J)") },
+                label = { Text(stringResource(R.string.max_allowed_joule_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true

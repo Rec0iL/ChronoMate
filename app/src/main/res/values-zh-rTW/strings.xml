@@ -1,0 +1,85 @@
+<resources>
+    <string name="app_name">ChronoMate</string>
+    <string name="dashboard">儀表板</string>
+    <string name="orga_chrono">場方彈速測量</string>
+    <string name="trajectory">彈道軌跡</string>
+    <string name="history">歷史紀錄</string>
+    <string name="export">匯出</string>
+    <string name="settings">設定</string>
+    
+    <string name="bb_weight_label">BB彈重量 (g)</string>
+    <string name="velocity_trend">初速趨勢</string>
+    <string name="no_shots_yet">尚無射擊紀錄</string>
+    
+    <string name="joule_grid_title">焦耳對照表</string>
+    <string name="latest_shot">最後一發</string>
+    <string name="max_practical_weight">最大允許實用重量</string>
+    <string name="room_to_limit">距離上限尚有 %.1f%% 空間</string>
+    <string name="over_limit">超過上限</string>
+    <string name="too_hot_for_20">即使 0.20g 也超過焦耳限制</string>
+    <string name="orga_limits">場方限制</string>
+    <string name="max_allowed_joule_label">最大允許焦耳 (J)</string>
+    
+    <string name="trajectory_sim">彈道模擬</string>
+    <string name="side_view_label">側面視圖 (m/cm) - 點擊查看詳情</string>
+    <string name="target_view_label">目標視圖 (@ %.0f m)</string>
+    <string name="optimization_limit">優化限制</string>
+    <string name="max_overhop">最大 Overhop: %.0f cm</string>
+    <string name="optimize_hopup">優化 HOP-UP</string>
+    <string name="powered_by">彈道計算由 GWC Airsoft Team Leipzig 提供支援。</string>
+    
+    <string name="export_session">匯出賽程報告</string>
+    <string name="export_desc">產生目前賽程的專業 PDF 報告。</string>
+    <string name="report_settings">報告設定</string>
+    <string name="shots_to_include">包含的射擊發數</string>
+    <string name="includes_desc">包含：完整射擊清單、重量、初速、能量、最小值/最大值/平均值統計及趨勢圖。</string>
+    <string name="generate_pdf">產生 PDF 報告</string>
+    <string name="no_shots_session">此賽程尚無射擊紀錄。</string>
+    
+    <string name="no_history">尚無歷史紀錄</string>
+    
+    <string name="general_settings">一般設定</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="dark_mode_desc">切換淺色與深色主題</string>
+    <string name="language">語言</string>
+    <string name="restart_required_desc">需要重新啟動以套用語言變更</string>
+    <string name="ballistics_engine_params">彈道引擎參數</string>
+    <string name="fine_tune_physics">微調物理模擬常數</string>
+
+    <string name="stat_average">平均值</string>
+    <string name="stat_max">最大值</string>
+    <string name="stat_min">最小值</string>
+    <string name="stat_es">ES (極差)</string>
+    <string name="stat_sd">標準差</string>
+    <string name="stat_rof">射速 (ROF)</string>
+    <string name="stat_eff_range">有效射程</string>
+    <string name="stat_max_range">最大射程</string>
+    <string name="stat_hold_over">彈道補償 (Hold-over)</string>
+    <string name="stat_target_e">目標能量</string>
+    <string name="stat_max_oh">最大 Overhop</string>
+    <string name="stat_oh_dist">OH 距離</string>
+
+    <string name="ballistic_diameter">直徑 (mm)</string>
+    <string name="ballistic_air_density">空氣密度 (rho)</string>
+    <string name="ballistic_drag_coeff">阻力係數 (Cw)</string>
+    <string name="ballistic_magnus_coeff">馬格努斯係數 (K)</string>
+    <string name="ballistic_spin_damping">旋轉衰減 (Cr)</string>
+    <string name="ballistic_gravity">重力加速 (m/s²)</string>
+
+    <string name="target_distance_label">目標距離: %.0f m</string>
+    <string name="shooter_h_label">射手高度 (m)</string>
+    <string name="target_h_label">目標高度 (m)</string>
+    <string name="speed_label">初速: %.1f m/s</string>
+    <string name="energy_label">能量: %.2f J</string>
+    <string name="hopup_label">Hop-Up: %.0f rad/s</string>
+    <string name="sight_h_label">瞄具高度: %.1f cm</string>
+
+    <string name="hit_above">擊中: 上方 %.1f cm</string>
+    <string name="hit_below">擊中: 下方 %.1f cm</string>
+    <string name="probe_dist">距離: %.1f m</string>
+    <string name="probe_time">時間: %.2f s</string>
+    <string name="probe_height">高度: %.1f cm</string>
+    <string name="probe_energy">能量: %.2f J</string>
+    <string name="probe_rel_impact">相對彈著: %.1f cm</string>
+    <string name="probe_holdover">彈道補償: %.1f cm</string>
+</resources>
