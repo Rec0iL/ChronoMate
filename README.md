@@ -31,7 +31,7 @@
 ### ⚙️ Customization & Persistence
 - **Ballistic Parameters**: Fine-tune physics constants like air density, drag coefficients, and BB diameter.
 - **Persistent Preferences**: Saves your default BB weight, Joule limits, and ballistic engine tweaks.
-- **Dark Mode Support**: High-contrast dark theme optimized for field use.
+- **Dark and Light Mode Support**: High-contrast light theme optimized for field use.
 
 ## 📸 Screenshots
 
