@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
+import com.example.chronomate.model.WeightType
 import com.example.chronomate.viewmodel.ChronoViewModel
 import kotlin.math.pow
 
@@ -26,7 +27,12 @@ import kotlin.math.pow
 fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val weights = listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
+    
+    val weights = when (data.weightType) {
+        WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
+        WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f)
+        WeightType.CUSTOM -> data.customWeights.map { it.weight }
+    }
     
     // We get the raw velocity float from the latest shot for precision
     val latestVelocity = data.shots.lastOrNull()?.velocity ?: 0f
@@ -54,7 +60,13 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Column(modifier = Modifier.weight(2.5f)) { 
                     Text(stringResource(R.string.joule_grid_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 4)
+                    if (weights.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No weights available. Check settings.")
+                        }
+                    } else {
+                        JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 4)
+                    }
                 }
             }
         } else {
@@ -62,7 +74,13 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
             Spacer(modifier = Modifier.height(24.dp))
             Text(stringResource(R.string.joule_grid_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
-            JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 2)
+            if (weights.isEmpty()) {
+                Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                    Text("No weights available. Check settings.")
+                }
+            } else {
+                JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 2)
+            }
             Spacer(modifier = Modifier.height(24.dp))
             OrgaSettingsSection(data = data, viewModel = viewModel)
         }

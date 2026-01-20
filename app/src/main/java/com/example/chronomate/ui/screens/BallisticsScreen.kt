@@ -48,6 +48,7 @@ import com.example.chronomate.ballistics.BallisticsEngine
 import com.example.chronomate.model.BallisticParams
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.TrajectoryPoint
+import com.example.chronomate.model.WeightType
 import com.example.chronomate.viewmodel.ChronoViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -304,23 +305,36 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = stringResource(R.string.bb_weight_label),
+            text = when(data.weightType) {
+                WeightType.BB -> stringResource(R.string.bb_weight_label)
+                WeightType.DIABLO -> stringResource(R.string.diablo_weight_label)
+                WeightType.CUSTOM -> stringResource(R.string.custom_weight_label)
+            },
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 4.dp)
         )
-        val weights = listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
-        LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(weights) { weightItem ->
-                FilterChip(
-                    selected = data.selectedWeight == weightItem,
-                    onClick = { viewModel.setWeight(weightItem) },
-                    label = { Text("%.2f".format(weightItem)) }
-                )
+        val weights = when (data.weightType) {
+            WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f).map { it to "%.2f".format(it) }
+            WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f).map { it to "%.2f".format(it) }
+            WeightType.CUSTOM -> data.customWeights.map { it.weight to it.name }
+        }
+
+        if (weights.isEmpty() && data.weightType == WeightType.CUSTOM) {
+            Text(stringResource(R.string.no_custom_weights_ballistics), style = MaterialTheme.typography.bodySmall)
+        } else {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(weights) { (weight, label) ->
+                    FilterChip(
+                        selected = data.selectedWeight == weight,
+                        onClick = { viewModel.setWeight(weight) },
+                        label = { Text(label) }
+                    )
+                }
             }
         }
 

@@ -8,6 +8,8 @@
     <string name="settings">Ustawienia</string>
     
     <string name="bb_weight_label">WAGA KULEK (g)</string>
+    <string name="diablo_weight_label">WAGA DIABLO (g)</string>
+    <string name="custom_weight_label">WAGA NIESTANDARDOWA (g)</string>
     <string name="velocity_trend">TREND PRĘDKOŚCI</string>
     <string name="no_shots_yet">Brak zarejestrowanych strzałów</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">Za mocny nawet dla 0.20g</string>
     <string name="orga_limits">Limity Orga</string>
     <string name="max_allowed_joule_label">Maks. dopuszczalne dżule (J)</string>
+    <string name="no_weights_orga">Brak dostępnych wag. Sprawdź ustawienia.</string>
     
     <string name="trajectory_sim">Symulacja trajektorii</string>
     <string name="side_view_label">WIDOK Z BOKU (m/cm) - KLIKNIJ ABY SPRAWDZIĆ</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">Wymagany restart, aby zastosować zmianę języka</string>
     <string name="ballistics_engine_params">Parametry silnika balistycznego</string>
     <string name="fine_tune_physics">Precyzyjne dostrajanie stałych fizycznych</string>
+
+    <string name="weight_config_title">Konfiguracja wag</string>
+    <string name="weight_type_bbs">Kulki</string>
+    <string name="weight_type_diablos">Diablo</string>
+    <string name="weight_type_custom">Niestandardowe</string>
+    <string name="custom_weights_list">Lista niestandardowych wag</string>
+    <string name="no_custom_weights">Nie dodano niestandardowych wag</string>
+    <string name="weight_name_label">Nazwa</string>
+    <string name="weight_value_label">Waga (g)</string>
+    <string name="add_row_button">Dodaj wiersz</string>
+    <string name="no_custom_weights_dashboard">Nie zdefiniowano niestandardowych wag. Przejdź do Ustawień.</string>
+    <string name="no_custom_weights_ballistics">Nie zdefiniowano niestandardowych wag.</string>
 
     <string name="stat_average">ŚREDNIA</string>
     <string name="stat_max">MAKS.</string>

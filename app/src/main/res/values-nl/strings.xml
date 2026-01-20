@@ -8,6 +8,8 @@
     <string name="settings">Instellingen</string>
     
     <string name="bb_weight_label">BB GEWICHT (g)</string>
+    <string name="diablo_weight_label">DIABLO GEWICHT (g)</string>
+    <string name="custom_weight_label">AANGEPAST GEWICHT (g)</string>
     <string name="velocity_trend">SNELHEIDSTREND</string>
     <string name="no_shots_yet">Nog geen schoten geregistreerd</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">Te krachtig, zelfs voor 0.20g</string>
     <string name="orga_limits">Orga Limieten</string>
     <string name="max_allowed_joule_label">Max Toegestane Joule (J)</string>
+    <string name="no_weights_orga">Geen gewichten beschikbaar. Controleer instellingen.</string>
     
     <string name="trajectory_sim">Traject Simulatie</string>
     <string name="side_view_label">ZIJAANZICHT (m/cm) - TIK VOOR DETAILS</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">Herstart vereist om taalwijziging toe te passen</string>
     <string name="ballistics_engine_params">Ballistiek Engine Parameters</string>
     <string name="fine_tune_physics">Fijnafstelling van de natuurkundige constanten</string>
+
+    <string name="weight_config_title">Gewicht Configuratie</string>
+    <string name="weight_type_bbs">BBs</string>
+    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_custom">Aangepast</string>
+    <string name="custom_weights_list">Lijst met aangepaste gewichten</string>
+    <string name="no_custom_weights">Geen aangepaste gewichten toegevoegd</string>
+    <string name="weight_name_label">Naam</string>
+    <string name="weight_value_label">Gewicht (g)</string>
+    <string name="add_row_button">Rij Toevoegen</string>
+    <string name="no_custom_weights_dashboard">Geen aangepaste gewichten gedefinieerd. Ga naar Instellingen.</string>
+    <string name="no_custom_weights_ballistics">Geen aangepaste gewichten gedefinieerd.</string>
 
     <string name="stat_average">GEMIDDELDE</string>
     <string name="stat_max">MAX</string>

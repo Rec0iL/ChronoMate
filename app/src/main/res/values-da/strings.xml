@@ -1,0 +1,100 @@
+<resources>
+    <string name="app_name">ChronoMate</string>
+    <string name="dashboard">Oversigt</string>
+    <string name="orga_chrono">Orga Chrono</string>
+    <string name="trajectory">Bane</string>
+    <string name="history">Historik</string>
+    <string name="export">Eksporter</string>
+    <string name="settings">Indstillinger</string>
+    
+    <string name="bb_weight_label">BB VEGT (g)</string>
+    <string name="diablo_weight_label">DIABLO VEGT (g)</string>
+    <string name="custom_weight_label">EGEN VEGT (g)</string>
+    <string name="velocity_trend">HASTIGHEDSTREND</string>
+    <string name="no_shots_yet">Ingen skud registreret endnu</string>
+    
+    <string name="joule_grid_title">Joule referencetabel</string>
+    <string name="latest_shot">SIDSTE SKUD</string>
+    <string name="max_practical_weight">MAKS TILLADT PRAKTISK VEGT</string>
+    <string name="room_to_limit">med %.1f%% margin til grænsen</string>
+    <string name="over_limit">OVER GRÆNSEN</string>
+    <string name="too_hot_for_20">For kraftig selv til 0.20g</string>
+    <string name="orga_limits">Orga Grænser</string>
+    <string name="max_allowed_joule_label">Maks tilladt Joule (J)</string>
+    <string name="no_weights_orga">Ingen vægte tilgængelige. Tjek indstillinger.</string>
+    
+    <string name="trajectory_sim">Banesimulering</string>
+    <string name="side_view_label">SIDEVISNING (m/cm) - TRYK FOR DETALJER</string>
+    <string name="target_view_label">MÅLVISNING (@ %.0f m)</string>
+    <string name="optimization_limit">Optimeringsgrænse</string>
+    <string name="max_overhop">Maks Overhop: %.0f cm</string>
+    <string name="optimize_hopup">OPTIMER HOP-UP</string>
+    <string name="powered_by">Ballistisk lommeregner leveret af GWC Airsoft Team Leipzig.</string>
+    
+    <string name="export_session">Eksporter sessionsrapport</string>
+    <string name="export_desc">Generer en professionel PDF-rapport for din nuværende session.</string>
+    <string name="report_settings">RAPPORTINDSTILLINGER</string>
+    <string name="shots_to_include">Skud der skal inkluderes</string>
+    <string name="includes_desc">Inkluderer: Komplet skudliste, vægt, hastighed, energi, min/maks/gns-statistik og energigraf.</string>
+    <string name="generate_pdf">GENERER PDF-RAPPORT</string>
+    <string name="no_shots_session">Ingen skud registreret i denne session endnu.</string>
+    
+    <string name="no_history">Ingen historik tilgængelig</string>
+    
+    <string name="general_settings">Generelle indstillinger</string>
+    <string name="dark_mode">Mørk tilstand</string>
+    <string name="dark_mode_desc">Skift mellem lyst og mørkt tema</string>
+    <string name="language">Sprog</string>
+    <string name="restart_required_desc">Genstart påkrævet for at anvende sprogskift</string>
+    <string name="ballistics_engine_params">Ballistiske motorparametre</string>
+    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstanter</string>
+
+    <string name="weight_config_title">Vægtkonfiguration</string>
+    <string name="weight_type_bbs">BBs</string>
+    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_custom">Brugerdefineret</string>
+    <string name="custom_weights_list">Liste over egne vægte</string>
+    <string name="no_custom_weights">Ingen egne vægte tilføjet</string>
+    <string name="weight_name_label">Navn</string>
+    <string name="weight_value_label">Vægt (g)</string>
+    <string name="add_row_button">Tilføj række</string>
+    <string name="no_custom_weights_dashboard">Ingen egne vægte defineret. Gå til Indstillinger.</string>
+    <string name="no_custom_weights_ballistics">Ingen egne vægte defineret.</string>
+
+    <string name="stat_average">GENNEMSNIT</string>
+    <string name="stat_max">MAKS</string>
+    <string name="stat_min">MIN</string>
+    <string name="stat_es">EXTREME SPREAD</string>
+    <string name="stat_sd">STANDARDAFVIGELSE</string>
+    <string name="stat_rof">ROF</string>
+    <string name="stat_eff_range">Eff. rækkevidde</string>
+    <string name="stat_max_range">Maks rækkevidde</string>
+    <string name="stat_hold_over">Kompensation</string>
+    <string name="stat_target_e">Målenergi</string>
+    <string name="stat_max_oh">Maks Overhop</string>
+    <string name="stat_oh_dist">OH Afstand</string>
+
+    <string name="ballistic_diameter">Diameter (mm)</string>
+    <string name="ballistic_air_density">Lufttæthed (rho)</string>
+    <string name="ballistic_drag_coeff">Luftmodstand (Cw)</string>
+    <string name="ballistic_magnus_coeff">Magnus-koefficient (K)</string>
+    <string name="ballistic_spin_damping">Spindæmpning (Cr)</string>
+    <string name="ballistic_gravity">Tyngdekraft (m/s²)</string>
+
+    <string name="target_distance_label">Målafstand: %.0f m</string>
+    <string name="shooter_h_label">Skyttehøjde (m)</string>
+    <string name="target_h_label">Målhøjde (m)</string>
+    <string name="speed_label">Fart: %.1f m/s</string>
+    <string name="energy_label">Energi: %.2f J</string>
+    <string name="hopup_label">Hop-Up: %.0f rad/s</string>
+    <string name="sight_h_label">Sigtehøjde: %.1f cm</string>
+
+    <string name="hit_above">TRÆF: %.1f cm OVER</string>
+    <string name="hit_below">TRÆF: %.1f cm UNDER</string>
+    <string name="probe_dist">Afst: %.1f m</string>
+    <string name="probe_time">Tid: %.2f s</string>
+    <string name="probe_height">Højde: %.1f cm</string>
+    <string name="probe_energy">Energi: %.2f J</string>
+    <string name="probe_rel_impact">Rel. træf: %.1f cm</string>
+    <string name="probe_holdover">Kompensation: %.1f cm</string>
+</resources>

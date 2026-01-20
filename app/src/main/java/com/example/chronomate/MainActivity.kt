@@ -52,7 +52,21 @@ class MainActivity : ComponentActivity() {
         // Load and apply language before super.onCreate and setContent
         val prefs = getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
         val lang = prefs.getString("language", "en") ?: "en"
-        val locale = Locale(lang)
+        
+        // Handle potential legacy codes like zh-rTW or zh-rCN
+        val languageTag = when(lang) {
+            "zh-rTW" -> "zh-TW"
+            "zh-rCN" -> "zh-CN"
+            else -> lang
+        }
+        
+        val locale = if (languageTag.contains("-")) {
+            val parts = languageTag.split("-")
+            Locale(parts[0], parts[1])
+        } else {
+            Locale(languageTag)
+        }
+        
         Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)

@@ -8,6 +8,8 @@
     <string name="settings">設定</string>
     
     <string name="bb_weight_label">BB弾重量 (g)</string>
+    <string name="diablo_weight_label">ディアブロ重量 (g)</string>
+    <string name="custom_weight_label">カスタム重量 (g)</string>
     <string name="velocity_trend">初速トレンド</string>
     <string name="no_shots_yet">記録されたショットはありません</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">0.20gでもオーバーです</string>
     <string name="orga_limits">運営制限</string>
     <string name="max_allowed_joule_label">最大許容ジュール (J)</string>
+    <string name="no_weights_orga">重量設定がありません。設定を確認してください。</string>
     
     <string name="trajectory_sim">弾道シミュレーション</string>
     <string name="side_view_label">側面図 (m/cm) - タップして詳細確認</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">言語設定を適用するには再起動が必要です</string>
     <string name="ballistics_engine_params">弾道エンジンパラメータ</string>
     <string name="fine_tune_physics">物理シミュレーション定数の微調整</string>
+
+    <string name="weight_config_title">重量設定</string>
+    <string name="weight_type_bbs">BB弾</string>
+    <string name="weight_type_diablos">ディアブロ</string>
+    <string name="weight_type_custom">カスタム</string>
+    <string name="custom_weights_list">カスタム重量リスト</string>
+    <string name="no_custom_weights">カスタム重量が追加されていません</string>
+    <string name="weight_name_label">名前</string>
+    <string name="weight_value_label">重量 (g)</string>
+    <string name="add_row_button">行を追加</string>
+    <string name="no_custom_weights_dashboard">カスタム重量が定義されていません。設定画面へ。</string>
+    <string name="no_custom_weights_ballistics">カスタム重量が定義されていません。</string>
 
     <string name="stat_average">平均</string>
     <string name="stat_max">最大</string>

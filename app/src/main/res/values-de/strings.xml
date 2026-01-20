@@ -8,6 +8,8 @@
     <string name="settings">Einstellungen</string>
     
     <string name="bb_weight_label">BB GEWICHT (g)</string>
+    <string name="diablo_weight_label">DIABLO GEWICHT (g)</string>
+    <string name="custom_weight_label">BENUTZERDEF. GEWICHT (g)</string>
     <string name="velocity_trend">GESCHWINDIGKEITS-TREND</string>
     <string name="no_shots_yet">Noch keine Schüsse aufgezeichnet</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">Zu stark selbst für 0.20g</string>
     <string name="orga_limits">Orga Limits</string>
     <string name="max_allowed_joule_label">Max. erlaubte Joule (J)</string>
+    <string name="no_weights_orga">Keine Gewichte verfügbar. Einstellungen prüfen.</string>
     
     <string name="trajectory_sim">Flugbahn-Simulation</string>
     <string name="side_view_label">SEITENANSICHT (m/cm) - TIPPEN FÜR DETAILS</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">Neustart erforderlich, um die Sprachänderung zu übernehmen</string>
     <string name="ballistics_engine_params">Parameter der Ballistik-Engine</string>
     <string name="fine_tune_physics">Feineinstellung der Physikkonstanten</string>
+
+    <string name="weight_config_title">Gewichtskonfiguration</string>
+    <string name="weight_type_bbs">BBs</string>
+    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_custom">Benutzerdefiniert</string>
+    <string name="custom_weights_list">Liste benutzerdef. Gewichte</string>
+    <string name="no_custom_weights">Keine benutzerdef. Gewichte hinzugefügt</string>
+    <string name="weight_name_label">Name</string>
+    <string name="weight_value_label">Gewicht (g)</string>
+    <string name="add_row_button">Zeile hinzufügen</string>
+    <string name="no_custom_weights_dashboard">Keine benutzerdef. Gewichte definiert. Gehen Sie zu Einstellungen.</string>
+    <string name="no_custom_weights_ballistics">Keine benutzerdef. Gewichte definiert.</string>
 
     <string name="stat_average">DURCHSCHNITT</string>
     <string name="stat_max">MAXIMUM</string>

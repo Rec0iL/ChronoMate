@@ -8,6 +8,8 @@
     <string name="settings">設定</string>
     
     <string name="bb_weight_label">BB彈重量 (g)</string>
+    <string name="diablo_weight_label">喇叭彈重量 (g)</string>
+    <string name="custom_weight_label">自定義重量 (g)</string>
     <string name="velocity_trend">初速趨勢</string>
     <string name="no_shots_yet">尚無射擊紀錄</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">即使 0.20g 也超過焦耳限制</string>
     <string name="orga_limits">場方限制</string>
     <string name="max_allowed_joule_label">最大允許焦耳 (J)</string>
+    <string name="no_weights_orga">無可用重量。請檢查設定。</string>
     
     <string name="trajectory_sim">彈道模擬</string>
     <string name="side_view_label">側面視圖 (m/cm) - 點擊查看詳情</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">需要重新啟動以套用語言變更</string>
     <string name="ballistics_engine_params">彈道引擎參數</string>
     <string name="fine_tune_physics">微調物理模擬常數</string>
+
+    <string name="weight_config_title">重量配置</string>
+    <string name="weight_type_bbs">BB彈</string>
+    <string name="weight_type_diablos">喇叭彈</string>
+    <string name="weight_type_custom">自定義</string>
+    <string name="custom_weights_list">自定義重量清單</string>
+    <string name="no_custom_weights">尚未新增自定義重量</string>
+    <string name="weight_name_label">名稱</string>
+    <string name="weight_value_label">重量 (g)</string>
+    <string name="add_row_button">新增行</string>
+    <string name="no_custom_weights_dashboard">尚未定義自定義重量。請前往設定。</string>
+    <string name="no_custom_weights_ballistics">尚未定義自定義重量。</string>
 
     <string name="stat_average">平均值</string>
     <string name="stat_max">最大值</string>

@@ -12,6 +12,15 @@ data class Shot(
     val energyJoules: Float = 0.5f * (weightGrams / 1000f) * velocity.pow(2)
 )
 
+enum class WeightType {
+    BB, DIABLO, CUSTOM
+}
+
+data class CustomWeight(
+    val name: String,
+    val weight: Float
+)
+
 data class ChronoData(
     val velocity: String = "0.00",
     val fireRate: String = "0.0",
@@ -30,6 +39,10 @@ data class ChronoData(
     val language: String = "en",
     val maxAllowedJoule: Float = 1.5f,
     val maxAllowedOverhopCm: Float = 15.0f,
+    
+    // Weight Settings
+    val weightType: WeightType = WeightType.BB,
+    val customWeights: List<CustomWeight> = emptyList(),
     
     // Ballistic Settings
     val diameterMm: Float = 5.95f,

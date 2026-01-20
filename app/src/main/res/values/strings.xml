@@ -8,6 +8,8 @@
     <string name="settings">Settings</string>
     
     <string name="bb_weight_label">BB WEIGHT (g)</string>
+    <string name="diablo_weight_label">DIABLO WEIGHT (g)</string>
+    <string name="custom_weight_label">CUSTOM WEIGHT (g)</string>
     <string name="velocity_trend">VELOCITY TREND</string>
     <string name="no_shots_yet">No shots recorded yet</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">Too hot for even 0.20g</string>
     <string name="orga_limits">Orga Limits</string>
     <string name="max_allowed_joule_label">Max Allowed Joule (J)</string>
+    <string name="no_weights_orga">No weights available. Check settings.</string>
     
     <string name="trajectory_sim">Trajectory Simulation</string>
     <string name="side_view_label">SIDE VIEW (m/cm) - TAP TO PROBE</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">Restart required to apply language change</string>
     <string name="ballistics_engine_params">Ballistics Engine Parameters</string>
     <string name="fine_tune_physics">Fine-tune the physics simulation constants</string>
+
+    <string name="weight_config_title">Weight Configuration</string>
+    <string name="weight_type_bbs">BBs</string>
+    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_custom">Custom</string>
+    <string name="custom_weights_list">Custom Weights List</string>
+    <string name="no_custom_weights">No custom weights added</string>
+    <string name="weight_name_label">Name</string>
+    <string name="weight_value_label">Weight (g)</string>
+    <string name="add_row_button">Add Row</string>
+    <string name="no_custom_weights_dashboard">No custom weights defined. Go to Settings.</string>
+    <string name="no_custom_weights_ballistics">No custom weights defined.</string>
 
     <string name="stat_average">AVERAGE</string>
     <string name="stat_max">MAX</string>

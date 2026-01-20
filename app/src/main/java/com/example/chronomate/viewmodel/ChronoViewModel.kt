@@ -1,6 +1,8 @@
 package com.example.chronomate.viewmodel
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
 import android.net.ConnectivityManager
@@ -12,7 +14,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chronomate.model.ChronoData
+import com.example.chronomate.model.CustomWeight
 import com.example.chronomate.model.Shot
+import com.example.chronomate.model.WeightType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,11 +53,22 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
     private fun loadPreferences(context: Context) {
         val prefs = context.getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
+        
+        val customWeightsJson = prefs.getString("custom_weights", "[]") ?: "[]"
+        val customWeights = if (customWeightsJson != "[]" && customWeightsJson.isNotEmpty()) {
+            customWeightsJson.split(";").mapNotNull {
+                val parts = it.split(":")
+                if (parts.size == 2) CustomWeight(parts[0], parts[1].toFloatOrNull() ?: 0.20f) else null
+            }
+        } else emptyList()
+
         _uiState.update { it.copy(
             isDarkMode = prefs.getBoolean("dark_mode", true),
             language = prefs.getString("language", "en") ?: "en",
             maxAllowedJoule = prefs.getFloat("max_joule", 1.5f),
             maxAllowedOverhopCm = prefs.getFloat("max_overhop", 15f),
+            weightType = WeightType.valueOf(prefs.getString("weight_type", WeightType.BB.name) ?: WeightType.BB.name),
+            customWeights = customWeights,
             diameterMm = prefs.getFloat("diameter", 5.95f),
             airDensityRho = prefs.getFloat("air_density", 1.225f),
             dragCoefficientCw = prefs.getFloat("drag_coeff", 0.35f),
@@ -75,17 +90,71 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
+    private fun saveCustomWeights(context: Context, weights: List<CustomWeight>) {
+        val serialized = weights.joinToString(";") { "${it.name}:${it.weight}" }
+        savePreference(context, "custom_weights", serialized)
+    }
+
     fun toggleDarkMode(enabled: Boolean) {
         _uiState.update { it.copy(isDarkMode = enabled) }
     }
 
     fun setLanguage(context: Context, langCode: String) {
-        _uiState.update { it.copy(language = langCode) }
         savePreference(context, "language", langCode)
+        _uiState.update { it.copy(language = langCode) }
+        
+        // Trigger restart
+        if (context is Activity) {
+            val intent = context.intent
+            context.finish()
+            context.startActivity(intent)
+        } else {
+            // Fallback for cases where context is not an activity
+            val pm = context.packageManager
+            val intent = pm.getLaunchIntentForPackage(context.packageName)
+            intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        }
     }
 
     fun setWeight(weight: Float) {
         _uiState.update { it.copy(selectedWeight = weight) }
+    }
+
+    fun setWeightType(context: Context, type: WeightType) {
+        _uiState.update { it.copy(weightType = type) }
+        savePreference(context, "weight_type", type.name)
+    }
+
+    fun addCustomWeight(context: Context) {
+        _uiState.update { current ->
+            val newList = current.customWeights + CustomWeight("New Weight", 0.20f)
+            saveCustomWeights(context, newList)
+            current.copy(customWeights = newList)
+        }
+    }
+
+    fun updateCustomWeight(context: Context, index: Int, name: String, weight: Float) {
+        _uiState.update { current ->
+            val newList = current.customWeights.toMutableList()
+            if (index in newList.indices) {
+                newList[index] = CustomWeight(name, weight)
+                saveCustomWeights(context, newList)
+            }
+            current.copy(customWeights = newList)
+        }
+    }
+
+    fun removeCustomWeight(context: Context, index: Int) {
+        _uiState.update { current ->
+            val newList = current.customWeights.toMutableList()
+            if (index in newList.indices) {
+                newList.removeAt(index)
+                saveCustomWeights(context, newList)
+            }
+            current.copy(customWeights = newList)
+        }
     }
 
     fun setMaxAllowedJoule(joule: Float) {

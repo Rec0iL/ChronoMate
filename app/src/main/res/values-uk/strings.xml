@@ -8,6 +8,8 @@
     <string name="settings">Налаштування</string>
     
     <string name="bb_weight_label">ВАГА КУЛІ (г)</string>
+    <string name="diablo_weight_label">ВАГА DIABLO (г)</string>
+    <string name="custom_weight_label">ВЛАСНА ВАГА (г)</string>
     <string name="velocity_trend">ТРЕНД ШВИДКОСТІ</string>
     <string name="no_shots_yet">Поки не зареєстровано жодного пострілу</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">Занадто потужно навіть для 0.20г</string>
     <string name="orga_limits">Організіційні ліміти</string>
     <string name="max_allowed_joule_label">Макс. допустимі Джоулі (Дж)</string>
+    <string name="no_weights_orga">Ваги не вибрані. Перевірте налаштування.</string>
     
     <string name="trajectory_sim">Симуляція траєкторії</string>
     <string name="side_view_label">ВИГЛЯД ЗБОКУ (м/см) - НАТИСНІТЬ ДЛЯ ДЕТАЛЕЙ</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">Для застосування мови потрібен перезапуск</string>
     <string name="ballistics_engine_params">Параметри балістичного двигуна</string>
     <string name="fine_tune_physics">Тонке налаштування фізичних констант</string>
+
+    <string name="weight_config_title">Конфігурація ваги</string>
+    <string name="weight_type_bbs">Кулі (BB)</string>
+    <string name="weight_type_diablos">Diablo</string>
+    <string name="weight_type_custom">Власна</string>
+    <string name="custom_weights_list">Список власних ваг</string>
+    <string name="no_custom_weights">Власних ваг не додано</string>
+    <string name="weight_name_label">Назва</string>
+    <string name="weight_value_label">Вага (г)</string>
+    <string name="add_row_button">Додати рядок</string>
+    <string name="no_custom_weights_dashboard">Власних ваг не визначено. Перейдіть до Налаштувань.</string>
+    <string name="no_custom_weights_ballistics">Власних ваг не визначено.</string>
 
     <string name="stat_average">СЕРЕДНЄ</string>
     <string name="stat_max">МАКС.</string>

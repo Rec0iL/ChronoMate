@@ -1,0 +1,100 @@
+<resources>
+    <string name="app_name">ChronoMate</string>
+    <string name="dashboard">仪表板</string>
+    <string name="orga_chrono">场方测速</string>
+    <string name="trajectory">弹道轨迹</string>
+    <string name="history">历史记录</string>
+    <string name="export">导出</string>
+    <string name="settings">设置</string>
+    
+    <string name="bb_weight_label">BB弹重量 (g)</string>
+    <string name="diablo_weight_label">喇叭弹重量 (g)</string>
+    <string name="custom_weight_label">自定义重量 (g)</string>
+    <string name="velocity_trend">初速趋势</string>
+    <string name="no_shots_yet">尚无射击记录</string>
+    
+    <string name="joule_grid_title">焦耳对照表</string>
+    <string name="latest_shot">最新射击</string>
+    <string name="max_practical_weight">最大允许实用重量</string>
+    <string name="room_to_limit">距离上限尚有 %.1f%% 空间</string>
+    <string name="over_limit">超过上限</string>
+    <string name="too_hot_for_20">即使 0.20g 也超过焦耳限制</string>
+    <string name="orga_limits">场方限制</string>
+    <string name="max_allowed_joule_label">最大允许焦耳 (J)</string>
+    <string name="no_weights_orga">无可用重量。请检查设置。</string>
+    
+    <string name="trajectory_sim">弹道模拟</string>
+    <string name="side_view_label">侧面视图 (m/cm) - 点击查看详情</string>
+    <string name="target_view_label">目标视图 (@ %.0f m)</string>
+    <string name="optimization_limit">优化限制</string>
+    <string name="max_overhop">最大 Overhop: %.0f cm</string>
+    <string name="optimize_hopup">优化 HOP-UP</string>
+    <string name="powered_by">弹道计算由 GWC Airsoft Team Leipzig 提供支持。</string>
+    
+    <string name="export_session">导出场次报告</string>
+    <string name="export_desc">生成当前场次的专业 PDF 报告。</string>
+    <string name="report_settings">报告设置</string>
+    <string name="shots_to_include">包含的射击数</string>
+    <string name="includes_desc">包含：完整射击列表、重量、初速、能量、最小值/最大值/平均值统计及趋势图。</string>
+    <string name="generate_pdf">生成 PDF 报告</string>
+    <string name="no_shots_session">本场次尚无射击记录。</string>
+    
+    <string name="no_history">尚无历史记录</string>
+    
+    <string name="general_settings">常规设置</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="dark_mode_desc">在浅色和深色主题之间切换</string>
+    <string name="language">语言</string>
+    <string name="restart_required_desc">需要重新启动以应用语言更改</string>
+    <string name="ballistics_engine_params">弹道引擎参数</string>
+    <string name="fine_tune_physics">微调物理模拟常数</string>
+
+    <string name="weight_config_title">重量配置</string>
+    <string name="weight_type_bbs">BB弹</string>
+    <string name="weight_type_diablos">喇叭弹</string>
+    <string name="weight_type_custom">自定义</string>
+    <string name="custom_weights_list">自定义重量列表</string>
+    <string name="no_custom_weights">尚未添加自定义重量</string>
+    <string name="weight_name_label">名称</string>
+    <string name="weight_value_label">重量 (g)</string>
+    <string name="add_row_button">添加行</string>
+    <string name="no_custom_weights_dashboard">尚未定义自定义重量。请前往设置。</string>
+    <string name="no_custom_weights_ballistics">尚未定义自定义重量。</string>
+
+    <string name="stat_average">平均值</string>
+    <string name="stat_max">最大值</string>
+    <string name="stat_min">最小值</string>
+    <string name="stat_es">ES (极差)</string>
+    <string name="stat_sd">标准差</string>
+    <string name="stat_rof">射速 (ROF)</string>
+    <string name="stat_eff_range">有效射程</string>
+    <string name="stat_max_range">最大射程</string>
+    <string name="stat_hold_over">弹道补偿 (Hold-over)</string>
+    <string name="stat_target_e">目标能量</string>
+    <string name="stat_max_oh">最大 Overhop</string>
+    <string name="stat_oh_dist">OH 距离</string>
+
+    <string name="ballistic_diameter">直径 (mm)</string>
+    <string name="ballistic_air_density">空气密度 (rho)</string>
+    <string name="ballistic_drag_coeff">阻力系数 (Cw)</string>
+    <string name="ballistic_magnus_coeff">马格努斯系数 (K)</string>
+    <string name="ballistic_spin_damping">旋转衰减 (Cr)</string>
+    <string name="ballistic_gravity">重力加速度 (m/s²)</string>
+
+    <string name="target_distance_label">目标距离: %.0f m</string>
+    <string name="shooter_h_label">射手高度 (m)</string>
+    <string name="target_h_label">目标高度 (m)</string>
+    <string name="speed_label">初速: %.1f m/s</string>
+    <string name="energy_label">能量: %.2f J</string>
+    <string name="hopup_label">Hop-Up: %.0f rad/s</string>
+    <string name="sight_h_label">瞄具高度: %.1f cm</string>
+
+    <string name="hit_above">击中: 上方 %.1f cm</string>
+    <string name="hit_below">击中: 下方 %.1f cm</string>
+    <string name="probe_dist">距离: %.1f m</string>
+    <string name="probe_time">时间: %.2f s</string>
+    <string name="probe_height">高度: %.1f cm</string>
+    <string name="probe_energy">能量: %.2f J</string>
+    <string name="probe_rel_impact">相对弹着: %.1f cm</string>
+    <string name="probe_holdover">弹道补偿: %.1f cm</string>
+</resources>

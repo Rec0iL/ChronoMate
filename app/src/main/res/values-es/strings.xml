@@ -8,6 +8,8 @@
     <string name="settings">Ajustes</string>
     
     <string name="bb_weight_label">PESO BB (g)</string>
+    <string name="diablo_weight_label">PESO DIABLO (g)</string>
+    <string name="custom_weight_label">PESO PERSONALIZADO (g)</string>
     <string name="velocity_trend">TENDENCIA VELOCIDAD</string>
     <string name="no_shots_yet">No hay disparos registrados</string>
     
@@ -19,6 +21,7 @@
     <string name="too_hot_for_20">Demasiado potente incluso para 0.20g</string>
     <string name="orga_limits">Límites Orga</string>
     <string name="max_allowed_joule_label">Julios Máximos Permitidos (J)</string>
+    <string name="no_weights_orga">No hay pesos disponibles. Verifica los ajustes.</string>
     
     <string name="trajectory_sim">Simulación de Trayectoria</string>
     <string name="side_view_label">VISTA LATERAL (m/cm) - TOCA PARA INFO</string>
@@ -45,6 +48,18 @@
     <string name="restart_required_desc">Reinicio requerido para aplicar el idioma</string>
     <string name="ballistics_engine_params">Parámetros del Motor Balístico</string>
     <string name="fine_tune_physics">Ajuste fino de las constantes físicas</string>
+
+    <string name="weight_config_title">Configuración de Peso</string>
+    <string name="weight_type_bbs">BBs</string>
+    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_custom">Personalizado</string>
+    <string name="custom_weights_list">Lista de Pesos Personalizados</string>
+    <string name="no_custom_weights">No se han añadido pesos personalizados</string>
+    <string name="weight_name_label">Nombre</string>
+    <string name="weight_value_label">Peso (g)</string>
+    <string name="add_row_button">Añadir Fila</string>
+    <string name="no_custom_weights_dashboard">No hay pesos personalizados definidos. Ve a Ajustes.</string>
+    <string name="no_custom_weights_ballistics">No hay pesos personalizados definidos.</string>
 
     <string name="stat_average">PROMEDIO</string>
     <string name="stat_max">MÁX</string>
