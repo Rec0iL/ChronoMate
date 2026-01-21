@@ -58,7 +58,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
         val customWeights = if (customWeightsJson != "[]" && customWeightsJson.isNotEmpty()) {
             customWeightsJson.split(";").mapNotNull {
                 val parts = it.split(":")
-                if (parts.size == 2) CustomWeight(parts[0], parts[1].toFloatOrNull() ?: 0.20f) else null
+                if (parts.size >= 2) {
+                    CustomWeight(
+                        name = parts[0],
+                        weight = parts[1].toFloatOrNull() ?: 0.20f,
+                        caliber = if (parts.size >= 3) parts[2].toFloatOrNull() ?: 6.0f else 6.0f,
+                        caliberUnit = if (parts.size >= 4) parts[3] else "mm"
+                    )
+                } else null
             }
         } else emptyList()
 
@@ -91,7 +98,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
     }
 
     private fun saveCustomWeights(context: Context, weights: List<CustomWeight>) {
-        val serialized = weights.joinToString(";") { "${it.name}:${it.weight}" }
+        val serialized = weights.joinToString(";") { "${it.name}:${it.weight}:${it.caliber}:${it.caliberUnit}" }
         savePreference(context, "custom_weights", serialized)
     }
 
@@ -135,11 +142,17 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
-    fun updateCustomWeight(context: Context, index: Int, name: String, weight: Float) {
+    fun updateCustomWeight(context: Context, index: Int, name: String, weight: Float, caliber: Float? = null, unit: String? = null) {
         _uiState.update { current ->
             val newList = current.customWeights.toMutableList()
             if (index in newList.indices) {
-                newList[index] = CustomWeight(name, weight)
+                val old = newList[index]
+                newList[index] = CustomWeight(
+                    name = name,
+                    weight = weight,
+                    caliber = caliber ?: old.caliber,
+                    caliberUnit = unit ?: old.caliberUnit
+                )
                 saveCustomWeights(context, newList)
             }
             current.copy(customWeights = newList)

@@ -57,6 +57,7 @@
     <string name="no_custom_weights">No se han añadido pesos personalizados</string>
     <string name="weight_name_label">Nombre</string>
     <string name="weight_value_label">Peso (g)</string>
+    <string name="caliber_label">Calibre</string>
     <string name="add_row_button">Añadir Fila</string>
     <string name="no_custom_weights_dashboard">No hay pesos personalizados definidos. Ve a Ajustes.</string>
     <string name="no_custom_weights_ballistics">No hay pesos personalizados definidos.</string>

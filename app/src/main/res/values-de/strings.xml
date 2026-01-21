@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Keine benutzerdef. Gewichte hinzugefügt</string>
     <string name="weight_name_label">Name</string>
     <string name="weight_value_label">Gewicht (g)</string>
+    <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Zeile hinzufügen</string>
     <string name="no_custom_weights_dashboard">Keine benutzerdef. Gewichte definiert. Gehen Sie zu Einstellungen.</string>
     <string name="no_custom_weights_ballistics">Keine benutzerdef. Gewichte definiert.</string>

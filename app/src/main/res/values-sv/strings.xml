@@ -42,7 +42,7 @@
     <string name="no_history">Ingen historik tillgänglig</string>
     
     <string name="general_settings">Allmänna inställningar</string>
-    <string name="dark_mode">Mörkt läge</string>
+    <string name="dark_mode">Mørkt läge</string>
     <string name="dark_mode_desc">Växla mellan ljust och mörkt tema</string>
     <string name="language">Språk</string>
     <string name="restart_required_desc">Omstart krävs för att tillämpa språkändring</string>
@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Inga egna vikter tillagda</string>
     <string name="weight_name_label">Namn</string>
     <string name="weight_value_label">Vikt (g)</string>
+    <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Lägg till rad</string>
     <string name="no_custom_weights_dashboard">Inga egna vikter definierade. Gå till Inställningar.</string>
     <string name="no_custom_weights_ballistics">Inga egna vikter definierade.</string>
@@ -79,7 +80,7 @@
     <string name="ballistic_drag_coeff">Luftmotstånd (Cw)</string>
     <string name="ballistic_magnus_coeff">Magnus-koefficient (K)</string>
     <string name="ballistic_spin_damping">Spinndämpning (Cr)</string>
-    <string name="ballistic_gravity">Tyngdkraft (m/s²)</string>
+    <string name="ballistic_gravity">Tyngdekraft (m/s²)</string>
 
     <string name="target_distance_label">Målavstånd: %.0f m</string>
     <string name="shooter_h_label">Skyttens höjd (m)</string>

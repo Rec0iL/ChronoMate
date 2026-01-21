@@ -57,6 +57,7 @@
     <string name="no_custom_weights">No custom weights added</string>
     <string name="weight_name_label">Name</string>
     <string name="weight_value_label">Weight (g)</string>
+    <string name="caliber_label">Caliber</string>
     <string name="add_row_button">Add Row</string>
     <string name="no_custom_weights_dashboard">No custom weights defined. Go to Settings.</string>
     <string name="no_custom_weights_ballistics">No custom weights defined.</string>

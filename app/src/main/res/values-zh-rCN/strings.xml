@@ -57,6 +57,7 @@
     <string name="no_custom_weights">尚未添加自定义重量</string>
     <string name="weight_name_label">名称</string>
     <string name="weight_value_label">重量 (g)</string>
+    <string name="caliber_label">口径</string>
     <string name="add_row_button">添加行</string>
     <string name="no_custom_weights_dashboard">尚未定义自定义重量。请前往设置。</string>
     <string name="no_custom_weights_ballistics">尚未定义自定义重量。</string>

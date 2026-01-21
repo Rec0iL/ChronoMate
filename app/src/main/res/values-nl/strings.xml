@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Geen aangepaste gewichten toegevoegd</string>
     <string name="weight_name_label">Naam</string>
     <string name="weight_value_label">Gewicht (g)</string>
+    <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Rij Toevoegen</string>
     <string name="no_custom_weights_dashboard">Geen aangepaste gewichten gedefinieerd. Ga naar Instellingen.</string>
     <string name="no_custom_weights_ballistics">Geen aangepaste gewichten gedefinieerd.</string>
@@ -92,7 +93,7 @@
     <string name="hit_above">RAAK: %.1f cm BOVEN</string>
     <string name="hit_below">RAAK: %.1f cm ONDER</string>
     <string name="probe_dist">Afst: %.1f m</string>
-    <string name="probe_time">Tijd: %.2f s</string>
+    <string name="probe_time">Tid: %.2f s</string>
     <string name="probe_height">Hoogte: %.1f cm</string>
     <string name="probe_energy">Energie: %.2f J</string>
     <string name="probe_rel_impact">Rel. Impact: %.1f cm</string>

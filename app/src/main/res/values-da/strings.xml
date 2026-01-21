@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Ingen egne vægte tilføjet</string>
     <string name="weight_name_label">Navn</string>
     <string name="weight_value_label">Vægt (g)</string>
+    <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Tilføj række</string>
     <string name="no_custom_weights_dashboard">Ingen egne vægte defineret. Gå til Indstillinger.</string>
     <string name="no_custom_weights_ballistics">Ingen egne vægte defineret.</string>

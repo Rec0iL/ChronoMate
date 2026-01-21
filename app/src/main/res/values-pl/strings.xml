@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Nie dodano niestandardowych wag</string>
     <string name="weight_name_label">Nazwa</string>
     <string name="weight_value_label">Waga (g)</string>
+    <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Dodaj wiersz</string>
     <string name="no_custom_weights_dashboard">Nie zdefiniowano niestandardowych wag. Przejdź do Ustawień.</string>
     <string name="no_custom_weights_ballistics">Nie zdefiniowano niestandardowych wag.</string>

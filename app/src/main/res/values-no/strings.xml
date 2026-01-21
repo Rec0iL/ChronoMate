@@ -47,7 +47,7 @@
     <string name="language">Språk</string>
     <string name="restart_required_desc">Omstart kreves for å bruke språkendring</string>
     <string name="ballistics_engine_params">Ballistiske motorparametere</string>
-    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstantene</string>
+    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstanter</string>
 
     <string name="weight_config_title">Vektkonfigurasjon</string>
     <string name="weight_type_bbs">BBs</string>
@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Ingen egne vekter lagt til</string>
     <string name="weight_name_label">Navn</string>
     <string name="weight_value_label">Vekt (g)</string>
+    <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Legg til rad</string>
     <string name="no_custom_weights_dashboard">Ingen egne vekter definert. Gå til Innstillinger.</string>
     <string name="no_custom_weights_ballistics">Ingen egne vekter definert.</string>

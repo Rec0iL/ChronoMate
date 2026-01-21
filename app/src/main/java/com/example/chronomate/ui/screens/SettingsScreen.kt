@@ -1,9 +1,12 @@
 package com.example.chronomate.ui.screens
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -140,48 +144,23 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                                 modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally)
                             )
                         } else {
-                            // Header
-                            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
-                                Text(stringResource(R.string.weight_name_label), modifier = Modifier.weight(2f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                                Text(stringResource(R.string.weight_value_label), modifier = Modifier.weight(1.5f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.width(48.dp))
-                            }
-                            
                             data.customWeights.forEachIndexed { index, custom ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    var nameText by remember(custom.name) { mutableStateOf(custom.name) }
-                                    var weightText by remember(custom.weight) { mutableStateOf(custom.weight.toString()) }
-                                    
-                                    TextField(
-                                        value = nameText,
-                                        onValueChange = { 
-                                            nameText = it
-                                            viewModel.updateCustomWeight(context, index, it, custom.weight)
-                                        },
-                                        modifier = Modifier.weight(2f),
-                                        textStyle = MaterialTheme.typography.bodySmall,
-                                        singleLine = true
+                                CustomWeightEntry(
+                                    index = index,
+                                    name = custom.name,
+                                    weight = custom.weight,
+                                    caliber = custom.caliber,
+                                    unit = custom.caliberUnit,
+                                    onUpdate = { name, w, cal, u ->
+                                        viewModel.updateCustomWeight(context, index, name, w, cal, u)
+                                    },
+                                    onDelete = { viewModel.removeCustomWeight(context, index) }
+                                )
+                                if (index < data.customWeights.size - 1) {
+                                    HorizontalDivider(
+                                        modifier = Modifier.padding(vertical = 8.dp),
+                                        color = MaterialTheme.colorScheme.outlineVariant
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    TextField(
-                                        value = weightText,
-                                        onValueChange = { 
-                                            weightText = it
-                                            it.toFloatOrNull()?.let { w ->
-                                                viewModel.updateCustomWeight(context, index, custom.name, w)
-                                            }
-                                        },
-                                        modifier = Modifier.weight(1.5f),
-                                        textStyle = MaterialTheme.typography.bodySmall,
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                        singleLine = true
-                                    )
-                                    IconButton(onClick = { viewModel.removeCustomWeight(context, index) }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
-                                    }
                                 }
                             }
                         }
@@ -244,6 +223,100 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     Text("Close")
                 }
             }
+        )
+    }
+}
+
+@Composable
+fun CustomWeightEntry(
+    index: Int,
+    name: String,
+    weight: Float,
+    caliber: Float,
+    unit: String,
+    onUpdate: (String, Float, Float, String) -> Unit,
+    onDelete: () -> Unit
+) {
+    var nameText by remember(name) { mutableStateOf(name) }
+    var weightText by remember(weight) { mutableStateOf(weight.toString()) }
+    var caliberText by remember(caliber) { mutableStateOf(caliber.toString()) }
+    var unitExpanded by remember { mutableStateOf(false) }
+    val units = listOf("mm", "inch", "cal", "ga")
+
+    Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+        // Row 1: Name and Delete
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextField(
+                value = nameText,
+                onValueChange = { 
+                    nameText = it
+                    onUpdate(it, weight, caliber, unit)
+                },
+                modifier = Modifier.weight(1f),
+                label = { Text(stringResource(R.string.weight_name_label), fontSize = 10.sp) },
+                textStyle = MaterialTheme.typography.bodySmall,
+                singleLine = true
+            )
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        // Row 2: Caliber and Unit Dropdown
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextField(
+                value = caliberText,
+                onValueChange = { 
+                    caliberText = it
+                    it.toFloatOrNull()?.let { c -> onUpdate(name, weight, c, unit) }
+                },
+                modifier = Modifier.weight(1f),
+                label = { Text(stringResource(R.string.caliber_label), fontSize = 10.sp) },
+                textStyle = MaterialTheme.typography.bodySmall,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true
+            )
+            
+            Box(modifier = Modifier.weight(0.6f)) {
+                OutlinedButton(
+                    onClick = { unitExpanded = true },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    Text(unit, style = MaterialTheme.typography.bodySmall)
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                }
+                DropdownMenu(expanded = unitExpanded, onDismissRequest = { unitExpanded = false }) {
+                    units.forEach { u ->
+                        DropdownMenuItem(
+                            text = { Text(u) },
+                            onClick = {
+                                onUpdate(name, weight, caliber, u)
+                                unitExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        // Row 3: Weight
+        TextField(
+            value = weightText,
+            onValueChange = { 
+                weightText = it
+                it.toFloatOrNull()?.let { w -> onUpdate(name, w, caliber, unit) }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(stringResource(R.string.weight_value_label), fontSize = 10.sp) },
+            textStyle = MaterialTheme.typography.bodySmall,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true
         )
     }
 }

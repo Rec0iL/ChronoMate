@@ -57,6 +57,7 @@
     <string name="no_custom_weights">Власних ваг не додано</string>
     <string name="weight_name_label">Назва</string>
     <string name="weight_value_label">Вага (г)</string>
+    <string name="caliber_label">Калібр</string>
     <string name="add_row_button">Додати рядок</string>
     <string name="no_custom_weights_dashboard">Власних ваг не визначено. Перейдіть до Налаштувань.</string>
     <string name="no_custom_weights_ballistics">Власних ваг не визначено.</string>

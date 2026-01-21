@@ -18,7 +18,9 @@ enum class WeightType {
 
 data class CustomWeight(
     val name: String,
-    val weight: Float
+    val weight: Float,
+    val caliber: Float = 6.0f,
+    val caliberUnit: String = "mm"
 )
 
 data class ChronoData(
