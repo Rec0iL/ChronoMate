@@ -318,7 +318,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         val weights = when (data.weightType) {
             WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f).map { it to "%.2f".format(it) }
             WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f).map { it to "%.2f".format(it) }
-            WeightType.CUSTOM -> data.customWeights.map { it.weight to it.name }
+            WeightType.CUSTOM -> data.customWeights.map { it.weight to "${it.name} ${it.caliber}${it.caliberUnit} %.2f g".format(it.weight) }
         }
 
         if (weights.isEmpty() && data.weightType == WeightType.CUSTOM) {

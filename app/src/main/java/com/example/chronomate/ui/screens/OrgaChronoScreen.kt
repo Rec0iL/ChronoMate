@@ -28,11 +28,13 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     
-    val weights = when (data.weightType) {
-        WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
-        WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f)
-        WeightType.CUSTOM -> data.customWeights.map { it.weight }
+    val weightItems = when (data.weightType) {
+        WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f).map { it to "%.2f g".format(it) }
+        WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f).map { it to "%.2f g".format(it) }
+        WeightType.CUSTOM -> data.customWeights.map { it.weight to "${it.name} ${it.caliber}${it.caliberUnit} %.2f g".format(it.weight) }
     }
+    
+    val weights = weightItems.map { it.first }
     
     // We get the raw velocity float from the latest shot for precision
     val latestVelocity = data.shots.lastOrNull()?.velocity ?: 0f
@@ -60,12 +62,12 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 Column(modifier = Modifier.weight(2.5f)) { 
                     Text(stringResource(R.string.joule_grid_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    if (weights.isEmpty()) {
+                    if (weightItems.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text("No weights available. Check settings.")
                         }
                     } else {
-                        JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 4)
+                        JouleGridStatic(velocity = latestVelocity, weights = weightItems, practicalWeight = practicalWeight, columns = 4)
                     }
                 }
             }
@@ -74,12 +76,12 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
             Spacer(modifier = Modifier.height(24.dp))
             Text(stringResource(R.string.joule_grid_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
-            if (weights.isEmpty()) {
+            if (weightItems.isEmpty()) {
                 Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                     Text("No weights available. Check settings.")
                 }
             } else {
-                JouleGridStatic(velocity = latestVelocity, weights = weights, practicalWeight = practicalWeight, columns = 2)
+                JouleGridStatic(velocity = latestVelocity, weights = weightItems, practicalWeight = practicalWeight, columns = 2)
             }
             Spacer(modifier = Modifier.height(24.dp))
             OrgaSettingsSection(data = data, viewModel = viewModel)
@@ -89,14 +91,14 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
 }
 
 @Composable
-fun JouleGridStatic(velocity: Float, weights: List<Float>, practicalWeight: Float, columns: Int) {
+fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practicalWeight: Float, columns: Int) {
     val isDark = isSystemInDarkTheme()
     val rows = weights.chunked(columns)
     
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         rows.forEach { rowWeights ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                rowWeights.forEach { weight ->
+                rowWeights.forEach { (weight, label) ->
                     val energy = 0.5f * (weight / 1000f) * velocity.pow(2)
                     
                     // Determine colors based on limits and theme
@@ -124,7 +126,7 @@ fun JouleGridStatic(velocity: Float, weights: List<Float>, practicalWeight: Floa
                     ) {
                         Column(modifier = Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                "%.2f g".format(weight), 
+                                label, 
                                 style = MaterialTheme.typography.labelSmall, 
                                 color = contentColor.copy(alpha = 0.8f)
                             )
