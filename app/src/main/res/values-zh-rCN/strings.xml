@@ -44,6 +44,8 @@
     <string name="general_settings">常规设置</string>
     <string name="dark_mode">深色模式</string>
     <string name="dark_mode_desc">在浅色和深色主题之间切换</string>
+    <string name="keep_screen_on">保持屏幕常亮</string>
+    <string name="keep_screen_on_desc">使用应用时防止设备进入睡眠状态</string>
     <string name="language">语言</string>
     <string name="restart_required_desc">需要重新启动以应用语言更改</string>
     <string name="ballistics_engine_params">弹道引擎参数</string>

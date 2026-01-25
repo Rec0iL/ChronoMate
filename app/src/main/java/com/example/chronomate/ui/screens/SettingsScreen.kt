@@ -58,6 +58,7 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Text(stringResource(R.string.general_settings), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(24.dp))
         
+        // Dark Mode Toggle
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -69,7 +70,25 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             }
             Switch(
                 checked = data.isDarkMode,
-                onCheckedChange = { viewModel.toggleDarkMode(it) }
+                onCheckedChange = { viewModel.toggleDarkMode(context, it) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Keep Screen On Toggle
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(stringResource(R.string.keep_screen_on), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.keep_screen_on_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(
+                checked = data.keepScreenOn,
+                onCheckedChange = { viewModel.toggleKeepScreenOn(context, it) }
             )
         }
 

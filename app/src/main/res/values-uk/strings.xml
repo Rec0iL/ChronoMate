@@ -44,6 +44,8 @@
     <string name="general_settings">Загальні налаштування</string>
     <string name="dark_mode">Темна тема</string>
     <string name="dark_mode_desc">Перемикання між світлою та темною темами</string>
+    <string name="keep_screen_on">Тримати екран увімкненим</string>
+    <string name="keep_screen_on_desc">Запобігає переходу пристрою в режим сну під час використання програми</string>
     <string name="language">Мова</string>
     <string name="restart_required_desc">Для застосування мови потрібен перезапуск</string>
     <string name="ballistics_engine_params">Параметри балістичного двигуна</string>
@@ -93,7 +95,7 @@
     <string name="hit_above">ВЛУЧАННЯ: %.1f см ВИЩЕ</string>
     <string name="hit_below">ВЛУЧАННЯ: %.1f см НИЖЧЕ</string>
     <string name="probe_dist">Відст: %.1f м</string>
-    <string name="probe_time">Час: %.2f с</string>
+    <string name="probe_time">Час: %.2f s</string>
     <string name="probe_height">Висота: %.1f см</string>
     <string name="probe_energy">Енергія: %.2f Дж</string>
     <string name="probe_rel_impact">Відносне влуч.: %.1f см</string>

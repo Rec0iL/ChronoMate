@@ -44,6 +44,8 @@
     <string name="general_settings">一般設定</string>
     <string name="dark_mode">深色模式</string>
     <string name="dark_mode_desc">切換淺色與深色主題</string>
+    <string name="keep_screen_on">保持螢幕常亮</string>
+    <string name="keep_screen_on_desc">使用應用時防止裝置進入睡眠狀態</string>
     <string name="language">語言</string>
     <string name="restart_required_desc">需要重新啟動以套用語言變更</string>
     <string name="ballistics_engine_params">彈道引擎參數</string>

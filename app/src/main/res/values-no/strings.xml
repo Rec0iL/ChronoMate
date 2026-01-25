@@ -44,6 +44,8 @@
     <string name="general_settings">Generelle innstillinger</string>
     <string name="dark_mode">Mørk modus</string>
     <string name="dark_mode_desc">Bytt mellom lyst og mørkt tema</string>
+    <string name="keep_screen_on">Hold skjermen på</string>
+    <string name="keep_screen_on_desc">Forhindrer at enheten går i dvale mens du bruker appen</string>
     <string name="language">Språk</string>
     <string name="restart_required_desc">Omstart kreves for å bruke språkendring</string>
     <string name="ballistics_engine_params">Ballistiske motorparametere</string>
@@ -84,7 +86,7 @@
 
     <string name="target_distance_label">Målavstand: %.0f m</string>
     <string name="shooter_h_label">Skytterhøyde (m)</string>
-    <string name="target_h_label">Målhøyde (m)</string>
+    <string name="target_h_label">Målhøjde (m)</string>
     <string name="speed_label">Fart: %.1f m/s</string>
     <string name="energy_label">Energi: %.2f J</string>
     <string name="hopup_label">Hop-Up: %.0f rad/s</string>

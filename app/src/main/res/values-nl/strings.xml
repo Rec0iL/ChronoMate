@@ -44,6 +44,8 @@
     <string name="general_settings">Algemene Instellingen</string>
     <string name="dark_mode">Donkere Modus</string>
     <string name="dark_mode_desc">Wissel tussen licht en donker thema</string>
+    <string name="keep_screen_on">Scherm aan laten</string>
+    <string name="keep_screen_on_desc">Voorkomt dat het apparaat in slaapstand gaat terwijl u de app gebruikt</string>
     <string name="language">Taal</string>
     <string name="restart_required_desc">Herstart vereist om taalwijziging toe te passen</string>
     <string name="ballistics_engine_params">Ballistiek Engine Parameters</string>

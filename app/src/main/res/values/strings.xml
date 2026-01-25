@@ -44,6 +44,8 @@
     <string name="general_settings">General Settings</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="dark_mode_desc">Toggle between light and dark theme</string>
+    <string name="keep_screen_on">Keep Screen On</string>
+    <string name="keep_screen_on_desc">Prevent the device from sleeping while using the app</string>
     <string name="language">Language</string>
     <string name="restart_required_desc">Restart required to apply language change</string>
     <string name="ballistics_engine_params">Ballistics Engine Parameters</string>

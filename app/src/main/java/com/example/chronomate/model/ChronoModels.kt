@@ -38,6 +38,7 @@ data class ChronoData(
     val currentEnergy: Float = 0f,
     val wifiStatus: String = "Disconnected",
     val isDarkMode: Boolean = true,
+    val keepScreenOn: Boolean = false,
     val language: String = "en",
     val maxAllowedJoule: Float = 1.5f,
     val maxAllowedOverhopCm: Float = 15.0f,

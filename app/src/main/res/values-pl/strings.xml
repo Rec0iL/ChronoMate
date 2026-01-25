@@ -44,6 +44,8 @@
     <string name="general_settings">Ustawienia ogólne</string>
     <string name="dark_mode">Tryb ciemny</string>
     <string name="dark_mode_desc">Przełącz między jasnym a ciemnym motywem</string>
+    <string name="keep_screen_on">Zawsze włączony ekran</string>
+    <string name="keep_screen_on_desc">Zapobiega przechodzeniu urządzenia w tryb uśpienia podczas korzystania z aplikacji</string>
     <string name="language">Język</string>
     <string name="restart_required_desc">Wymagany restart, aby zastosować zmianę języka</string>
     <string name="ballistics_engine_params">Parametry silnika balistycznego</string>

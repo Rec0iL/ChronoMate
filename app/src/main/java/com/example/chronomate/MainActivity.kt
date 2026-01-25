@@ -88,10 +88,8 @@ class MainActivity : ComponentActivity() {
             ChronoMateTheme(darkTheme = data.isDarkMode) {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestMultiplePermissions()
-                ) { permissions ->
-                    if (permissions.values.all { it }) {
-                        viewModel.connectToChronoWifi(context)
-                    }
+                ) { _ ->
+                    // Permissions granted, we just wait for the user to tap connect
                 }
 
                 LaunchedEffect(Unit) {
@@ -115,11 +113,7 @@ class MainActivity : ComponentActivity() {
                         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
                     }
 
-                    if (allGranted) {
-                        if (data.wifiStatus == "Disconnected") {
-                            viewModel.connectToChronoWifi(context)
-                        }
-                    } else {
+                    if (!allGranted) {
                         permissionLauncher.launch(requiredPermissions)
                     }
                 }

@@ -44,6 +44,8 @@
     <string name="general_settings">Impostazioni Generali</string>
     <string name="dark_mode">Modalità Scura</string>
     <string name="dark_mode_desc">Passa dal tema chiaro a quello scuro</string>
+    <string name="keep_screen_on">Mantieni schermo attivo</string>
+    <string name="keep_screen_on_desc">Impedisce al dispositivo di andare in standby mentre usi l\'app</string>
     <string name="language">Lingua</string>
     <string name="restart_required_desc">Riavvio richiesto per applicare la lingua</string>
     <string name="ballistics_engine_params">Parametri Motore Balistico</string>

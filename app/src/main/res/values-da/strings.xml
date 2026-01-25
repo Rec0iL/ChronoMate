@@ -44,6 +44,8 @@
     <string name="general_settings">Generelle indstillinger</string>
     <string name="dark_mode">Mørk tilstand</string>
     <string name="dark_mode_desc">Skift mellem lyst og mørkt tema</string>
+    <string name="keep_screen_on">Hold skærmen tændt</string>
+    <string name="keep_screen_on_desc">Forhindrer enheden i at gå i dvale, mens appen bruges</string>
     <string name="language">Sprog</string>
     <string name="restart_required_desc">Genstart påkrævet for at anvende sprogskift</string>
     <string name="ballistics_engine_params">Ballistiske motorparametre</string>

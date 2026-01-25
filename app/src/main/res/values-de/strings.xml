@@ -44,6 +44,8 @@
     <string name="general_settings">Allgemeine Einstellungen</string>
     <string name="dark_mode">Dunkler Modus</string>
     <string name="dark_mode_desc">Zwischen hellem und dunklem Design wechseln</string>
+    <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
+    <string name="keep_screen_on_desc">Verhindert, dass das Gerät in den Ruhezustand wechselt, während die App verwendet wird</string>
     <string name="language">Sprache</string>
     <string name="restart_required_desc">Neustart erforderlich, um die Sprachänderung zu übernehmen</string>
     <string name="ballistics_engine_params">Parameter der Ballistik-Engine</string>

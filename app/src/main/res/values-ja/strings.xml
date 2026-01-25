@@ -44,6 +44,8 @@
     <string name="general_settings">全般設定</string>
     <string name="dark_mode">ダークモード</string>
     <string name="dark_mode_desc">ライトテーマとダークテーマを切り替えます</string>
+    <string name="keep_screen_on">画面を常時点灯</string>
+    <string name="keep_screen_on_desc">アプリ使用中にデバイスがスリープ状態になるのを防ぎます</string>
     <string name="language">言語</string>
     <string name="restart_required_desc">言語設定を適用するには再起動が必要です</string>
     <string name="ballistics_engine_params">弾道エンジンパラメータ</string>
