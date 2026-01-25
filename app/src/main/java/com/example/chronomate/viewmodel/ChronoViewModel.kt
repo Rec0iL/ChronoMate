@@ -1,6 +1,7 @@
 package com.example.chronomate.viewmodel
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
@@ -9,7 +10,11 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.wifi.WifiNetworkSpecifier
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,6 +36,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -39,12 +45,13 @@ class ChronoViewModel(context: Context) : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
-        .readTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
+        .connectTimeout(3, TimeUnit.SECONDS)
+        .readTimeout(3, TimeUnit.SECONDS)
         .build()
 
     private var lastSeenRawShots = emptyList<Float>()
-    private val url = "http://192.168.1.1"
+    private val url = "http://8.8.8.8"
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
     init {
         startPolling()
@@ -71,6 +78,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
         _uiState.update { it.copy(
             isDarkMode = prefs.getBoolean("dark_mode", true),
+            keepScreenOn = prefs.getBoolean("keep_screen_on", false),
             language = prefs.getString("language", "en") ?: "en",
             maxAllowedJoule = prefs.getFloat("max_joule", 1.5f),
             maxAllowedOverhopCm = prefs.getFloat("max_overhop", 15f),
@@ -83,6 +91,11 @@ class ChronoViewModel(context: Context) : ViewModel() {
             spinDampingCr = prefs.getFloat("spin_damping", 0.01f),
             gravity = prefs.getFloat("gravity", 9.81f)
         ) }
+        
+        // Apply initial screen on state
+        if (_uiState.value.keepScreenOn) {
+            applyKeepScreenOn(context, true)
+        }
     }
 
     private fun savePreference(context: Context, key: String, value: Any) {
@@ -102,8 +115,25 @@ class ChronoViewModel(context: Context) : ViewModel() {
         savePreference(context, "custom_weights", serialized)
     }
 
-    fun toggleDarkMode(enabled: Boolean) {
+    fun toggleDarkMode(context: Context, enabled: Boolean) {
         _uiState.update { it.copy(isDarkMode = enabled) }
+        savePreference(context, "dark_mode", enabled)
+    }
+
+    fun toggleKeepScreenOn(context: Context, enabled: Boolean) {
+        _uiState.update { it.copy(keepScreenOn = enabled) }
+        savePreference(context, "keep_screen_on", enabled)
+        applyKeepScreenOn(context, enabled)
+    }
+
+    private fun applyKeepScreenOn(context: Context, enabled: Boolean) {
+        if (context is Activity) {
+            if (enabled) {
+                context.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                context.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
     }
 
     fun setLanguage(context: Context, langCode: String) {
@@ -199,22 +229,48 @@ class ChronoViewModel(context: Context) : ViewModel() {
     }
 
     fun connectToChronoWifi(context: Context) {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val request = NetworkRequest.Builder()
-            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            .build()
-
-        connectivityManager.requestNetwork(request, object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                connectivityManager.bindProcessToNetwork(network)
-                _uiState.update { it.copy(wifiStatus = "Connected to Chrono") }
+        try {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            
+            networkCallback?.let { 
+                try { connectivityManager.unregisterNetworkCallback(it) } catch (e: Exception) {}
             }
 
-            override fun onLost(network: Network) {
-                connectivityManager.bindProcessToNetwork(null)
-                _uiState.update { it.copy(wifiStatus = "Disconnected", isConnected = false) }
+            val requestBuilder = NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val specifier = WifiNetworkSpecifier.Builder()
+                    .setSsid("HT-X3000")
+                    .setWpa2Passphrase("88888888")
+                    .build()
+                requestBuilder.setNetworkSpecifier(specifier)
             }
-        })
+
+            val request = requestBuilder.build()
+            _uiState.update { it.copy(wifiStatus = "Connecting...") }
+
+            val callback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    connectivityManager.bindProcessToNetwork(network)
+                    _uiState.update { it.copy(wifiStatus = "Connected to Chrono", isConnected = true) }
+                }
+
+                override fun onLost(network: Network) {
+                    connectivityManager.bindProcessToNetwork(null)
+                    _uiState.update { it.copy(wifiStatus = "Disconnected", isConnected = false) }
+                }
+
+                override fun onUnavailable() {
+                    _uiState.update { it.copy(wifiStatus = "Connection Failed", isConnected = false) }
+                }
+            }
+            
+            networkCallback = callback
+            connectivityManager.requestNetwork(request, callback)
+        } catch (e: Exception) {
+            _uiState.update { it.copy(wifiStatus = "Error: ${e.message}") }
+        }
     }
 
     private fun startPolling() {
@@ -287,7 +343,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
             val latestShot = currentSessionShots.lastOrNull()
             val currentVelocityString = latestShot?.velocity?.let { "%.2f".format(it) } ?: "0.00"
-            val currentEnergy = latestShot?.energyJoules ?: 0f
+            val current_energy = latestShot?.energyJoules ?: 0f
 
             val velocities = currentSessionShots.map { it.velocity }
             val avg = if (velocities.isNotEmpty()) velocities.average().toFloat() else 0f
@@ -311,7 +367,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 extremeSpread = es,
                 standardDeviation = sd,
                 variance = varVal,
-                currentEnergy = currentEnergy,
+                currentEnergy = current_energy,
                 isConnected = true
             )
         }
@@ -332,10 +388,11 @@ class ChronoViewModel(context: Context) : ViewModel() {
             withContext(Dispatchers.IO) {
                 try {
                     val pdfDocument = PdfDocument()
-                    val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
-                    val page = pdfDocument.startPage(pageInfo)
-                    val canvas = page.canvas
-                    val paint = Paint()
+                    var pageNumber = 1
+                    var pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
+                    var currentPage = pdfDocument.startPage(pageInfo)
+                    var currentCanvas = currentPage.canvas
+                    
                     val titlePaint = Paint().apply {
                         textSize = 24f
                         isFakeBoldText = true
@@ -359,20 +416,20 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     }
 
                     var y = 50f
-                    canvas.drawRect(40f, y, 60f, y + 30f, accentPaint)
-                    canvas.drawText("ChronoMate Report", 70f, y + 24f, titlePaint)
+                    currentCanvas.drawRect(40f, y, 60f, y + 30f, accentPaint)
+                    currentCanvas.drawText("ChronoMate Report", 70f, y + 24f, titlePaint)
                     
                     y += 60f
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    canvas.drawText("Date: ${dateFormat.format(Date())}", 40f, y, bodyPaint)
+                    currentCanvas.drawText("Date: ${dateFormat.format(Date())}", 40f, y, bodyPaint)
                     y += 20f
-                    canvas.drawText("Total Shots in Report: ${shotsToExport.size}", 40f, y, bodyPaint)
+                    currentCanvas.drawText("Total Shots in Report: ${shotsToExport.size}", 40f, y, bodyPaint)
 
                     // Stats Section
                     y += 40f
-                    canvas.drawRect(40f, y, 555f, y + 2f, accentPaint)
+                    currentCanvas.drawRect(40f, y, 555f, y + 2f, accentPaint)
                     y += 25f
-                    canvas.drawText("SESSION STATISTICS", 40f, y, headerPaint)
+                    currentCanvas.drawText("SESSION STATISTICS", 40f, y, headerPaint)
                     
                     y += 30f
                     val col1 = 40f
@@ -388,18 +445,18 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     val varVal = if (velocities.size > 1) velocities.sumOf { (it - mean).pow(2.0) }.toFloat() / velocities.size else 0f
                     val sd = sqrt(varVal)
 
-                    canvas.drawText("AVERAGE: %.1f m/s".format(avg), col1, y, bodyPaint)
-                    canvas.drawText("MAX: %.1f m/s".format(max), col2, y, bodyPaint)
-                    canvas.drawText("MIN: %.1f m/s".format(min), col3, y, bodyPaint)
+                    currentCanvas.drawText("AVERAGE: %.1f m/s".format(avg), col1, y, bodyPaint)
+                    currentCanvas.drawText("MAX: %.1f m/s".format(max), col2, y, bodyPaint)
+                    currentCanvas.drawText("MIN: %.1f m/s".format(min), col3, y, bodyPaint)
                     
                     y += 25f
-                    canvas.drawText("EXTREME SPREAD: %.1f m/s".format(es), col1, y, bodyPaint)
-                    canvas.drawText("STANDARD DEVIATION: %.2f m/s".format(sd), col2, y, bodyPaint)
-                    canvas.drawText("ROF: ${data.fireRate} r/m", col3, y, bodyPaint)
+                    currentCanvas.drawText("EXTREME SPREAD: %.1f m/s".format(es), col1, y, bodyPaint)
+                    currentCanvas.drawText("STANDARD DEVIATION: %.2f m/s".format(sd), col2, y, bodyPaint)
+                    currentCanvas.drawText("ROF: ${data.fireRate} r/m", col3, y, bodyPaint)
 
                     // Graph Section
                     y += 50f
-                    canvas.drawText("VELOCITY TREND (m/s)", 40f, y, headerPaint)
+                    currentCanvas.drawText("VELOCITY TREND (m/s)", 40f, y, headerPaint)
                     y += 20f
                     
                     val graphHeight = 150f
@@ -407,7 +464,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     val graphLeft = 80f // Shifted right for Y axis labels
                     val graphTop = y
                     
-                    canvas.drawRect(graphLeft, graphTop, graphLeft + graphWidth, graphTop + graphHeight, Paint().apply {
+                    currentCanvas.drawRect(graphLeft, graphTop, graphLeft + graphWidth, graphTop + graphHeight, Paint().apply {
                         color = Color.LTGRAY
                         alpha = 30
                         style = Paint.Style.FILL
@@ -421,10 +478,10 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     val displayRange = (displayMax - displayMin).coerceAtLeast(0.1f)
 
                     // Draw Chart Axis Labels
-                    canvas.drawText("%.1f".format(displayMax), graphLeft - 5f, graphTop + 10f, labelPaint.apply { textAlign = Paint.Align.RIGHT })
-                    canvas.drawText("%.1f".format(displayMin), graphLeft - 5f, graphTop + graphHeight, labelPaint)
-                    canvas.drawText("m/s", graphLeft - 5f, graphTop - 5f, labelPaint)
-                    canvas.drawText("SHOT #", graphLeft + graphWidth/2, graphTop + graphHeight + 25f, labelPaint.apply { textAlign = Paint.Align.CENTER })
+                    currentCanvas.drawText("%.1f".format(displayMax), graphLeft - 5f, graphTop + 10f, labelPaint.apply { textAlign = Paint.Align.RIGHT })
+                    currentCanvas.drawText("%.1f".format(displayMin), graphLeft - 5f, graphTop + graphHeight, labelPaint)
+                    currentCanvas.drawText("m/s", graphLeft - 5f, graphTop - 5f, labelPaint)
+                    currentCanvas.drawText("SHOT #", graphLeft + graphWidth/2, graphTop + graphHeight + 25f, labelPaint.apply { textAlign = Paint.Align.CENTER })
 
                     // Draw Average Line (Orange)
                     val avgY = graphTop + graphHeight - ((avg - displayMin) / displayRange) * graphHeight
@@ -434,7 +491,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         pathEffect = DashPathEffect(floatArrayOf(5f, 5f), 0f)
                         style = Paint.Style.STROKE
                     }
-                    canvas.drawLine(graphLeft, avgY, graphLeft + graphWidth, avgY, avgLinePaint)
+                    currentCanvas.drawLine(graphLeft, avgY, graphLeft + graphWidth, avgY, avgLinePaint)
                     
                     val path = Path()
                     val graphPaint = Paint().apply {
@@ -448,42 +505,75 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         val py = graphTop + graphHeight - ((shot.velocity - displayMin) / displayRange) * graphHeight
                         
                         if (index == 0) path.moveTo(x, py) else path.lineTo(x, py)
-                        canvas.drawCircle(x, py, 3f, Paint().apply { color = Color.parseColor("#2E7D32") })
+                        currentCanvas.drawCircle(x, py, 3f, Paint().apply { color = Color.parseColor("#2E7D32") })
                     }
-                    canvas.drawPath(path, graphPaint)
+                    currentCanvas.drawPath(path, graphPaint)
                     
                     y += graphHeight + 45f
                     
                     // Table Header
-                    canvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
-                    canvas.drawText("#", 50f, y + 15f, headerPaint)
-                    canvas.drawText("Weight (g)", 100f, y + 15f, headerPaint)
-                    canvas.drawText("Velocity (m/s)", 250f, y + 15f, headerPaint)
-                    canvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
+                    currentCanvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
+                    currentCanvas.drawText("#", 50f, y + 15f, headerPaint)
+                    currentCanvas.drawText("Weight (g)", 100f, y + 15f, headerPaint)
+                    currentCanvas.drawText("Velocity (m/s)", 250f, y + 15f, headerPaint)
+                    currentCanvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
                     
                     y += 35f
-                    val reversedShots = shotsToExport.asReversed()
-                    for (index in reversedShots.indices) {
-                        val shot = reversedShots[index]
-                        val shotNum = shotsToExport.size - index
-                        canvas.drawText("%02d".format(shotNum), 50f, y, bodyPaint)
-                        canvas.drawText("%.2f".format(shot.weightGrams), 100f, y, bodyPaint)
-                        canvas.drawText("%.1f".format(shot.velocity), 250f, y, bodyPaint)
-                        canvas.drawText("%.2f".format(shot.energyJoules), 450f, y, bodyPaint)
+                    // Now showing shots in chronological order (oldest first)
+                    for (index in shotsToExport.indices) {
+                        // Pagination check
+                        if (y > 780f) {
+                            pdfDocument.finishPage(currentPage)
+                            pageNumber++
+                            pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
+                            currentPage = pdfDocument.startPage(pageInfo)
+                            currentCanvas = currentPage.canvas
+                            y = 50f
+                            
+                            // Redraw table header on new page
+                            currentCanvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
+                            currentCanvas.drawText("#", 50f, y + 15f, headerPaint)
+                            currentCanvas.drawText("Weight (g)", 100f, y + 15f, headerPaint)
+                            currentCanvas.drawText("Velocity (m/s)", 250f, y + 15f, headerPaint)
+                            currentCanvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
+                            y += 35f
+                        }
+
+                        val shot = shotsToExport[index]
+                        // shotNum relative to the session
+                        val shotNum = (data.shots.size - shotsToExport.size) + index + 1
+                        currentCanvas.drawText("%02d".format(shotNum), 50f, y, bodyPaint)
+                        currentCanvas.drawText("%.2f".format(shot.weightGrams), 100f, y, bodyPaint)
+                        currentCanvas.drawText("%.1f".format(shot.velocity), 250f, y, bodyPaint)
+                        currentCanvas.drawText("%.2f".format(shot.energyJoules), 450f, y, bodyPaint)
                         y += 20f
                     }
 
-                    pdfDocument.finishPage(page)
+                    pdfDocument.finishPage(currentPage)
 
-                    val file = File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                        "ChronoMate_Report_${System.currentTimeMillis()}.pdf"
-                    )
-                    pdfDocument.writeTo(FileOutputStream(file))
-                    pdfDocument.close()
+                    // Modern way to save to Downloads using MediaStore
+                    val fileName = "ChronoMate_Report_${System.currentTimeMillis()}.pdf"
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/ChronoMate")
+                        }
+                    }
 
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "PDF saved to Downloads", Toast.LENGTH_LONG).show()
+                    val resolver = context.contentResolver
+                    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                    
+                    if (uri != null) {
+                        resolver.openOutputStream(uri)?.use { outputStream ->
+                            pdfDocument.writeTo(outputStream)
+                        }
+                        pdfDocument.close()
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "PDF saved to Downloads/ChronoMate", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        throw Exception("Could not create PDF file in Downloads")
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {

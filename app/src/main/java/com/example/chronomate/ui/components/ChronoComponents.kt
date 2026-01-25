@@ -138,7 +138,8 @@ fun ShotChart(shots: List<Shot>, modifier: Modifier = Modifier) {
     
     val primaryColor = MaterialTheme.colorScheme.primary
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
-    val labelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    val trendColor = if (isLight) Color(0xFF2E7D32) else Color(0xFF88FF11)
 
     Box(modifier = modifier.padding(start = 40.dp, bottom = 20.dp, top = 10.dp, end = 10.dp)) {
         Canvas(
@@ -223,14 +224,14 @@ fun ShotChart(shots: List<Shot>, modifier: Modifier = Modifier) {
                 }
                 drawPath(
                     path = path,
-                    color = Color(0xFF88FF11),
+                    color = trendColor,
                     style = Stroke(width = 2.dp.toPx())
                 )
             }
 
             points.forEachIndexed { index, point ->
                 drawCircle(
-                    color = if (selectedIndex == index) primaryColor else Color(0xFF88FF11),
+                    color = if (selectedIndex == index) primaryColor else trendColor,
                     radius = if (selectedIndex == index) 5.dp.toPx() else 3.dp.toPx(),
                     center = point
                 )
@@ -281,6 +282,9 @@ fun ShotChart(shots: List<Shot>, modifier: Modifier = Modifier) {
 
 @Composable
 fun ShotRow(shot: Shot, index: Int) {
+    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    val trendColor = if (isLight) Color(0xFF2E7D32) else Color(0xFF88FF11)
+
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -306,7 +310,7 @@ fun ShotRow(shot: Shot, index: Int) {
             Box(
                 modifier = Modifier
                     .size(6.dp)
-                    .background(Color(0xFF88FF11), shape = CircleShape)
+                    .background(trendColor, shape = CircleShape)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = "%.2f J".format(shot.energyJoules), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)

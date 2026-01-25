@@ -1,7 +1,6 @@
 package com.example.chronomate.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,6 +26,7 @@ import kotlin.math.pow
 fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isDark = data.isDarkMode
     
     val weightItems = when (data.weightType) {
         WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f).map { it to "%.2f g".format(it) }
@@ -67,7 +67,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
                             Text("No weights available. Check settings.")
                         }
                     } else {
-                        JouleGridStatic(velocity = latestVelocity, weights = weightItems, practicalWeight = practicalWeight, columns = 4)
+                        JouleGridStatic(velocity = latestVelocity, weights = weightItems, practicalWeight = practicalWeight, columns = 4, isDark = isDark)
                     }
                 }
             }
@@ -81,7 +81,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     Text("No weights available. Check settings.")
                 }
             } else {
-                JouleGridStatic(velocity = latestVelocity, weights = weightItems, practicalWeight = practicalWeight, columns = 2)
+                JouleGridStatic(velocity = latestVelocity, weights = weightItems, practicalWeight = practicalWeight, columns = 2, isDark = isDark)
             }
             Spacer(modifier = Modifier.height(24.dp))
             OrgaSettingsSection(data = data, viewModel = viewModel)
@@ -91,8 +91,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
 }
 
 @Composable
-fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practicalWeight: Float, columns: Int) {
-    val isDark = isSystemInDarkTheme()
+fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practicalWeight: Float, columns: Int, isDark: Boolean) {
     val rows = weights.chunked(columns)
     
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -104,19 +103,20 @@ fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practic
                     // Determine colors based on limits and theme
                     val (bgColor, contentColor) = when {
                         velocity <= 0f -> {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) to MaterialTheme.colorScheme.onSurfaceVariant
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) to 
+                                (if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color.Black)
                         }
                         weight < practicalWeight -> {
-                            if (isDark) Color(0xFF1B5E20).copy(alpha = 0.4f) to Color(0xFFA5D6A7)
-                            else Color(0xFFC8E6C9) to Color(0xFF1B5E20)
+                            if (isDark) Color(0xFF1B5E20) to Color(0xFF4CAF50)
+                            else Color(0xFF2E7D32) to Color.White
                         }
                         weight == practicalWeight -> {
-                            if (isDark) Color(0xFFE65100).copy(alpha = 0.4f) to Color(0xFFFFCC80)
-                            else Color(0xFFFFE0B2) to Color(0xFFE65100)
+                            if (isDark) Color(0xFFE65100) to Color(0xFFFFEB3B)
+                            else Color(0xFFEF6C00) to Color.White
                         }
                         else -> {
-                            if (isDark) Color(0xFFB71C1C).copy(alpha = 0.4f) to Color(0xFFEF9A9A)
-                            else Color(0xFFFFCDD2) to Color(0xFFB71C1C)
+                            if (isDark) Color(0xFFB71C1C) to Color(0xFFF44336)
+                            else Color(0xFFC62828) to Color.White
                         }
                     }
 
@@ -149,14 +149,14 @@ fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practic
 
 @Composable
 fun OrgaHeroSection(data: ChronoData, practicalWeight: Float, sparePercentage: Float) {
-    val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
+    val isDark = data.isDarkMode
     val chronoGreen = Color(0xFF88FF11)
-    val contentColor = if (isLight) MaterialTheme.colorScheme.onPrimaryContainer else chronoGreen
+    val contentColor = if (!isDark) MaterialTheme.colorScheme.onPrimaryContainer else chronoGreen
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isLight) MaterialTheme.colorScheme.primaryContainer else Color.Black
+            containerColor = if (!isDark) MaterialTheme.colorScheme.primaryContainer else Color.Black
         )
     ) {
         Column(
@@ -199,13 +199,13 @@ fun OrgaHeroSection(data: ChronoData, practicalWeight: Float, sparePercentage: F
                 Text(
                     text = stringResource(R.string.over_limit),
                     fontSize = 32.sp,
-                    color = if (isLight) Color(0xFFB71C1C) else Color.Red,
+                    color = if (!isDark) Color(0xFFB71C1C) else Color.Red,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = stringResource(R.string.too_hot_for_20),
                     style = MaterialTheme.typography.labelSmall,
-                    color = (if (isLight) Color(0xFFB71C1C) else Color.Red).copy(alpha = 0.7f)
+                    color = (if (!isDark) Color(0xFFB71C1C) else Color.Red).copy(alpha = 0.7f)
                 )
             }
         }
