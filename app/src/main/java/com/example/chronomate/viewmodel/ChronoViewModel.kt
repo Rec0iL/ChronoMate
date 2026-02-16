@@ -18,10 +18,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chronomate.model.ChronoData
-import com.example.chronomate.model.CustomWeight
-import com.example.chronomate.model.Shot
-import com.example.chronomate.model.WeightType
+import com.example.chronomate.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +29,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -44,10 +39,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private val _uiState = MutableStateFlow(ChronoData())
     val uiState = _uiState.asStateFlow()
 
-    private val client = OkHttpClient.Builder()
+    private val baseClient = OkHttpClient.Builder()
         .connectTimeout(3, TimeUnit.SECONDS)
         .readTimeout(3, TimeUnit.SECONDS)
         .build()
+
+    // This client will be swapped when the specific network is available
+    @Volatile
+    private var activeClient: OkHttpClient = baseClient
 
     private var lastSeenRawShots = emptyList<Float>()
     private val url = "http://8.8.8.8"
@@ -76,6 +75,20 @@ class ChronoViewModel(context: Context) : ViewModel() {
             }
         } else emptyList()
 
+        val calibrationEntriesJson = prefs.getString("calibration_entries", "[]") ?: "[]"
+        val calibrationEntries = if (calibrationEntriesJson != "[]" && calibrationEntriesJson.isNotEmpty()) {
+            calibrationEntriesJson.split(";").mapNotNull {
+                val parts = it.split(":")
+                if (parts.size >= 1) {
+                    val chronoValue = parts[0].toFloatOrNull() ?: return@mapNotNull null
+                    val controlValue = if (parts.size >= 2) parts[1].toFloatOrNull() else null
+                    CalibrationEntry(chronoValue, controlValue)
+                } else null
+            }
+        } else emptyList()
+
+        val compMode = CompensationMode.valueOf(prefs.getString("comp_mode", CompensationMode.NONE.name) ?: CompensationMode.NONE.name)
+
         _uiState.update { it.copy(
             isDarkMode = prefs.getBoolean("dark_mode", true),
             keepScreenOn = prefs.getBoolean("keep_screen_on", false),
@@ -89,10 +102,13 @@ class ChronoViewModel(context: Context) : ViewModel() {
             dragCoefficientCw = prefs.getFloat("drag_coeff", 0.35f),
             magnusCoefficientK = prefs.getFloat("magnus_coeff", 0.002f),
             spinDampingCr = prefs.getFloat("spin_damping", 0.01f),
-            gravity = prefs.getFloat("gravity", 9.81f)
+            gravity = prefs.getFloat("gravity", 9.81f),
+            compensationMode = compMode,
+            calibrationEntries = calibrationEntries
         ) }
         
-        // Apply initial screen on state
+        updateCompensationFactor()
+
         if (_uiState.value.keepScreenOn) {
             applyKeepScreenOn(context, true)
         }
@@ -113,6 +129,15 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private fun saveCustomWeights(context: Context, weights: List<CustomWeight>) {
         val serialized = weights.joinToString(";") { "${it.name}:${it.weight}:${it.caliber}:${it.caliberUnit}" }
         savePreference(context, "custom_weights", serialized)
+    }
+
+    private fun saveCalibration(context: Context) {
+        val state = _uiState.value
+        val serialized = state.calibrationEntries.joinToString(";") { 
+            "${it.chronoValue}:${it.controlValue ?: ""}"
+        }
+        savePreference(context, "calibration_entries", serialized)
+        savePreference(context, "comp_mode", state.compensationMode.name)
     }
 
     fun toggleDarkMode(context: Context, enabled: Boolean) {
@@ -140,13 +165,11 @@ class ChronoViewModel(context: Context) : ViewModel() {
         savePreference(context, "language", langCode)
         _uiState.update { it.copy(language = langCode) }
         
-        // Trigger restart
         if (context is Activity) {
             val intent = context.intent
             context.finish()
             context.startActivity(intent)
         } else {
-            // Fallback for cases where context is not an activity
             val pm = context.packageManager
             val intent = pm.getLaunchIntentForPackage(context.packageName)
             intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -228,6 +251,108 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
+    // Calibration Methods
+    fun setCompensationMode(context: Context, mode: CompensationMode) {
+        _uiState.update { it.copy(compensationMode = mode) }
+        updateCompensationFactor()
+        saveCalibration(context)
+    }
+
+    fun startCalibration() {
+        _uiState.update { it.copy(isCalibrationActive = true) }
+    }
+
+    fun stopCalibration() {
+        _uiState.update { it.copy(isCalibrationActive = false) }
+    }
+
+    fun updateCalibrationControlValue(context: Context, index: Int, value: Float?) {
+        _uiState.update { current ->
+            val newList = current.calibrationEntries.toMutableList()
+            if (index in newList.indices) {
+                newList[index] = newList[index].copy(controlValue = value)
+            }
+            current.copy(calibrationEntries = newList)
+        }
+        updateCompensationFactor()
+        saveCalibration(context)
+    }
+
+    fun removeCalibrationEntry(context: Context, index: Int) {
+        _uiState.update { current ->
+            val newList = current.calibrationEntries.toMutableList()
+            if (index in newList.indices) {
+                newList.removeAt(index)
+            }
+            current.copy(calibrationEntries = newList)
+        }
+        updateCompensationFactor()
+        saveCalibration(context)
+    }
+
+    fun clearCalibration(context: Context) {
+        _uiState.update { it.copy(calibrationEntries = emptyList()) }
+        updateCompensationFactor()
+        saveCalibration(context)
+    }
+
+    private fun updateCompensationFactor() {
+        _uiState.update { current ->
+            val entriesWithControl = current.calibrationEntries.filter { it.controlValue != null && it.chronoValue > 0 }
+            val factor = when (current.compensationMode) {
+                CompensationMode.NONE -> 1.0f
+                CompensationMode.MEDIAN -> {
+                    if (entriesWithControl.isEmpty()) 1.0f
+                    else {
+                        val ratios = entriesWithControl.map { it.controlValue!! / it.chronoValue }
+                        val medianRatio = ratios.sorted()[ratios.size / 2]
+                        (1.0f + medianRatio) / 2.0f
+                    }
+                }
+                CompensationMode.TRUST_EXTERNAL -> {
+                    if (entriesWithControl.isEmpty()) 1.0f
+                    else {
+                        val ratios = entriesWithControl.map { it.controlValue!! / it.chronoValue }
+                        ratios.sorted()[ratios.size / 2]
+                    }
+                }
+            }
+            
+            // Re-apply factor to all existing shots to ensure history/stats update instantly
+            val updatedShots = current.shots.map { it.copy(compensationFactor = factor) }
+            
+            // Recalculate stats based on updated shots
+            val velocities = updatedShots.map { it.velocity }
+            val avg = if (velocities.isNotEmpty()) velocities.average().toFloat() else 0f
+            val max = if (velocities.isNotEmpty()) velocities.maxOrNull() ?: 0f else 0f
+            val min = if (velocities.isNotEmpty()) velocities.minOrNull() ?: 0f else 0f
+            val es = if (velocities.isNotEmpty()) max - min else 0f
+            
+            val varVal = if (velocities.size > 1) {
+                val mean = velocities.average()
+                velocities.sumOf { (it - mean).pow(2.0) }.toFloat() / velocities.size
+            } else 0f
+            val sd = sqrt(varVal)
+
+            val latestShot = updatedShots.lastOrNull()
+            val currentVelocityString = latestShot?.velocity?.let { "%.2f".format(it) } ?: "0.00"
+            val currentEnergy = latestShot?.energyJoules ?: 0f
+
+            current.copy(
+                compensationFactor = factor,
+                shots = updatedShots,
+                averageVelocity = avg,
+                maxVelocity = max,
+                minVelocity = min,
+                extremeSpread = es,
+                standardDeviation = sd,
+                variance = varVal,
+                velocity = currentVelocityString,
+                currentEnergy = currentEnergy
+            )
+        }
+    }
+
     fun connectToChronoWifi(context: Context) {
         try {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -238,6 +363,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
             val requestBuilder = NetworkRequest.Builder()
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val specifier = WifiNetworkSpecifier.Builder()
@@ -252,12 +378,20 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
+                    // 1. Bind the process (hint for the OS)
                     connectivityManager.bindProcessToNetwork(network)
+                    
+                    // 2. Bind the OkHttpClient specifically (guarantee for the app)
+                    activeClient = baseClient.newBuilder()
+                        .socketFactory(network.socketFactory)
+                        .build()
+
                     _uiState.update { it.copy(wifiStatus = "Connected to Chrono", isConnected = true) }
                 }
 
                 override fun onLost(network: Network) {
                     connectivityManager.bindProcessToNetwork(null)
+                    activeClient = baseClient
                     _uiState.update { it.copy(wifiStatus = "Disconnected", isConnected = false) }
                 }
 
@@ -281,7 +415,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         .url(url)
                         .header("Cache-Control", "no-cache") 
                         .build()
-                    client.newCall(request).execute().use { response ->
+                    
+                    // Always use the current activeClient
+                    activeClient.newCall(request).execute().use { response ->
                         if (response.isSuccessful) {
                             val html = response.body?.string() ?: ""
                             if (html.isNotEmpty()) {
@@ -313,6 +449,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
         _uiState.update { current ->
             val currentSessionShots = current.shots.toMutableList()
+            val currentCalibrationEntries = current.calibrationEntries.toMutableList()
             val currentWeight = current.selectedWeight
             var updatedLastSeen = lastSeenRawShots
 
@@ -334,7 +471,15 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 }
                 
                 newShotsToAdd.forEach { vel ->
-                    currentSessionShots.add(Shot(vel, currentWeight))
+                    currentSessionShots.add(Shot(
+                        rawVelocity = vel, 
+                        weightGrams = currentWeight, 
+                        compensationFactor = current.compensationFactor
+                    ))
+                    
+                    if (current.isCalibrationActive && currentCalibrationEntries.size < 100) {
+                        currentCalibrationEntries.add(CalibrationEntry(vel))
+                    }
                 }
                 updatedLastSeen = rawShots
             }
@@ -361,6 +506,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 velocity = currentVelocityString,
                 fireRate = fireRate,
                 shots = currentSessionShots,
+                calibrationEntries = currentCalibrationEntries,
                 averageVelocity = avg,
                 maxVelocity = max,
                 minVelocity = min,
@@ -418,7 +564,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     var y = 50f
                     currentCanvas.drawRect(40f, y, 60f, y + 30f, accentPaint)
                     currentCanvas.drawText("ChronoMate Report", 70f, y + 24f, titlePaint)
-                    
+
                     y += 60f
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                     currentCanvas.drawText("Date: ${dateFormat.format(Date())}", 40f, y, bodyPaint)
@@ -430,12 +576,12 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     currentCanvas.drawRect(40f, y, 555f, y + 2f, accentPaint)
                     y += 25f
                     currentCanvas.drawText("SESSION STATISTICS", 40f, y, headerPaint)
-                    
+
                     y += 30f
                     val col1 = 40f
                     val col2 = 230f
                     val col3 = 420f
-                    
+
                     val velocities = shotsToExport.map { it.velocity }
                     val avg = velocities.average().toFloat()
                     val max = velocities.maxOrNull() ?: 0f
@@ -448,7 +594,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     currentCanvas.drawText("AVERAGE: %.1f m/s".format(avg), col1, y, bodyPaint)
                     currentCanvas.drawText("MAX: %.1f m/s".format(max), col2, y, bodyPaint)
                     currentCanvas.drawText("MIN: %.1f m/s".format(min), col3, y, bodyPaint)
-                    
+
                     y += 25f
                     currentCanvas.drawText("EXTREME SPREAD: %.1f m/s".format(es), col1, y, bodyPaint)
                     currentCanvas.drawText("STANDARD DEVIATION: %.2f m/s".format(sd), col2, y, bodyPaint)
@@ -458,12 +604,12 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     y += 50f
                     currentCanvas.drawText("VELOCITY TREND (m/s)", 40f, y, headerPaint)
                     y += 20f
-                    
+
                     val graphHeight = 150f
                     val graphWidth = 475f // Adjusted for labels
                     val graphLeft = 80f // Shifted right for Y axis labels
                     val graphTop = y
-                    
+
                     currentCanvas.drawRect(graphLeft, graphTop, graphLeft + graphWidth, graphTop + graphHeight, Paint().apply {
                         color = Color.LTGRAY
                         alpha = 30
@@ -492,7 +638,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         style = Paint.Style.STROKE
                     }
                     currentCanvas.drawLine(graphLeft, avgY, graphLeft + graphWidth, avgY, avgLinePaint)
-                    
+
                     val path = Path()
                     val graphPaint = Paint().apply {
                         color = Color.parseColor("#4CAF50")
@@ -503,21 +649,21 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     shotsToExport.forEachIndexed { index, shot ->
                         val x = graphLeft + (index.toFloat() / (shotsToExport.size - 1).coerceAtLeast(1)) * graphWidth
                         val py = graphTop + graphHeight - ((shot.velocity - displayMin) / displayRange) * graphHeight
-                        
+
                         if (index == 0) path.moveTo(x, py) else path.lineTo(x, py)
                         currentCanvas.drawCircle(x, py, 3f, Paint().apply { color = Color.parseColor("#2E7D32") })
                     }
                     currentCanvas.drawPath(path, graphPaint)
-                    
+
                     y += graphHeight + 45f
-                    
+
                     // Table Header
                     currentCanvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
                     currentCanvas.drawText("#", 50f, y + 15f, headerPaint)
                     currentCanvas.drawText("Weight (g)", 100f, y + 15f, headerPaint)
                     currentCanvas.drawText("Velocity (m/s)", 250f, y + 15f, headerPaint)
                     currentCanvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
-                    
+
                     y += 35f
                     // Now showing shots in chronological order (oldest first)
                     for (index in shotsToExport.indices) {
@@ -529,7 +675,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                             currentPage = pdfDocument.startPage(pageInfo)
                             currentCanvas = currentPage.canvas
                             y = 50f
-                            
+
                             // Redraw table header on new page
                             currentCanvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
                             currentCanvas.drawText("#", 50f, y + 15f, headerPaint)
@@ -563,7 +709,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
                     val resolver = context.contentResolver
                     val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-                    
+
                     if (uri != null) {
                         resolver.openOutputStream(uri)?.use { outputStream ->
                             pdfDocument.writeTo(outputStream)

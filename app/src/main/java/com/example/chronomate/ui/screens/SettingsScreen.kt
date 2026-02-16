@@ -16,16 +16,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronomate.R
+import com.example.chronomate.model.CalibrationEntry
 import com.example.chronomate.model.ChronoData
+import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.WeightType
 import com.example.chronomate.viewmodel.ChronoViewModel
 
@@ -35,6 +40,7 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val context = LocalContext.current
     var showLanguageDialog by remember { mutableStateOf(false) }
     var weightsExpanded by remember { mutableStateOf(false) }
+    var calibrationExpanded by remember { mutableStateOf(false) }
     
     val languages = remember {
         listOf(
@@ -103,7 +109,110 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             modifier = Modifier.clickable { showLanguageDialog = true }
         )
         
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Calibration Section
+        Text(stringResource(R.string.calibration_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.calibration_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                var expandedMode by remember { mutableStateOf(false) }
+                Text(stringResource(R.string.comp_mode_label), style = MaterialTheme.typography.labelMedium)
+                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    OutlinedButton(
+                        onClick = { expandedMode = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(when(data.compensationMode) {
+                            CompensationMode.NONE -> stringResource(R.string.comp_mode_none)
+                            CompensationMode.MEDIAN -> stringResource(R.string.comp_mode_median)
+                            CompensationMode.TRUST_EXTERNAL -> stringResource(R.string.comp_mode_external)
+                        })
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                    DropdownMenu(expanded = expandedMode, onDismissRequest = { expandedMode = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.comp_mode_none)) },
+                            onClick = { viewModel.setCompensationMode(context, CompensationMode.NONE); expandedMode = false }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.comp_mode_median)) },
+                            onClick = { viewModel.setCompensationMode(context, CompensationMode.MEDIAN); expandedMode = false }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.comp_mode_external)) },
+                            onClick = { viewModel.setCompensationMode(context, CompensationMode.TRUST_EXTERNAL); expandedMode = false }
+                        )
+                    }
+                }
+
+                if (data.compensationMode != CompensationMode.NONE) {
+                    Text(
+                        text = stringResource(R.string.comp_factor_display).format(data.compensationFactor),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { if (data.isCalibrationActive) viewModel.stopCalibration() else viewModel.startCalibration() },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (data.isCalibrationActive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(if (data.isCalibrationActive) Icons.Default.Stop else Icons.Default.PlayArrow, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (data.isCalibrationActive) stringResource(R.string.stop_calibration) else stringResource(R.string.start_calibration))
+                    }
+                    
+                    OutlinedButton(
+                        onClick = { viewModel.clearCalibration(context) },
+                        modifier = Modifier.weight(0.6f)
+                    ) {
+                        Text(stringResource(R.string.clear_calibration))
+                    }
+                }
+
+                if (data.calibrationEntries.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(modifier = Modifier.fillMaxWidth().clickable { calibrationExpanded = !calibrationExpanded }.padding(vertical = 8.dp), 
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("${data.calibrationEntries.size} Entries", style = MaterialTheme.typography.titleSmall)
+                        Icon(if (calibrationExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, contentDescription = null)
+                    }
+
+                    AnimatedVisibility(visible = calibrationExpanded) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(stringResource(R.string.chrono_val_header), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.control_val_header), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.width(48.dp))
+                            }
+                            data.calibrationEntries.asReversed().forEachIndexed { index, entry ->
+                                val realIndex = data.calibrationEntries.size - 1 - index
+                                CalibrationRow(
+                                    entry = entry,
+                                    onUpdateControl = { viewModel.updateCalibrationControlValue(context, realIndex, it) },
+                                    onDelete = { viewModel.removeCalibrationEntry(context, realIndex) }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(32.dp))
         
         // Weight Type Selection
         Text(stringResource(R.string.weight_config_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -247,6 +356,52 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 }
 
 @Composable
+fun CalibrationRow(
+    entry: CalibrationEntry,
+    onUpdateControl: (Float?) -> Unit,
+    onDelete: () -> Unit
+) {
+    var textFieldValue by remember(entry.controlValue) { 
+        mutableStateOf(TextFieldValue(
+            text = entry.controlValue?.toString() ?: "",
+            selection = TextRange(entry.controlValue?.toString()?.length ?: 0)
+        )) 
+    }
+    
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "%.1f".format(entry.chronoValue),
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        
+        TextField(
+            value = textFieldValue,
+            onValueChange = {
+                textFieldValue = it
+                onUpdateControl(it.text.toFloatOrNull())
+            },
+            modifier = Modifier.weight(1f).height(48.dp),
+            textStyle = MaterialTheme.typography.bodySmall,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent
+            )
+        )
+        
+        IconButton(onClick = onDelete) {
+            Icon(Icons.Default.Close, contentDescription = "Delete", tint = MaterialTheme.colorScheme.outline)
+        }
+    }
+}
+
+@Composable
 fun CustomWeightEntry(
     index: Int,
     name: String,
@@ -257,13 +412,22 @@ fun CustomWeightEntry(
     onDelete: () -> Unit
 ) {
     var nameText by remember(name) { mutableStateOf(name) }
-    var weightText by remember(weight) { mutableStateOf(weight.toString()) }
-    var caliberText by remember(caliber) { mutableStateOf(caliber.toString()) }
+    var weightValue by remember(weight) { 
+        mutableStateOf(TextFieldValue(
+            text = weight.toString(),
+            selection = TextRange(weight.toString().length)
+        )) 
+    }
+    var caliberValue by remember(caliber) { 
+        mutableStateOf(TextFieldValue(
+            text = caliber.toString(),
+            selection = TextRange(caliber.toString().length)
+        )) 
+    }
     var unitExpanded by remember { mutableStateOf(false) }
     val units = listOf("mm", "inch", "cal", "ga")
 
     Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
-        // Row 1: Name and Delete
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 value = nameText,
@@ -283,13 +447,12 @@ fun CustomWeightEntry(
         
         Spacer(modifier = Modifier.height(4.dp))
         
-        // Row 2: Caliber and Unit Dropdown
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextField(
-                value = caliberText,
+                value = caliberValue,
                 onValueChange = { 
-                    caliberText = it
-                    it.toFloatOrNull()?.let { c -> onUpdate(name, weight, c, unit) }
+                    caliberValue = it
+                    it.text.toFloatOrNull()?.let { c -> onUpdate(name, weight, c, unit) }
                 },
                 modifier = Modifier.weight(1f),
                 label = { Text(stringResource(R.string.caliber_label), fontSize = 10.sp) },
@@ -324,12 +487,11 @@ fun CustomWeightEntry(
         
         Spacer(modifier = Modifier.height(4.dp))
         
-        // Row 3: Weight
         TextField(
-            value = weightText,
+            value = weightValue,
             onValueChange = { 
-                weightText = it
-                it.toFloatOrNull()?.let { w -> onUpdate(name, w, caliber, unit) }
+                weightValue = it
+                it.text.toFloatOrNull()?.let { w -> onUpdate(name, w, caliber, unit) }
             },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.weight_value_label), fontSize = 10.sp) },
@@ -390,13 +552,18 @@ fun LanguageOption(label: String, code: String, currentCode: String, onClick: ()
 
 @Composable
 fun BallisticSettingField(label: String, value: String, onUpdate: (Float) -> Unit) {
-    var text by remember(value) { mutableStateOf(value) }
+    var textFieldValue by remember(value) { 
+        mutableStateOf(TextFieldValue(
+            text = value,
+            selection = TextRange(value.length)
+        )) 
+    }
     
     OutlinedTextField(
-        value = text,
+        value = textFieldValue,
         onValueChange = {
-            text = it
-            it.toFloatOrNull()?.let { f -> onUpdate(f) }
+            textFieldValue = it
+            it.text.toFloatOrNull()?.let { f -> onUpdate(f) }
         },
         label = { Text(label) },
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),

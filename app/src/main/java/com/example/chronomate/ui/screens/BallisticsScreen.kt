@@ -47,6 +47,7 @@ import com.example.chronomate.R
 import com.example.chronomate.ballistics.BallisticsEngine
 import com.example.chronomate.model.BallisticParams
 import com.example.chronomate.model.ChronoData
+import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.TrajectoryPoint
 import com.example.chronomate.model.WeightType
 import com.example.chronomate.viewmodel.ChronoViewModel
@@ -69,7 +70,15 @@ data class ProbeResult(
 fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
     
+    // Auto-update speed when a new shot is recorded
     var speedMps by rememberSaveable { mutableStateOf(data.velocity.toDoubleOrNull() ?: 100.0) }
+    
+    val lastShotVelocity = data.shots.lastOrNull()?.velocity?.toDouble() ?: 0.0
+    LaunchedEffect(lastShotVelocity) {
+        if (lastShotVelocity > 0) {
+            speedMps = lastShotVelocity
+        }
+    }
     
     val currentJoule = 0.5 * (data.selectedWeight.toDouble() / 1000.0) * speedMps.pow(2.0)
     

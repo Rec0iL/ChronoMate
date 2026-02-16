@@ -7,14 +7,26 @@ import com.example.chronomate.R
 import kotlin.math.pow
 
 data class Shot(
-    val velocity: Float,
+    val rawVelocity: Float,
     val weightGrams: Float,
-    val energyJoules: Float = 0.5f * (weightGrams / 1000f) * velocity.pow(2)
-)
+    val compensationFactor: Float = 1.0f
+) {
+    val velocity: Float get() = rawVelocity * compensationFactor
+    val energyJoules: Float get() = 0.5f * (weightGrams / 1000f) * velocity.pow(2)
+}
 
 enum class WeightType {
     BB, DIABLO, CUSTOM
 }
+
+enum class CompensationMode {
+    NONE, MEDIAN, TRUST_EXTERNAL
+}
+
+data class CalibrationEntry(
+    val chronoValue: Float,
+    val controlValue: Float? = null
+)
 
 data class CustomWeight(
     val name: String,
@@ -53,7 +65,13 @@ data class ChronoData(
     val dragCoefficientCw: Float = 0.35f,
     val magnusCoefficientK: Float = 0.002f,
     val spinDampingCr: Float = 0.01f,
-    val gravity: Float = 9.81f
+    val gravity: Float = 9.81f,
+
+    // Calibration
+    val compensationMode: CompensationMode = CompensationMode.NONE,
+    val calibrationEntries: List<CalibrationEntry> = emptyList(),
+    val isCalibrationActive: Boolean = false,
+    val compensationFactor: Float = 1.0f
 )
 
 sealed class Screen(val route: String, val titleResId: Int, val icon: ImageVector) {
