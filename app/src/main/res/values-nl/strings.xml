@@ -95,7 +95,7 @@
     <string name="hit_above">TREFFER: %.1f cm BOVEN</string>
     <string name="hit_below">TREFFER: %.1f cm ONDER</string>
     <string name="probe_dist">Afst: %.1f m</string>
-    <string name="probe_time">Tijd: %.2f s</string>
+    <string name="probe_time">Tid: %.2f s</string>
     <string name="probe_height">Hoogte: %.1f cm</string>
     <string name="probe_energy">Energie: %.2f J</string>
     <string name="probe_rel_impact">Rel. impact: %.1f cm</string>
