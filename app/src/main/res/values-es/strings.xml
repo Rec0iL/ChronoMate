@@ -100,4 +100,17 @@
     <string name="probe_energy">Energía: %.2f J</string>
     <string name="probe_rel_impact">Impacto Rel.: %.1f cm</string>
     <string name="probe_holdover">Compensación: %.1f cm</string>
+
+    <string name="calibration_title">Calibración</string>
+    <string name="calibration_desc">Calibra tu crono con una fuente confiable.</string>
+    <string name="comp_mode_label">Modo de Compensación</string>
+    <string name="comp_mode_none">Sin Compensación</string>
+    <string name="comp_mode_median">Compensación Mediana (Igual Confianza)</string>
+    <string name="comp_mode_external">Confianza en Crono Externo</string>
+    <string name="start_calibration">INICIAR CALIBRACIÓN</string>
+    <string name="stop_calibration">DETENER CALIBRACIÓN</string>
+    <string name="clear_calibration">BORRAR DATOS</string>
+    <string name="chrono_val_header">HT-X (m/s)</string>
+    <string name="control_val_header">Control (m/s)</string>
+    <string name="comp_factor_display">Factor Actual: %.3f</string>
 </resources>

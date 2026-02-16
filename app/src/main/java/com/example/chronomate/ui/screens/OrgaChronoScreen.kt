@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronomate.R
@@ -214,7 +216,12 @@ fun OrgaHeroSection(data: ChronoData, practicalWeight: Float, sparePercentage: F
 
 @Composable
 fun OrgaSettingsSection(data: ChronoData, viewModel: ChronoViewModel) {
-    var textValue by remember(data.maxAllowedJoule) { mutableStateOf(data.maxAllowedJoule.toString()) }
+    var textFieldValue by remember(data.maxAllowedJoule) { 
+        mutableStateOf(TextFieldValue(
+            text = data.maxAllowedJoule.toString(),
+            selection = TextRange(data.maxAllowedJoule.toString().length)
+        )) 
+    }
     
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -224,10 +231,10 @@ fun OrgaSettingsSection(data: ChronoData, viewModel: ChronoViewModel) {
             Text(stringResource(R.string.orga_limits), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
-                value = textValue,
+                value = textFieldValue,
                 onValueChange = { 
-                    textValue = it
-                    it.toFloatOrNull()?.let { joule ->
+                    textFieldValue = it
+                    it.text.toFloatOrNull()?.let { joule ->
                         viewModel.setMaxAllowedJoule(joule)
                     }
                 },

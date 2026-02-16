@@ -13,54 +13,54 @@
     <string name="velocity_trend">SNELHEIDSTREND</string>
     <string name="no_shots_yet">Nog geen schoten geregistreerd</string>
     
-    <string name="joule_grid_title">Joule Referentie Overzicht</string>
+    <string name="joule_grid_title">Joule referentietabel</string>
     <string name="latest_shot">LAATSTE SCHOT</string>
     <string name="max_practical_weight">MAXIMAAL TOEGESTAAN PRAKTISCH GEWICHT</string>
-    <string name="room_to_limit">met %.1f%% ruimte tot limiet</string>
+    <string name="room_to_limit">met %.1f%% marge tot limiet</string>
     <string name="over_limit">BOVEN LIMIET</string>
-    <string name="too_hot_for_20">Te krachtig, zelfs voor 0.20g</string>
+    <string name="too_hot_for_20">Te krachtig zelfs voor 0.20g</string>
     <string name="orga_limits">Orga Limieten</string>
     <string name="max_allowed_joule_label">Max Toegestane Joule (J)</string>
     <string name="no_weights_orga">Geen gewichten beschikbaar. Controleer instellingen.</string>
     
-    <string name="trajectory_sim">Traject Simulatie</string>
+    <string name="trajectory_sim">Trajectsimulatie</string>
     <string name="side_view_label">ZIJAANZICHT (m/cm) - TIK VOOR DETAILS</string>
     <string name="target_view_label">DOELAANZICHT (@ %.0f m)</string>
-    <string name="optimization_limit">Optimalisatie Limiet</string>
+    <string name="optimization_limit">Optimalisatielimiet</string>
     <string name="max_overhop">Max Overhop: %.0f cm</string>
     <string name="optimize_hopup">OPTIMALISEER HOP-UP</string>
     <string name="powered_by">Ballistische calculator mede mogelijk gemaakt door GWC Airsoft Team Leipzig.</string>
     
-    <string name="export_session">Sessierapport Exporteren</string>
+    <string name="export_session">Sessie-rapport exporteren</string>
     <string name="export_desc">Genereer een professioneel PDF-rapport van uw huidige sessie.</string>
-    <string name="report_settings">RAPPORT INSTELLINGEN</string>
-    <string name="shots_to_include">Aantal schoten</string>
-    <string name="includes_desc">Inclusief: Volledige schotenlijst, gewicht, snelheid, energie, min/max/gem stats en energiegrafiek.</string>
-    <string name="generate_pdf">GENEREER PDF RAPPORT</string>
+    <string name="report_settings">RAPPORTINSTELLINGEN</string>
+    <string name="shots_to_include">Schoten om op te nemen</string>
+    <string name="includes_desc">Inclusief: Volledige schotenlijst, gewicht, snelheid, energie, min/max/avg statistieken en energietrendgrafiek.</string>
+    <string name="generate_pdf">PDF-RAPPORT GENEREREN</string>
     <string name="no_shots_session">Nog geen schoten geregistreerd in deze sessie.</string>
     
     <string name="no_history">Geen geschiedenis beschikbaar</string>
     
-    <string name="general_settings">Algemene Instellingen</string>
-    <string name="dark_mode">Donkere Modus</string>
-    <string name="dark_mode_desc">Wissel tussen licht en donker thema</string>
-    <string name="keep_screen_on">Scherm aan laten</string>
-    <string name="keep_screen_on_desc">Voorkomt dat het apparaat in slaapstand gaat terwijl u de app gebruikt</string>
+    <string name="general_settings">Algemene instellingen</string>
+    <string name="dark_mode">Donkere modus</string>
+    <string name="dark_mode_desc">Wisselen tussen licht en donker thema</string>
+    <string name="keep_screen_on">Scherm aan houden</string>
+    <string name="keep_screen_on_desc">Voorkom dat het apparaat in slaapstand gaat tijdens gebruik</string>
     <string name="language">Taal</string>
-    <string name="restart_required_desc">Herstart vereist om taalwijziging toe te passen</string>
-    <string name="ballistics_engine_params">Ballistiek Engine Parameters</string>
-    <string name="fine_tune_physics">Fijnafstelling van de natuurkundige constanten</string>
+    <string name="restart_required_desc">Opnieuw opstarten vereist om taalwijziging toe te passen</string>
+    <string name="ballistics_engine_params">Ballistische motorparameters</string>
+    <string name="fine_tune_physics">Fysica-simulatieconstanten afstemmen</string>
 
-    <string name="weight_config_title">Gewicht Configuratie</string>
+    <string name="weight_config_title">Gewichtconfiguratie</string>
     <string name="weight_type_bbs">BBs</string>
     <string name="weight_type_diablos">Diablos</string>
     <string name="weight_type_custom">Aangepast</string>
-    <string name="custom_weights_list">Lijst met aangepaste gewichten</string>
+    <string name="custom_weights_list">Lijst aangepaste gewichten</string>
     <string name="no_custom_weights">Geen aangepaste gewichten toegevoegd</string>
     <string name="weight_name_label">Naam</string>
     <string name="weight_value_label">Gewicht (g)</string>
     <string name="caliber_label">Kaliber</string>
-    <string name="add_row_button">Rij Toevoegen</string>
+    <string name="add_row_button">Rij toevoegen</string>
     <string name="no_custom_weights_dashboard">Geen aangepaste gewichten gedefinieerd. Ga naar Instellingen.</string>
     <string name="no_custom_weights_ballistics">Geen aangepaste gewichten gedefinieerd.</string>
 
@@ -70,34 +70,47 @@
     <string name="stat_es">EXTREME SPREAD</string>
     <string name="stat_sd">STANDAARDDEVIATIE</string>
     <string name="stat_rof">ROF</string>
-    <string name="stat_eff_range">Eff. Bereik</string>
-    <string name="stat_max_range">Max Bereik</string>
+    <string name="stat_eff_range">Eff. bereik</string>
+    <string name="stat_max_range">Max bereik</string>
     <string name="stat_hold_over">Correctie</string>
-    <string name="stat_target_e">Doel Energie</string>
+    <string name="stat_target_e">Doel E</string>
     <string name="stat_max_oh">Max Overhop</string>
     <string name="stat_oh_dist">OH Afstand</string>
 
     <string name="ballistic_diameter">Diameter (mm)</string>
     <string name="ballistic_air_density">Luchtdichtheid (rho)</string>
     <string name="ballistic_drag_coeff">Luchtweerstand (Cw)</string>
-    <string name="ballistic_magnus_coeff">Magnus Coëfficiënt (K)</string>
-    <string name="ballistic_spin_damping">Spin Damping (Cr)</string>
+    <string name="ballistic_magnus_coeff">Magnus-coëfficiënt (K)</string>
+    <string name="ballistic_spin_damping">Spin-demping (Cr)</string>
     <string name="ballistic_gravity">Zwaartekracht (m/s²)</string>
 
     <string name="target_distance_label">Doelafstand: %.0f m</string>
-    <string name="shooter_h_label">Schutter Hoogte (m)</string>
-    <string name="target_h_label">Doelhoogte (m)</string>
+    <string name="shooter_h_label">Schutter H (m)</string>
+    <string name="target_h_label">Doel H (m)</string>
     <string name="speed_label">Snelheid: %.1f m/s</string>
     <string name="energy_label">Energie: %.2f J</string>
     <string name="hopup_label">Hop-Up: %.0f rad/s</string>
     <string name="sight_h_label">Vizierhoogte: %.1f cm</string>
 
-    <string name="hit_above">RAAK: %.1f cm BOVEN</string>
-    <string name="hit_below">RAAK: %.1f cm ONDER</string>
+    <string name="hit_above">TREFFER: %.1f cm BOVEN</string>
+    <string name="hit_below">TREFFER: %.1f cm ONDER</string>
     <string name="probe_dist">Afst: %.1f m</string>
-    <string name="probe_time">Tid: %.2f s</string>
+    <string name="probe_time">Tijd: %.2f s</string>
     <string name="probe_height">Hoogte: %.1f cm</string>
     <string name="probe_energy">Energie: %.2f J</string>
-    <string name="probe_rel_impact">Rel. Impact: %.1f cm</string>
+    <string name="probe_rel_impact">Rel. impact: %.1f cm</string>
     <string name="probe_holdover">Correctie: %.1f cm</string>
+
+    <string name="calibration_title">Kalibratie</string>
+    <string name="calibration_desc">Kalibreer uw chrono tegen een vertrouwde bron.</string>
+    <string name="comp_mode_label">Compensatiemodus</string>
+    <string name="comp_mode_none">Geen compensatie</string>
+    <string name="comp_mode_median">Mediaan-compensatie (Gelijk vertrouwen)</string>
+    <string name="comp_mode_external">Vertrouw externe chrono</string>
+    <string name="start_calibration">START KALIBRATIE</string>
+    <string name="stop_calibration">STOP KALIBRATIE</string>
+    <string name="clear_calibration">GEGEVENS WISSEN</string>
+    <string name="chrono_val_header">HT-X (m/s)</string>
+    <string name="control_val_header">Controle (m/s)</string>
+    <string name="comp_factor_display">Huidige factor: %.3f</string>
 </resources>

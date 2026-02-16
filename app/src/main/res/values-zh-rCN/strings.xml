@@ -32,7 +32,7 @@
     <string name="powered_by">弹道计算由 GWC Airsoft Team Leipzig 提供支持。</string>
     
     <string name="export_session">导出场次报告</string>
-    <string name="export_desc">生成当前场次的专业 PDF 报告。</string>
+    <string name="export_desc">生成当前场次的专业 PDF报告。</string>
     <string name="report_settings">报告设置</string>
     <string name="shots_to_include">包含的射击数</string>
     <string name="includes_desc">包含：完整射击列表、重量、初速、能量、最小值/最大值/平均值统计及趋势图。</string>
@@ -100,4 +100,17 @@
     <string name="probe_energy">能量: %.2f J</string>
     <string name="probe_rel_impact">相对弹着: %.1f cm</string>
     <string name="probe_holdover">弹道补偿: %.1f cm</string>
+
+    <string name="calibration_title">校准</string>
+    <string name="calibration_desc">参考可信来源校准您的测速仪。</string>
+    <string name="comp_mode_label">补偿模式</string>
+    <string name="comp_mode_none">无补偿</string>
+    <string name="comp_mode_median">中位数补偿 (同等信任)</string>
+    <string name="comp_mode_external">信任外部测速仪</string>
+    <string name="start_calibration">开始校准</string>
+    <string name="stop_calibration">停止校准</string>
+    <string name="clear_calibration">清除数据</string>
+    <string name="chrono_val_header">HT-X (m/s)</string>
+    <string name="control_val_header">对照值 (m/s)</string>
+    <string name="comp_factor_display">当前系数: %.3f</string>
 </resources>

@@ -16,7 +16,7 @@
     <string name="joule_grid_title">Joule referansetabell</string>
     <string name="latest_shot">SISTE SKUDD</string>
     <string name="max_practical_weight">MAKS TILLATT PRAKTISK VEKT</string>
-    <string name="room_to_limit">med %.1f%% klaring til grensen</string>
+    <string name="room_to_limit">med %.1f%% margin til grensen</string>
     <string name="over_limit">OVER GRENSEN</string>
     <string name="too_hot_for_20">For kraftig selv for 0.20g</string>
     <string name="orga_limits">Orga Grenser</string>
@@ -26,18 +26,18 @@
     <string name="trajectory_sim">Banesimulering</string>
     <string name="side_view_label">SIDEVISNING (m/cm) - TRYKK FOR DETALJER</string>
     <string name="target_view_label">MÅLVISNING (@ %.0f m)</string>
-    <string name="optimization_limit">Optimaliseringsgrense</string>
+    <string name="optimization_limit">Optimeringsgrense</string>
     <string name="max_overhop">Maks Overhop: %.0f cm</string>
-    <string name="optimize_hopup">OPTIMALISER HOP-UP</string>
+    <string name="optimize_hopup">OPTIMER HOP-UP</string>
     <string name="powered_by">Ballistisk kalkulator levert av GWC Airsoft Team Leipzig.</string>
     
-    <string name="export_session">Eksporter øktrapport</string>
-    <string name="export_desc">Generer en profesjonell PDF-rapport for din nåværende økt.</string>
+    <string name="export_session">Eksporter sesjonsrapport</string>
+    <string name="export_desc">Generer en profesjonell PDF-rapport for din nåværende sesjon.</string>
     <string name="report_settings">RAPPORTINNSTILLINGER</string>
     <string name="shots_to_include">Skudd som skal inkluderes</string>
-    <string name="includes_desc">Inkluderer: Fullstendig skuddliste, vekt, hastighet, energi, min/maks/gj.snitt-statistikk og energigraf.</string>
+    <string name="includes_desc">Inkluderer: Komplett skuddliste, vekt, hastighet, energi, min/maks/snitt-statistikk og energigraf.</string>
     <string name="generate_pdf">GENERER PDF-RAPPORT</string>
-    <string name="no_shots_session">Ingen skudd registrert i denne økten ennå.</string>
+    <string name="no_shots_session">Ingen skudd registrert i denne sesjonen ennå.</string>
     
     <string name="no_history">Ingen historikk tilgjengelig</string>
     
@@ -45,11 +45,11 @@
     <string name="dark_mode">Mørk modus</string>
     <string name="dark_mode_desc">Bytt mellom lyst og mørkt tema</string>
     <string name="keep_screen_on">Hold skjermen på</string>
-    <string name="keep_screen_on_desc">Forhindrer at enheten går i dvale mens du bruker appen</string>
+    <string name="keep_screen_on_desc">Forhindrer enheten i å gå i dvale mens appen brukes</string>
     <string name="language">Språk</string>
     <string name="restart_required_desc">Omstart kreves for å bruke språkendring</string>
-    <string name="ballistics_engine_params">Ballistiske motorparametere</string>
-    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstanter</string>
+    <string name="ballistics_engine_params">Ballistiske motorparametre</string>
+    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstantene</string>
 
     <string name="weight_config_title">Vektkonfigurasjon</string>
     <string name="weight_type_bbs">BBs</string>
@@ -85,8 +85,8 @@
     <string name="ballistic_gravity">Tyngdekraft (m/s²)</string>
 
     <string name="target_distance_label">Målavstand: %.0f m</string>
-    <string name="shooter_h_label">Skytterhøyde (m)</string>
-    <string name="target_h_label">Målhøjde (m)</string>
+    <string name="shooter_h_label">Skyttehøyde (m)</string>
+    <string name="target_h_label">Målhøyde (m)</string>
     <string name="speed_label">Fart: %.1f m/s</string>
     <string name="energy_label">Energi: %.2f J</string>
     <string name="hopup_label">Hop-Up: %.0f rad/s</string>
@@ -100,4 +100,17 @@
     <string name="probe_energy">Energi: %.2f J</string>
     <string name="probe_rel_impact">Rel. treff: %.1f cm</string>
     <string name="probe_holdover">Kompensasjon: %.1f cm</string>
+
+    <string name="calibration_title">Kalibrering</string>
+    <string name="calibration_desc">Kalibrer din chrono mot en pålitelig kilde.</string>
+    <string name="comp_mode_label">Kompensasjonsmodus</string>
+    <string name="comp_mode_none">Ingen kompensasjon</string>
+    <string name="comp_mode_median">Mediankompensasjon (Lik tillit)</string>
+    <string name="comp_mode_external">Stol på ekstern chrono</string>
+    <string name="start_calibration">START KALIBRERING</string>
+    <string name="stop_calibration">STOPP KALIBRERING</string>
+    <string name="clear_calibration">SLETT DATA</string>
+    <string name="chrono_val_header">HT-X (m/s)</string>
+    <string name="control_val_header">Kontroll (m/s)</string>
+    <string name="comp_factor_display">Gjeldende faktor: %.3f</string>
 </resources>

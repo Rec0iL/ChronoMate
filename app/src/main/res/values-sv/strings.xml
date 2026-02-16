@@ -32,7 +32,7 @@
     <string name="powered_by">Ballistisk kalkylator tillhandahålls av GWC Airsoft Team Leipzig.</string>
     
     <string name="export_session">Exportera sessionsrapport</string>
-    <string name="export_desc">Generera en professionell PDF-rapport för din nuvarande session.</string>
+    <string name="export_desc">Generera en professionel PDF-rapport för din nuvarande session.</string>
     <string name="report_settings">RAPPORTINSTÄLLNINGAR</string>
     <string name="shots_to_include">Skott att inkludera</string>
     <string name="includes_desc">Inkluderar: Fullständig skottlista, vikt, hastighet, energi, min/max/medel-statistik och energigraf.</string>
@@ -42,7 +42,7 @@
     <string name="no_history">Ingen historik tillgänglig</string>
     
     <string name="general_settings">Allmänna inställningar</string>
-    <string name="dark_mode">Mørkt läge</string>
+    <string name="dark_mode">Mörkt läge</string>
     <string name="dark_mode_desc">Växla mellan ljust och mörkt tema</string>
     <string name="keep_screen_on">Håll skärmen på</string>
     <string name="keep_screen_on_desc">Förhindrar att enheten går i viloläge medan du använder appen</string>
@@ -100,4 +100,17 @@
     <string name="probe_energy">Energi: %.2f J</string>
     <string name="probe_rel_impact">Rel. träff: %.1f cm</string>
     <string name="probe_holdover">Kompensation: %.1f cm</string>
+
+    <string name="calibration_title">Kalibrering</string>
+    <string name="calibration_desc">Kalibrera din chrono mot en pålitlig källa.</string>
+    <string name="comp_mode_label">Kompensationsläge</string>
+    <string name="comp_mode_none">Ingen kompensation</string>
+    <string name="comp_mode_median">Median-kompensation (Lika tillit)</string>
+    <string name="comp_mode_external">Lita på extern chrono</string>
+    <string name="start_calibration">STARTA KALIBRERING</string>
+    <string name="stop_calibration">STOPPA KALIBRERING</string>
+    <string name="clear_calibration">RENSA DATA</string>
+    <string name="chrono_val_header">HT-X (m/s)</string>
+    <string name="control_val_header">Kontroll (m/s)</string>
+    <string name="comp_factor_display">Aktuell faktor: %.3f</string>
 </resources>

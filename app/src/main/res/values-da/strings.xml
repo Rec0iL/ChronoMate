@@ -100,4 +100,17 @@
     <string name="probe_energy">Energi: %.2f J</string>
     <string name="probe_rel_impact">Rel. træf: %.1f cm</string>
     <string name="probe_holdover">Kompensation: %.1f cm</string>
+
+    <string name="calibration_title">Kalibrering</string>
+    <string name="calibration_desc">Kalibrer din chrono mod en pålidelig kilde.</string>
+    <string name="comp_mode_label">Kompensationstilstand</string>
+    <string name="comp_mode_none">Ingen kompensation</string>
+    <string name="comp_mode_median">Mediankompensation (Lige tillid)</string>
+    <string name="comp_mode_external">Stol på ekstern chrono</string>
+    <string name="start_calibration">START KALIBRERING</string>
+    <string name="stop_calibration">STOP KALIBRERING</string>
+    <string name="clear_calibration">RYD DATA</string>
+    <string name="chrono_val_header">HT-X (m/s)</string>
+    <string name="control_val_header">Kontrol (m/s)</string>
+    <string name="comp_factor_display">Aktuel faktor: %.3f</string>
 </resources>

@@ -100,4 +100,17 @@
     <string name="probe_energy">Енергія: %.2f Дж</string>
     <string name="probe_rel_impact">Відносне влуч.: %.1f см</string>
     <string name="probe_holdover">Поправка: %.1f см</string>
+
+    <string name="calibration_title">Калібрування</string>
+    <string name="calibration_desc">Відкалібруйте свій хроно за допомогою перевіреного джерела.</string>
+    <string name="comp_mode_label">Режим компенсації</string>
+    <string name="comp_mode_none">Без компенсації</string>
+    <string name="comp_mode_median">Медіанна компенсація (Рівна довіра)</string>
+    <string name="comp_mode_external">Довіра зовнішньому хроно</string>
+    <string name="start_calibration">ПОЧАТИ КАЛІБРУВАННЯ</string>
+    <string name="stop_calibration">ЗУПИНИТИ КАЛІБРУВАННЯ</string>
+    <string name="clear_calibration">ОЧИСТИТИ ДАНІ</string>
+    <string name="chrono_val_header">HT-X (м/с)</string>
+    <string name="control_val_header">Контроль (м/с)</string>
+    <string name="comp_factor_display">Поточний фактор: %.3f</string>
 </resources>
