@@ -33,6 +33,7 @@
 - **Ballistic Parameters**: Fine-tune physics constants like air density, drag coefficients, and BB diameter.
 - **Persistent Preferences**: Saves your default BB weight, Joule limits, and ballistic engine tweaks.
 - **Dark and Light Mode Support**: High-contrast theme optimized for both day and night field use.
+- **Compensation Mode**: Calibrate your chrono against another Chrono!
 
 ## 📸 Screenshots
 
