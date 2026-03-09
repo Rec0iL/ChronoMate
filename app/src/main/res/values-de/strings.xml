@@ -35,6 +35,13 @@
     <string name="export_desc">Erstellen Sie einen professionellen PDF-Bericht Ihrer aktuellen Sitzung.</string>
     <string name="report_settings">BERICHT-EINSTELLUNGEN</string>
     <string name="shots_to_include">Einzuschließende Schüsse</string>
+    <string name="gun_name_label">Name der Waffe (optional)</string>
+    <string name="pdf_report_title">ChronoMate Bericht</string>
+    <string name="pdf_gun_label">Waffe: %s</string>
+    <string name="pdf_date_label">Datum: %s</string>
+    <string name="pdf_total_shots">Gesamtanzahl Schüsse im Bericht: %d</string>
+    <string name="pdf_velocity_header">Geschwindigkeit (m/s)</string>
+    <string name="pdf_energy_header">Energie (J)</string>
     <string name="includes_desc">Enthält: Vollständige Schussliste, Gewicht, Geschwindigkeit, Energie, Min/Max/Avg-Statistiken und Energie-Trendgraph.</string>
     <string name="generate_pdf">PDF-BERICHT ERSTELLEN</string>
     <string name="no_shots_session">Noch keine Schüsse in dieser Sitzung aufgezeichnet.</string>

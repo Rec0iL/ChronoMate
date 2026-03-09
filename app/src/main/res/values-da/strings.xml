@@ -35,6 +35,13 @@
     <string name="export_desc">Generer en professionel PDF-rapport for din nuværende session.</string>
     <string name="report_settings">RAPPORTINDSTILLINGER</string>
     <string name="shots_to_include">Skud der skal inkluderes</string>
+    <string name="gun_name_label">Våbennavn (valgfrit)</string>
+    <string name="pdf_report_title">ChronoMate Rapport</string>
+    <string name="pdf_gun_label">Våben: %s</string>
+    <string name="pdf_date_label">Dato: %s</string>
+    <string name="pdf_total_shots">Samlet antal skud i rapporten: %d</string>
+    <string name="pdf_velocity_header">Hastighed (m/s)</string>
+    <string name="pdf_energy_header">Energi (J)</string>
     <string name="includes_desc">Inkluderer: Komplet skudliste, vægt, hastighed, energi, min/maks/gns-statistik og energigraf.</string>
     <string name="generate_pdf">GENERER PDF-RAPPORT</string>
     <string name="no_shots_session">Ingen skud registreret i denne session endnu.</string>

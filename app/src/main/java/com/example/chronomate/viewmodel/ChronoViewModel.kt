@@ -18,6 +18,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.chronomate.R
 import com.example.chronomate.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -519,7 +520,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
-    fun exportToPdf(context: Context, shotCount: Int) {
+    fun exportToPdf(context: Context, shotCount: Int, gunName: String = "") {
         viewModelScope.launch {
             val data = _uiState.value
             val shotsToExport = data.shots.takeLast(shotCount)
@@ -563,19 +564,26 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
                     var y = 50f
                     currentCanvas.drawRect(40f, y, 60f, y + 30f, accentPaint)
-                    currentCanvas.drawText("ChronoMate Report", 70f, y + 24f, titlePaint)
+                    currentCanvas.drawText(context.getString(R.string.pdf_report_title), 70f, y + 24f, titlePaint)
+                    
+                    if (gunName.isNotBlank()) {
+                        y += 55f
+                        currentCanvas.drawText(context.getString(R.string.pdf_gun_label, gunName), 70f, y, headerPaint.apply { textSize = 18f })
+                        y += 25f
+                    } else {
+                        y += 65f
+                    }
 
-                    y += 60f
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    currentCanvas.drawText("Date: ${dateFormat.format(Date())}", 40f, y, bodyPaint)
+                    currentCanvas.drawText(context.getString(R.string.pdf_date_label, dateFormat.format(Date())), 40f, y, bodyPaint)
                     y += 20f
-                    currentCanvas.drawText("Total Shots in Report: ${shotsToExport.size}", 40f, y, bodyPaint)
+                    currentCanvas.drawText(context.getString(R.string.pdf_total_shots, shotsToExport.size), 40f, y, bodyPaint)
 
                     // Stats Section
                     y += 40f
                     currentCanvas.drawRect(40f, y, 555f, y + 2f, accentPaint)
                     y += 25f
-                    currentCanvas.drawText("SESSION STATISTICS", 40f, y, headerPaint)
+                    currentCanvas.drawText(context.getString(R.string.report_settings), 40f, y, headerPaint.apply { textSize = 14f })
 
                     y += 30f
                     val col1 = 40f
@@ -591,18 +599,18 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     val varVal = if (velocities.size > 1) velocities.sumOf { (it - mean).pow(2.0) }.toFloat() / velocities.size else 0f
                     val sd = sqrt(varVal)
 
-                    currentCanvas.drawText("AVERAGE: %.1f m/s".format(avg), col1, y, bodyPaint)
-                    currentCanvas.drawText("MAX: %.1f m/s".format(max), col2, y, bodyPaint)
-                    currentCanvas.drawText("MIN: %.1f m/s".format(min), col3, y, bodyPaint)
+                    currentCanvas.drawText("${context.getString(R.string.stat_average)}: %.1f m/s".format(avg), col1, y, bodyPaint)
+                    currentCanvas.drawText("${context.getString(R.string.stat_max)}: %.1f m/s".format(max), col2, y, bodyPaint)
+                    currentCanvas.drawText("${context.getString(R.string.stat_min)}: %.1f m/s".format(min), col3, y, bodyPaint)
 
                     y += 25f
-                    currentCanvas.drawText("EXTREME SPREAD: %.1f m/s".format(es), col1, y, bodyPaint)
-                    currentCanvas.drawText("STANDARD DEVIATION: %.2f m/s".format(sd), col2, y, bodyPaint)
-                    currentCanvas.drawText("ROF: ${data.fireRate} r/m", col3, y, bodyPaint)
+                    currentCanvas.drawText("${context.getString(R.string.stat_es)}: %.1f m/s".format(es), col1, y, bodyPaint)
+                    currentCanvas.drawText("${context.getString(R.string.stat_sd)}: %.2f m/s".format(sd), col2, y, bodyPaint)
+                    currentCanvas.drawText("${context.getString(R.string.stat_rof)}: ${data.fireRate} r/m", col3, y, bodyPaint)
 
                     // Graph Section
                     y += 50f
-                    currentCanvas.drawText("VELOCITY TREND (m/s)", 40f, y, headerPaint)
+                    currentCanvas.drawText(context.getString(R.string.velocity_trend), 40f, y, headerPaint)
                     y += 20f
 
                     val graphHeight = 150f
@@ -660,9 +668,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     // Table Header
                     currentCanvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
                     currentCanvas.drawText("#", 50f, y + 15f, headerPaint)
-                    currentCanvas.drawText("Weight (g)", 100f, y + 15f, headerPaint)
-                    currentCanvas.drawText("Velocity (m/s)", 250f, y + 15f, headerPaint)
-                    currentCanvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
+                    currentCanvas.drawText("${context.getString(R.string.weight_name_label)} (g)", 100f, y + 15f, headerPaint)
+                    currentCanvas.drawText(context.getString(R.string.pdf_velocity_header), 250f, y + 15f, headerPaint)
+                    currentCanvas.drawText(context.getString(R.string.pdf_energy_header), 450f, y + 15f, headerPaint)
 
                     y += 35f
                     // Now showing shots in chronological order (oldest first)
@@ -679,9 +687,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
                             // Redraw table header on new page
                             currentCanvas.drawRect(40f, y, 555f, y + 20f, Paint().apply { color = Color.LTGRAY; alpha = 50 })
                             currentCanvas.drawText("#", 50f, y + 15f, headerPaint)
-                            currentCanvas.drawText("Weight (g)", 100f, y + 15f, headerPaint)
-                            currentCanvas.drawText("Velocity (m/s)", 250f, y + 15f, headerPaint)
-                            currentCanvas.drawText("Energy (J)", 450f, y + 15f, headerPaint)
+                            currentCanvas.drawText("${context.getString(R.string.weight_name_label)} (g)", 100f, y + 15f, headerPaint)
+                            currentCanvas.drawText(context.getString(R.string.pdf_velocity_header), 250f, y + 15f, headerPaint)
+                            currentCanvas.drawText(context.getString(R.string.pdf_energy_header), 450f, y + 15f, headerPaint)
                             y += 35f
                         }
 
@@ -698,7 +706,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     pdfDocument.finishPage(currentPage)
 
                     // Modern way to save to Downloads using MediaStore
-                    val fileName = "ChronoMate_Report_${System.currentTimeMillis()}.pdf"
+                    val cleanGunName = gunName.replace(Regex("[^a-zA-Z0-9_-]"), "_").take(30)
+                    val dateStr = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Date())
+                    val fileName = if (cleanGunName.isNotBlank()) {
+                        "${cleanGunName}_$dateStr.pdf"
+                    } else {
+                        "ChronoMate_Report_$dateStr.pdf"
+                    }
+                    
                     val contentValues = ContentValues().apply {
                         put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
                         put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
@@ -716,7 +731,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         }
                         pdfDocument.close()
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "PDF saved to Downloads/ChronoMate", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "PDF saved: $fileName", Toast.LENGTH_LONG).show()
                         }
                     } else {
                         throw Exception("Could not create PDF file in Downloads")

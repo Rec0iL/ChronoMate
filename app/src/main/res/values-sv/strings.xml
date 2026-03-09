@@ -21,7 +21,7 @@
     <string name="too_hot_for_20">För kraftfull även för 0.20g</string>
     <string name="orga_limits">Orga-gränser</string>
     <string name="max_allowed_joule_label">Max tillåten Joule (J)</string>
-    <string name="no_weights_orga">Inga vikter tillgängliga. Kontrollera inställningarna.</string>
+    <string name="no_weights_orga">Ingen vikter tillgängliga. Kontrollera inställningarna.</string>
     
     <string name="trajectory_sim">Bansimulering</string>
     <string name="side_view_label">SIDOVY (m/cm) - TRYCK FÖR DETALJER</string>
@@ -35,7 +35,14 @@
     <string name="export_desc">Generera en professionel PDF-rapport för din nuvarande session.</string>
     <string name="report_settings">RAPPORTINSTÄLLNINGAR</string>
     <string name="shots_to_include">Skott att inkludera</string>
-    <string name="includes_desc">Inkluderar: Fullständig skottlista, vikt, hastighet, energi, min/max/medel-statistik och energigraf.</string>
+    <string name="gun_name_label">Vapennamn (valfritt)</string>
+    <string name="pdf_report_title">ChronoMate-rapport</string>
+    <string name="pdf_gun_label">Vapen: %s</string>
+    <string name="pdf_date_label">Datum: %s</string>
+    <string name="pdf_total_shots">Totalt antal skott i rapporten: %d</string>
+    <string name="pdf_velocity_header">Hastighet (m/s)</string>
+    <string name="pdf_energy_header">Energi (J)</string>
+    <string name="includes_desc">Inkluderer: Fullständig skottlista, vikt, hastighet, energi, min/max/medel-statistik och energigraf.</string>
     <string name="generate_pdf">GENERERA PDF-RAPPORT</string>
     <string name="no_shots_session">Inga skott registrerade i denna session än.</string>
     
@@ -49,7 +56,7 @@
     <string name="language">Språk</string>
     <string name="restart_required_desc">Omstart krävs för att tillämpa språkändring</string>
     <string name="ballistics_engine_params">Parametrar för ballistikmotor</string>
-    <string name="fine_tune_physics">Finjustera de fysiska simuleringskonstanterna</string>
+    <string name="fine_tune_physics">Finjustera de fysiske simuleringskonstanterna</string>
 
     <string name="weight_config_title">Viktkonfiguration</string>
     <string name="weight_type_bbs">BBs</string>
@@ -81,7 +88,7 @@
     <string name="ballistic_air_density">Luftdensitet (rho)</string>
     <string name="ballistic_drag_coeff">Luftmotstånd (Cw)</string>
     <string name="ballistic_magnus_coeff">Magnus-koefficient (K)</string>
-    <string name="ballistic_spin_damping">Spinndämpning (Cr)</string>
+    <string name="ballistic_spin_damping">Spinndemping (Cr)</string>
     <string name="ballistic_gravity">Tyngdekraft (m/s²)</string>
 
     <string name="target_distance_label">Målavstånd: %.0f m</string>
@@ -102,7 +109,7 @@
     <string name="probe_holdover">Kompensation: %.1f cm</string>
 
     <string name="calibration_title">Kalibrering</string>
-    <string name="calibration_desc">Kalibrera din chrono mot en pålitlig källa.</string>
+    <string name="calibration_desc">Kalibrera din chrono mot en pålitelig källa.</string>
     <string name="comp_mode_label">Kompensationsläge</string>
     <string name="comp_mode_none">Ingen kompensation</string>
     <string name="comp_mode_median">Median-kompensation (Lika tillit)</string>

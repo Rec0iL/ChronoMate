@@ -35,6 +35,13 @@
     <string name="export_desc">現在のセッションのプロフェッショナルなPDFレポートを生成します。</string>
     <string name="report_settings">レポート設定</string>
     <string name="shots_to_include">含めるショット数</string>
+    <string name="gun_name_label">銃器名（任意）</string>
+    <string name="pdf_report_title">ChronoMate レポート</string>
+    <string name="pdf_gun_label">銃器: %s</string>
+    <string name="pdf_date_label">日付: %s</string>
+    <string name="pdf_total_shots">レポート内ショット総数: %d</string>
+    <string name="pdf_velocity_header">初速 (m/s)</string>
+    <string name="pdf_energy_header">エネルギー (J)</string>
     <string name="includes_desc">内容：ショット全リスト、重量、初速、エネルギー、統計(min/max/avg)、エネルギートレンドグラフ。</string>
     <string name="generate_pdf">PDFレポートを生成</string>
     <string name="no_shots_session">このセッションにはショットが記録されていません。</string>
@@ -44,7 +51,7 @@
     <string name="general_settings">全般設定</string>
     <string name="dark_mode">ダークモード</string>
     <string name="dark_mode_desc">ライトテーマとダークテーマを切り替えます</string>
-    <string name="keep_screen_on">画面を常時点灯</string>
+    <string name="keep_screen_on">画面を常時点点灯</string>
     <string name="keep_screen_on_desc">アプリ使用中にデバイスがスリープするのを防ぎます</string>
     <string name="language">言語</string>
     <string name="restart_required_desc">言語変更を適用するには再起動が必要です</string>
@@ -86,7 +93,7 @@
 
     <string name="target_distance_label">ターゲット距離: %.0f m</string>
     <string name="shooter_h_label">射手高 (m)</string>
-    <string name="target_h_label">的標高 (m)</string>
+    <string name="target_h_label">的な標高 (m)</string>
     <string name="speed_label">初速: %.1f m/s</string>
     <string name="energy_label">エネルギー: %.2f J</string>
     <string name="hopup_label">Hop-Up: %.0f rad/s</string>

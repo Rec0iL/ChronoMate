@@ -35,6 +35,13 @@
     <string name="export_desc">生成当前场次的专业 PDF报告。</string>
     <string name="report_settings">报告设置</string>
     <string name="shots_to_include">包含的射击数</string>
+    <string name="gun_name_label">枪械名称 (可选)</string>
+    <string name="pdf_report_title">ChronoMate 报告</string>
+    <string name="pdf_gun_label">枪械: %s</string>
+    <string name="pdf_date_label">日期: %s</string>
+    <string name="pdf_total_shots">报告内射击总数: %d</string>
+    <string name="pdf_velocity_header">初速 (m/s)</string>
+    <string name="pdf_energy_header">能量 (J)</string>
     <string name="includes_desc">包含：完整射击列表、重量、初速、能量、最小值/最大值/平均值统计及趋势图。</string>
     <string name="generate_pdf">生成 PDF 报告</string>
     <string name="no_shots_session">本场次尚无射击记录。</string>

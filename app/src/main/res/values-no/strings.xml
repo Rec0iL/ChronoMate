@@ -35,6 +35,13 @@
     <string name="export_desc">Generer en profesjonell PDF-rapport for din nåværende sesjon.</string>
     <string name="report_settings">RAPPORTINNSTILLINGER</string>
     <string name="shots_to_include">Skudd som skal inkluderes</string>
+    <string name="gun_name_label">Våpennavn (valgfritt)</string>
+    <string name="pdf_report_title">ChronoMate-rapport</string>
+    <string name="pdf_gun_label">Våpen: %s</string>
+    <string name="pdf_date_label">Dato: %s</string>
+    <string name="pdf_total_shots">Totalt antall skudd i rapporten: %d</string>
+    <string name="pdf_velocity_header">Hastighet (m/s)</string>
+    <string name="pdf_energy_header">Energi (J)</string>
     <string name="includes_desc">Inkluderer: Komplett skuddliste, vekt, hastighet, energi, min/maks/snitt-statistikk og energigraf.</string>
     <string name="generate_pdf">GENERER PDF-RAPPORT</string>
     <string name="no_shots_session">Ingen skudd registrert i denne sesjonen ennå.</string>
@@ -49,7 +56,7 @@
     <string name="language">Språk</string>
     <string name="restart_required_desc">Omstart kreves for å bruke språkendring</string>
     <string name="ballistics_engine_params">Ballistiske motorparametre</string>
-    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstantene</string>
+    <string name="fine_tune_physics">Finjuster de fysiske simuleringskonstanterne</string>
 
     <string name="weight_config_title">Vektkonfigurasjon</string>
     <string name="weight_type_bbs">BBs</string>
@@ -60,8 +67,8 @@
     <string name="weight_name_label">Navn</string>
     <string name="weight_value_label">Vekt (g)</string>
     <string name="caliber_label">Kaliber</string>
-    <string name="add_row_button">Legg til rad</string>
-    <string name="no_custom_weights_dashboard">Ingen egne vekter definert. Gå til Innstillinger.</string>
+    <string name="add_row_button">Legg till rad</string>
+    <string name="no_custom_weights_dashboard">Ingen egne vekter definert. Gå till Innstillinger.</string>
     <string name="no_custom_weights_ballistics">Ingen egne vekter definert.</string>
 
     <string name="stat_average">GJENNOMSNITT</string>

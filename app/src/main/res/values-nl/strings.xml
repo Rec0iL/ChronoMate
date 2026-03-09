@@ -35,6 +35,13 @@
     <string name="export_desc">Genereer een professioneel PDF-rapport van uw huidige sessie.</string>
     <string name="report_settings">RAPPORTINSTELLINGEN</string>
     <string name="shots_to_include">Schoten om op te nemen</string>
+    <string name="gun_name_label">Naam wapen (optioneel)</string>
+    <string name="pdf_report_title">ChronoMate-rapport</string>
+    <string name="pdf_gun_label">Wapen: %s</string>
+    <string name="pdf_date_label">Datum: %s</string>
+    <string name="pdf_total_shots">Totaal aantal schoten in rapport: %d</string>
+    <string name="pdf_velocity_header">Snelheid (m/s)</string>
+    <string name="pdf_energy_header">Energie (J)</string>
     <string name="includes_desc">Inclusief: Volledige schotenlijst, gewicht, snelheid, energie, min/max/avg statistieken en energietrendgrafiek.</string>
     <string name="generate_pdf">PDF-RAPPORT GENEREREN</string>
     <string name="no_shots_session">Nog geen schoten geregistreerd in deze sessie.</string>

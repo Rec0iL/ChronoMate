@@ -35,6 +35,13 @@
     <string name="export_desc">Створіть професійний PDF-звіт вашої поточної сесії.</string>
     <string name="report_settings">НАЛАШТУВАННЯ ЗВІТУ</string>
     <string name="shots_to_include">Кількість пострілів</string>
+    <string name="gun_name_label">Назва зброї (опціонально)</string>
+    <string name="pdf_report_title">Звіт ChronoMate</string>
+    <string name="pdf_gun_label">Зброя: %s</string>
+    <string name="pdf_date_label">Дата: %s</string>
+    <string name="pdf_total_shots">Всього пострілів у звіті: %d</string>
+    <string name="pdf_velocity_header">Швидкість (м/с)</string>
+    <string name="pdf_energy_header">Енергія (Дж)</string>
     <string name="includes_desc">Включає: Повний список пострілів, вагу, швидкість, енергію, статистику min/max/avg та графік тренду.</string>
     <string name="generate_pdf">ЗГЕНЕРУВАТИ PDF-ЗВІТ</string>
     <string name="no_shots_session">У цій сесії пострілів не зареєстровано.</string>

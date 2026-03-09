@@ -35,6 +35,13 @@
     <string name="export_desc">為當前賽程生成專業的 PDF 報告。</string>
     <string name="report_settings">報告設定</string>
     <string name="shots_to_include">包含的射擊次數</string>
+    <string name="gun_name_label">槍械名稱 (可選)</string>
+    <string name="pdf_report_title">ChronoMate 報告</string>
+    <string name="pdf_gun_label">槍械: %s</string>
+    <string name="pdf_date_label">日期: %s</string>
+    <string name="pdf_total_shots">報告內射擊總數: %d</string>
+    <string name="pdf_velocity_header">速度 (m/s)</string>
+    <string name="pdf_energy_header">能量 (J)</string>
     <string name="includes_desc">包含：完整射擊列表、重量、初速、能量、最小/最大/平均統計數據以及能量趨勢圖。</string>
     <string name="generate_pdf">生成 PDF 報告</string>
     <string name="no_shots_session">當前賽程尚無射擊記錄。</string>
@@ -59,7 +66,7 @@
     <string name="no_custom_weights">未添加自定義重量</string>
     <string name="weight_name_label">名稱</string>
     <string name="weight_value_label">重量 (g)</string>
-    <string name="caliber_label">口徑</string>
+    <string name="caliber_label">口径</string>
     <string name="add_row_button">添加行</string>
     <string name="no_custom_weights_dashboard">未定義自定義重量。請前往設定。</string>
     <string name="no_custom_weights_ballistics">未定義自定義重量。</string>

@@ -23,6 +23,7 @@ import com.example.chronomate.viewmodel.ChronoViewModel
 @Composable
 fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
     var shotCount by remember { mutableStateOf(data.shots.size.coerceAtMost(10).coerceAtLeast(1)) }
+    var gunName by remember { mutableStateOf("") }
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -63,6 +64,17 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = gunName,
+                    onValueChange = { gunName = it },
+                    label = { Text(stringResource(R.string.gun_name_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
                 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -96,7 +108,7 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { viewModel.exportToPdf(context, shotCount) },
+            onClick = { viewModel.exportToPdf(context, shotCount, gunName) },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             enabled = data.shots.isNotEmpty(),
             shape = RoundedCornerShape(12.dp)
