@@ -111,6 +111,43 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Chrono Selection
+        Text(stringResource(R.string.chrono_settings), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.select_chrono), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        var chronoExpanded by remember { mutableStateOf(false) }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = { chronoExpanded = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(when(data.chronoType) {
+                    com.example.chronomate.model.ChronoType.HT_X3000 -> stringResource(R.string.ht_x3000)
+                    com.example.chronomate.model.ChronoType.HT_50 -> stringResource(R.string.ht_50)
+                })
+                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+            }
+            DropdownMenu(expanded = chronoExpanded, onDismissRequest = { chronoExpanded = false }) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.ht_x3000)) },
+                    onClick = { 
+                        viewModel.setChronoType(context, com.example.chronomate.model.ChronoType.HT_X3000)
+                        chronoExpanded = false 
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.ht_50)) },
+                    onClick = { 
+                        viewModel.setChronoType(context, com.example.chronomate.model.ChronoType.HT_50)
+                        chronoExpanded = false 
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         // Calibration Section
         Text(stringResource(R.string.calibration_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.calibration_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

@@ -120,4 +120,8 @@
     <string name="chrono_val_header">HT-X (m/s)</string>
     <string name="control_val_header">对照值 (m/s)</string>
     <string name="comp_factor_display">当前系数: %.3f</string>
+    <string name="chrono_settings">测速仪设置</string>
+    <string name="select_chrono">选择测速仪型号</string>
+    <string name="ht_x3000">HT-X3000</string>
+    <string name="ht_50">HT-50</string>
 </resources>

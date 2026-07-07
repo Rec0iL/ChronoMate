@@ -89,6 +89,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
         } else emptyList()
 
         val compMode = CompensationMode.valueOf(prefs.getString("comp_mode", CompensationMode.NONE.name) ?: CompensationMode.NONE.name)
+        val chronoType = ChronoType.valueOf(prefs.getString("chrono_type", ChronoType.HT_X3000.name) ?: ChronoType.HT_X3000.name)
 
         _uiState.update { it.copy(
             isDarkMode = prefs.getBoolean("dark_mode", true),
@@ -105,7 +106,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
             spinDampingCr = prefs.getFloat("spin_damping", 0.01f),
             gravity = prefs.getFloat("gravity", 9.81f),
             compensationMode = compMode,
-            calibrationEntries = calibrationEntries
+            calibrationEntries = calibrationEntries,
+            chronoType = chronoType
         ) }
         
         updateCompensationFactor()
@@ -186,6 +188,11 @@ class ChronoViewModel(context: Context) : ViewModel() {
     fun setWeightType(context: Context, type: WeightType) {
         _uiState.update { it.copy(weightType = type) }
         savePreference(context, "weight_type", type.name)
+    }
+
+    fun setChronoType(context: Context, type: ChronoType) {
+        _uiState.update { it.copy(chronoType = type) }
+        savePreference(context, "chrono_type", type.name)
     }
 
     fun addCustomWeight(context: Context) {
@@ -367,8 +374,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val chrono = _uiState.value.chronoType
                 val specifier = WifiNetworkSpecifier.Builder()
-                    .setSsid("HT-X3000")
+                    .setSsid(chrono.ssid)
                     .setWpa2Passphrase("88888888")
                     .build()
                 requestBuilder.setNetworkSpecifier(specifier)

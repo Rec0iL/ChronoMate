@@ -35,6 +35,11 @@ data class CustomWeight(
     val caliberUnit: String = "mm"
 )
 
+enum class ChronoType(val ssid: String, val displayName: String) {
+    HT_X3000("HT-X3000", "HT-X3000"),
+    HT_50("HT50", "HT-50")
+}
+
 data class ChronoData(
     val velocity: String = "0.00",
     val fireRate: String = "0.0",
@@ -54,6 +59,9 @@ data class ChronoData(
     val language: String = "en",
     val maxAllowedJoule: Float = 1.5f,
     val maxAllowedOverhopCm: Float = 15.0f,
+    
+    // Chrono Settings
+    val chronoType: ChronoType = ChronoType.HT_X3000,
     
     // Weight Settings
     val weightType: WeightType = WeightType.BB,

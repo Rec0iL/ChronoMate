@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,38 +39,50 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = when(data.weightType) {
-                WeightType.BB -> stringResource(R.string.bb_weight_label)
-                WeightType.DIABLO -> stringResource(R.string.diablo_weight_label)
-                WeightType.CUSTOM -> stringResource(R.string.custom_weight_label)
-            },
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            text = "${data.chronoType.displayName} shot chronograph",
+            style = MaterialTheme.typography.titleLarge,
+            color = if (MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f) 
+                Color(0xFF2E7D32) else Color(0xFF88FF11),
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 8.dp)
         )
-        
-        if (weights.isEmpty() && data.weightType == WeightType.CUSTOM) {
+
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                stringResource(R.string.no_custom_weights_dashboard),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 8.dp)
+                text = when(data.weightType) {
+                    WeightType.BB -> stringResource(R.string.bb_weight_label)
+                    WeightType.DIABLO -> stringResource(R.string.diablo_weight_label)
+                    WeightType.CUSTOM -> stringResource(R.string.custom_weight_label)
+                },
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp)
             )
-        } else {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(weights) { (weight, label) ->
-                    FilterChip(
-                        selected = data.selectedWeight == weight,
-                        onClick = { viewModel.setWeight(weight) },
-                        label = { Text(label) }
-                    )
+            
+            if (weights.isEmpty() && data.weightType == WeightType.CUSTOM) {
+                Text(
+                    stringResource(R.string.no_custom_weights_dashboard),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(weights) { (weight, label) ->
+                        FilterChip(
+                            selected = data.selectedWeight == weight,
+                            onClick = { viewModel.setWeight(weight) },
+                            label = { Text(label) }
+                        )
+                    }
                 }
             }
         }
