@@ -124,4 +124,5 @@
     <string name="select_chrono">Оберіть модель хронографа</string>
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
+    <string name="permissions_required_msg">Дозволи на доступ до місцезнаходження потрібні для підключення до Wi-Fi хронографа.</string>
 </resources>

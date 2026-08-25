@@ -50,7 +50,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private var activeClient: OkHttpClient = baseClient
 
     private var lastSeenRawShots = emptyList<Float>()
-    private val url = "http://8.8.8.8"
+    @Volatile
+    private var url = "http://8.8.8.8"
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
     init {
@@ -371,7 +372,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
             val requestBuilder = NetworkRequest.Builder()
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val chrono = _uiState.value.chronoType
@@ -391,17 +394,23 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     connectivityManager.bindProcessToNetwork(network)
                     
                     // 2. Bind the OkHttpClient specifically (guarantee for the app)
+                    // We use a custom connection pool to avoid reusing sockets from previous networks
                     activeClient = baseClient.newBuilder()
                         .socketFactory(network.socketFactory)
+                        .connectionPool(okhttp3.ConnectionPool(0, 1, TimeUnit.NANOSECONDS))
                         .build()
 
                     _uiState.update { it.copy(wifiStatus = "Connected to Chrono", isConnected = true) }
+                    
+                    // Fallback check: Some devices use 192.168.1.1 instead of 8.8.8.8
+                    checkConnectivity(network)
                 }
 
                 override fun onLost(network: Network) {
                     connectivityManager.bindProcessToNetwork(null)
                     activeClient = baseClient
                     _uiState.update { it.copy(wifiStatus = "Disconnected", isConnected = false) }
+                    lastSeenRawShots = emptyList()
                 }
 
                 override fun onUnavailable() {
@@ -413,6 +422,27 @@ class ChronoViewModel(context: Context) : ViewModel() {
             connectivityManager.requestNetwork(request, callback)
         } catch (e: Exception) {
             _uiState.update { it.copy(wifiStatus = "Error: ${e.message}") }
+        }
+    }
+
+    private fun checkConnectivity(network: Network) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val ips = listOf("8.8.8.8", "192.168.1.1", "192.168.4.1")
+            for (ip in ips) {
+                try {
+                    val connection = network.openConnection(java.net.URL("http://$ip")) as java.net.HttpURLConnection
+                    connection.connectTimeout = 2000
+                    connection.readTimeout = 2000
+                    connection.requestMethod = "GET"
+                    
+                    if (connection.responseCode == 200) {
+                        url = "http://$ip"
+                        connection.disconnect()
+                        return@launch
+                    }
+                    connection.disconnect()
+                } catch (e: Exception) {}
+            }
         }
     }
 
@@ -497,7 +527,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
             val latestShot = currentSessionShots.lastOrNull()
             val currentVelocityString = latestShot?.velocity?.let { "%.2f".format(it) } ?: "0.00"
-            val current_energy = latestShot?.energyJoules ?: 0f
+            val currentEnergy = latestShot?.energyJoules ?: 0f
 
             val velocities = currentSessionShots.map { it.velocity }
             val avg = if (velocities.isNotEmpty()) velocities.average().toFloat() else 0f
@@ -522,7 +552,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 extremeSpread = es,
                 standardDeviation = sd,
                 variance = varVal,
-                currentEnergy = current_energy,
+                currentEnergy = currentEnergy,
                 isConnected = true
             )
         }

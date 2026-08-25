@@ -124,4 +124,5 @@
     <string name="select_chrono">选择测速仪型号</string>
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
+    <string name="permissions_required_msg">需要位置权限才能连接到测速仪 Wi-Fi。</string>
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -54,23 +55,19 @@ class MainActivity : ComponentActivity() {
         val prefs = getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
         val lang = prefs.getString("language", "en") ?: "en"
         
-        // Handle potential legacy codes like zh-rTW or zh-rCN
+        // Handle potential legacy codes and convert to proper language tag
         val languageTag = when(lang) {
             "zh-rTW" -> "zh-TW"
             "zh-rCN" -> "zh-CN"
-            else -> lang
+            else -> lang.replace("-r", "-")
         }
         
-        val locale = if (languageTag.contains("-")) {
-            val parts = languageTag.split("-")
-            Locale(parts[0], parts[1])
-        } else {
-            Locale(languageTag)
-        }
-        
+        val locale = Locale.forLanguageTag(languageTag)
         Locale.setDefault(locale)
+        
         val config = resources.configuration
         config.setLocale(locale)
+        config.setLayoutDirection(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
 
         super.onCreate(savedInstanceState)
@@ -88,8 +85,11 @@ class MainActivity : ComponentActivity() {
             ChronoMateTheme(darkTheme = data.isDarkMode) {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestMultiplePermissions()
-                ) { _ ->
-                    // Permissions granted, we just wait for the user to tap connect
+                ) { results ->
+                    val allGranted = results.values.all { it }
+                    if (!allGranted) {
+                        Toast.makeText(context, context.getString(R.string.permissions_required_msg), Toast.LENGTH_LONG).show()
+                    }
                 }
 
                 LaunchedEffect(Unit) {
@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         arrayOf(
                             Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_WIFI_STATE,
                             Manifest.permission.CHANGE_WIFI_STATE,
                             Manifest.permission.CHANGE_NETWORK_STATE
