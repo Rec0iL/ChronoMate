@@ -62,14 +62,14 @@
     <string name="weight_type_bbs">BBs</string>
     <string name="weight_type_diablos">Diablos</string>
     <string name="weight_type_custom">Benutzerdefiniert</string>
-    <string name="custom_weights_list">Liste benutzerdef. Gewichte</string>
-    <string name="no_custom_weights">Keine benutzerdef. Gewichte hinzugefügt</string>
+    <string name="custom_weights_list">Liste benutzerdef. Geschosse</string>
+    <string name="no_custom_weights">Keine benutzerdef. Geschosse hinzugefügt</string>
     <string name="weight_name_label">Name</string>
     <string name="weight_value_label">Gewicht (g)</string>
     <string name="caliber_label">Kaliber</string>
     <string name="add_row_button">Zeile hinzufügen</string>
-    <string name="no_custom_weights_dashboard">Keine benutzerdef. Gewichte definiert. Gehen Sie zu Einstellungen.</string>
-    <string name="no_custom_weights_ballistics">Keine benutzerdef. Gewichte definiert.</string>
+    <string name="no_custom_weights_dashboard">Keine benutzerdef. Geschosse definiert. Gehen Sie zu Einstellungen.</string>
+    <string name="no_custom_weights_ballistics">Keine benutzerdef. Geschosse definiert.</string>
 
     <string name="stat_average">DURCHSCHNITT</string>
     <string name="stat_max">MAXIMUM</string>
@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">Standortberechtigungen sind erforderlich, um eine Verbindung zum Chronographen-WLAN herzustellen.</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Nicht verbunden</string>
+    <string name="status_connecting">Verbinde…</string>
+    <string name="status_waiting">Warte auf Chrono-Daten…</string>
+    <string name="status_connected">Mit Chrono verbunden</string>
+    <string name="status_failed">Verbindung fehlgeschlagen</string>
+    <string name="badge_live">LIVE</string>
+    <string name="badge_connecting">VERBINDE…</string>
+    <string name="badge_waiting">KEINE DATEN - TIPPEN</string>
+    <string name="badge_offline">OFFLINE - ZUM VERBINDEN TIPPEN</string>
+    <string name="badge_failed">FEHLER - ZUM WIEDERHOLEN TIPPEN</string>
 </resources>

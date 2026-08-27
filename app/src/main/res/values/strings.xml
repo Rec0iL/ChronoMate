@@ -126,4 +126,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">Location permissions are required to connect to the chronograph Wi-Fi.</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_waiting">Waiting for chrono data…</string>
+    <string name="status_connected">Connected to Chrono</string>
+    <string name="status_failed">Connection failed</string>
+    <string name="badge_live">LIVE</string>
+    <string name="badge_connecting">CONNECTING…</string>
+    <string name="badge_waiting">NO DATA - TAP TO RETRY</string>
+    <string name="badge_offline">OFFLINE - TAP TO CONNECT</string>
+    <string name="badge_failed">FAILED - TAP TO RETRY</string>
 </resources>

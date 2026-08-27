@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">需要位置權限才能連接到測速儀 Wi-Fi。</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">未連線</string>
+    <string name="status_connecting">正在連線…</string>
+    <string name="status_waiting">等待測速儀資料…</string>
+    <string name="status_connected">已連線至測速儀</string>
+    <string name="status_failed">連線失敗</string>
+    <string name="badge_live">即時</string>
+    <string name="badge_connecting">連線中…</string>
+    <string name="badge_waiting">無資料 - 點擊重試</string>
+    <string name="badge_offline">離線 - 點擊連線</string>
+    <string name="badge_failed">失敗 - 點擊重試</string>
 </resources>

@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">Uprawnienia do lokalizacji są wymagane, aby połączyć się z Wi-Fi chronografu.</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Rozłączono</string>
+    <string name="status_connecting">Łączenie…</string>
+    <string name="status_waiting">Oczekiwanie na dane chrono…</string>
+    <string name="status_connected">Połączono z chrono</string>
+    <string name="status_failed">Połączenie nieudane</string>
+    <string name="badge_live">NA ŻYWO</string>
+    <string name="badge_connecting">ŁĄCZENIE…</string>
+    <string name="badge_waiting">BRAK DANYCH - DOTKNIJ</string>
+    <string name="badge_offline">OFFLINE - DOTKNIJ, ABY POŁĄCZYĆ</string>
+    <string name="badge_failed">BŁĄD - DOTKNIJ, ABY PONOWIĆ</string>
 </resources>

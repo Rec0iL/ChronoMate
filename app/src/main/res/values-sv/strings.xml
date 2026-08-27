@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">Platsbehörigheter krävs för att ansluta till kronografens Wi-Fi.</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Inte ansluten</string>
+    <string name="status_connecting">Ansluter…</string>
+    <string name="status_waiting">Väntar på chrono-data…</string>
+    <string name="status_connected">Ansluten till chrono</string>
+    <string name="status_failed">Anslutningen misslyckades</string>
+    <string name="badge_live">LIVE</string>
+    <string name="badge_connecting">ANSLUTER…</string>
+    <string name="badge_waiting">INGEN DATA - TRYCK</string>
+    <string name="badge_offline">OFFLINE - TRYCK FÖR ATT ANSLUTA</string>
+    <string name="badge_failed">FEL - TRYCK FÖR ATT FÖRSÖKA IGEN</string>
 </resources>

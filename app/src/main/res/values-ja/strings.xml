@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">クロノグラフのWi-Fiに接続するには、位置情報の権限が必要です。</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">未接続</string>
+    <string name="status_connecting">接続中…</string>
+    <string name="status_waiting">クロノのデータを待機中…</string>
+    <string name="status_connected">クロノに接続済み</string>
+    <string name="status_failed">接続に失敗しました</string>
+    <string name="badge_live">ライブ</string>
+    <string name="badge_connecting">接続中…</string>
+    <string name="badge_waiting">データなし - タップ</string>
+    <string name="badge_offline">オフライン - タップして接続</string>
+    <string name="badge_failed">失敗 - タップして再試行</string>
 </resources>

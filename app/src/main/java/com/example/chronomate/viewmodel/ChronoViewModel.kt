@@ -50,9 +50,26 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private var activeClient: OkHttpClient = baseClient
 
     private var lastSeenRawShots = emptyList<Float>()
-    @Volatile
-    private var url = "http://8.8.8.8"
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var connectivityManager: ConnectivityManager? = null
+
+    // --- Connection tracking -------------------------------------------------
+    // The chrono is considered connected when - and only when - it answers us.
+    // The Wi-Fi callback only tells us how far the *attempt* got; it is never
+    // allowed to claim "connected" on its own, because the phone can stay joined
+    // to the chrono AP long after the callback has given up on it (and the other
+    // way round, the user may have joined the AP manually via Android settings).
+
+    /** Address the chrono answered on, or null while we still have to look for it. */
+    @Volatile
+    private var chronoUrl: String? = null
+
+    /** True while our own NetworkCallback owns the link to the chrono AP. */
+    @Volatile
+    private var boundToChronoAp = false
+
+    /** Consecutive failed polls; we tolerate a few before dropping the status. */
+    private var missedPolls = 0
 
     init {
         startPolling()
@@ -364,8 +381,11 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
     fun connectToChronoWifi(context: Context) {
         try {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            
+            // Application context: the request outlives the Activity that started it.
+            val connectivityManager = context.applicationContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            this.connectivityManager = connectivityManager
+
             networkCallback?.let { 
                 try { connectivityManager.unregisterNetworkCallback(it) } catch (e: Exception) {}
             }
@@ -386,13 +406,20 @@ class ChronoViewModel(context: Context) : ViewModel() {
             }
 
             val request = requestBuilder.build()
-            _uiState.update { it.copy(wifiStatus = "Connecting...") }
+
+            // A deliberate reconnect starts a fresh link: forget the old address and
+            // the shots we have already seen on the previous device.
+            boundToChronoAp = false
+            chronoUrl = null
+            missedPolls = 0
+            lastSeenRawShots = emptyList()
+            setConnectionState(ConnectionState.CONNECTING)
 
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     // 1. Bind the process (hint for the OS)
                     connectivityManager.bindProcessToNetwork(network)
-                    
+
                     // 2. Bind the OkHttpClient specifically (guarantee for the app)
                     // We use a custom connection pool to avoid reusing sockets from previous networks
                     activeClient = baseClient.newBuilder()
@@ -400,88 +427,185 @@ class ChronoViewModel(context: Context) : ViewModel() {
                         .connectionPool(okhttp3.ConnectionPool(0, 1, TimeUnit.NANOSECONDS))
                         .build()
 
-                    _uiState.update { it.copy(wifiStatus = "Connected to Chrono", isConnected = true) }
-                    
-                    // Fallback check: Some devices use 192.168.1.1 instead of 8.8.8.8
-                    checkConnectivity(network)
+                    boundToChronoAp = true
+                    chronoUrl = null
+                    missedPolls = 0
+
+                    // The Wi-Fi is up - but that is not the same as "the chrono is
+                    // talking to us". The poller promotes us to CONNECTED as soon as
+                    // the device actually answers.
+                    setConnectionState(ConnectionState.LINKED)
                 }
 
                 override fun onLost(network: Network) {
                     connectivityManager.bindProcessToNetwork(null)
                     activeClient = baseClient
-                    _uiState.update { it.copy(wifiStatus = "Disconnected", isConnected = false) }
-                    lastSeenRawShots = emptyList()
+                    boundToChronoAp = false
+
+                    // Do NOT declare a disconnect here: Android drops this callback
+                    // routinely (e.g. when the internet-less AP is de-prioritised)
+                    // while the phone stays joined and the chrono keeps answering.
+                    // Re-run discovery on the default network and let the poll result
+                    // decide what the status is.
+                    chronoUrl = null
+                    missedPolls = 0
                 }
 
                 override fun onUnavailable() {
-                    _uiState.update { it.copy(wifiStatus = "Connection Failed", isConnected = false) }
+                    boundToChronoAp = false
+                    setConnectionState(ConnectionState.FAILED)
                 }
             }
-            
+
             networkCallback = callback
             connectivityManager.requestNetwork(request, callback)
         } catch (e: Exception) {
-            _uiState.update { it.copy(wifiStatus = "Error: ${e.message}") }
+            setConnectionState(ConnectionState.FAILED, e.message)
         }
     }
 
-    private fun checkConnectivity(network: Network) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val ips = listOf("8.8.8.8", "192.168.1.1", "192.168.4.1")
-            for (ip in ips) {
-                try {
-                    val connection = network.openConnection(java.net.URL("http://$ip")) as java.net.HttpURLConnection
-                    connection.connectTimeout = 2000
-                    connection.readTimeout = 2000
-                    connection.requestMethod = "GET"
-                    
-                    if (connection.responseCode == 200) {
-                        url = "http://$ip"
-                        connection.disconnect()
-                        return@launch
-                    }
-                    connection.disconnect()
-                } catch (e: Exception) {}
-            }
-        }
+    private fun setConnectionState(state: ConnectionState, error: String? = null) {
+        _uiState.update { it.copy(connectionState = state, connectionError = error) }
     }
 
+    // --- Polling / status detection -----------------------------------------
+
+    /**
+     * Runs forever: finds the chrono, keeps reading it, and keeps the connection
+     * status in sync with what is really happening on the wire.
+     */
     private fun startPolling() {
         viewModelScope.launch(Dispatchers.IO) {
             while (true) {
-                try {
-                    val request = Request.Builder()
-                        .url(url)
-                        .header("Cache-Control", "no-cache") 
-                        .build()
-                    
-                    // Always use the current activeClient
-                    activeClient.newCall(request).execute().use { response ->
-                        if (response.isSuccessful) {
-                            val html = response.body?.string() ?: ""
-                            if (html.isNotEmpty()) {
-                                parseHtml(html)
-                            }
-                        } else {
-                            _uiState.update { it.copy(isConnected = false) }
-                        }
+                val target = chronoUrl
+                if (target == null) {
+                    discoverChrono()
+                } else {
+                    val html = fetch(target, activeClient)
+                    if (html != null && (boundToChronoAp || looksLikeChronoPage(html))) {
+                        onChronoAnswered(html)
+                    } else {
+                        onPollFailed()
                     }
-                } catch (e: Exception) {
-                    _uiState.update { it.copy(isConnected = false) }
                 }
-                delay(1000)
+
+                delay(if (_uiState.value.isConnected) POLL_INTERVAL_MS else RETRY_INTERVAL_MS)
             }
         }
+    }
+
+    /**
+     * Looks for the chrono on the addresses the different models are known to use.
+     * A page is only accepted if it actually looks like a chronograph page, so a
+     * home router on 192.168.1.1 can never be mistaken for the device.
+     */
+    private fun discoverChrono() {
+        val probeClient = activeClient.newBuilder()
+            .connectTimeout(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .readTimeout(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .build()
+
+        // Anything that replies at all, used as a fallback when we are sitting on
+        // the chrono's own AP and none of the pages matched the known markers.
+        var fallback: Pair<String, String>? = null
+
+        for (host in CANDIDATE_HOSTS) {
+            val candidate = "http://$host"
+            val html = fetch(candidate, probeClient) ?: continue
+
+            if (looksLikeChronoPage(html)) {
+                chronoUrl = candidate
+                onChronoAnswered(html)
+                return
+            }
+            if (fallback == null) fallback = candidate to html
+        }
+
+        val (fallbackUrl, fallbackHtml) = fallback ?: run { onPollFailed(); return }
+
+        if (boundToChronoAp) {
+            // We are on the chrono's private AP - whatever answers there is it.
+            chronoUrl = fallbackUrl
+            onChronoAnswered(fallbackHtml)
+        } else {
+            onPollFailed()
+        }
+    }
+
+    private fun fetch(url: String, client: OkHttpClient): String? {
+        return try {
+            val request = Request.Builder()
+                .url(url)
+                .header("Cache-Control", "no-cache")
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return null
+                response.body?.string()?.takeIf { it.isNotEmpty() }
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** The chrono replied - this is the only place that reports CONNECTED. */
+    private fun onChronoAnswered(html: String) {
+        missedPolls = 0
+        parseHtml(html)
+        if (_uiState.value.connectionState != ConnectionState.CONNECTED) {
+            setConnectionState(ConnectionState.CONNECTED)
+        }
+    }
+
+    /**
+     * A poll went nowhere. Single hiccups are ignored - only after
+     * [MAX_MISSED_POLLS] in a row do we downgrade the status, and then only to
+     * what we can still prove (Wi-Fi link up vs. nothing at all).
+     */
+    private fun onPollFailed() {
+        missedPolls++
+        if (missedPolls < MAX_MISSED_POLLS) return
+
+        // Address may have changed (other model, DHCP) - look for it again.
+        chronoUrl = null
+
+        val next = when {
+            boundToChronoAp -> ConnectionState.LINKED
+            // An association attempt is still running / already failed: those states
+            // are owned by the network callback, don't overwrite them.
+            _uiState.value.connectionState == ConnectionState.CONNECTING -> return
+            _uiState.value.connectionState == ConnectionState.FAILED -> return
+            else -> ConnectionState.DISCONNECTED
+        }
+        setConnectionState(next)
+    }
+
+    /**
+     * Cheap sanity check that a fetched page belongs to a chronograph and not to
+     * whatever else happens to serve HTTP on that address.
+     */
+    private fun looksLikeChronoPage(html: String): Boolean {
+        val text = Jsoup.parse(html).text()
+        return FIRE_RATE_REGEX.containsMatchIn(text) || CHRONO_MARKER_REGEX.containsMatchIn(text)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        networkCallback?.let { callback ->
+            try { connectivityManager?.unregisterNetworkCallback(callback) } catch (e: Exception) {}
+        }
+        connectivityManager?.bindProcessToNetwork(null)
+        networkCallback = null
+        connectivityManager = null
     }
 
     private fun parseHtml(html: String) {
         val doc = Jsoup.parse(html)
         val text = doc.text()
 
-        val fireRate = "(?i)(?:firerate|射速)[^0-9]*(\\d+(?:\\.\\d+)?)".toRegex()
-            .find(text)?.groupValues?.get(1) ?: "0.0"
+        val fireRate = FIRE_RATE_REGEX.find(text)?.groupValues?.get(1) ?: "0.0"
 
-        val rawShots = "(\\d{2})\\s*[:：]\\s*(\\d+(?:\\.\\d+)?)".toRegex().findAll(text)
+        val rawShots = SHOT_REGEX.findAll(text)
             .map { it.groupValues[2].toFloat() }
             .filter { it > 0.0f }
             .toList()
@@ -552,8 +676,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 extremeSpread = es,
                 standardDeviation = sd,
                 variance = varVal,
-                currentEnergy = currentEnergy,
-                isConnected = true
+                currentEnergy = currentEnergy
             )
         }
     }
@@ -781,5 +904,23 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 }
             }
         }
+    }
+
+    private companion object {
+        /** Addresses the supported chrono models are known to serve their page on. */
+        val CANDIDATE_HOSTS = listOf("8.8.8.8", "192.168.4.1", "192.168.1.1", "192.168.0.1")
+
+        const val POLL_INTERVAL_MS = 1000L
+        const val RETRY_INTERVAL_MS = 3000L
+        const val PROBE_TIMEOUT_MS = 1500L
+
+        /** Failed polls tolerated before the status is downgraded. */
+        const val MAX_MISSED_POLLS = 3
+
+        val FIRE_RATE_REGEX = "(?i)(?:firerate|fire rate|射速)[^0-9]*(\\d+(?:\\.\\d+)?)".toRegex()
+        val SHOT_REGEX = "(\\d{2})\\s*[:：]\\s*(\\d+(?:\\.\\d+)?)".toRegex()
+
+        /** Markers that only a chronograph page will carry. */
+        val CHRONO_MARKER_REGEX = "(?i)(m/s|fps|ft/s|速度|射速|chrono)".toRegex()
     }
 }

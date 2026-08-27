@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">Locatiepermissies zijn vereist om verbinding te maken met de Wi-Fi van de chronograaf.</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Niet verbonden</string>
+    <string name="status_connecting">Verbinden…</string>
+    <string name="status_waiting">Wachten op chrono-gegevens…</string>
+    <string name="status_connected">Verbonden met chrono</string>
+    <string name="status_failed">Verbinding mislukt</string>
+    <string name="badge_live">LIVE</string>
+    <string name="badge_connecting">VERBINDEN…</string>
+    <string name="badge_waiting">GEEN DATA - TIK</string>
+    <string name="badge_offline">OFFLINE - TIK OM TE VERBINDEN</string>
+    <string name="badge_failed">MISLUKT - TIK OPNIEUW</string>
 </resources>

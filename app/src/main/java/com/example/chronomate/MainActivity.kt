@@ -214,7 +214,11 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(stringResource(currentScreen.titleResId), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                                Text(data.wifiStatus, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                                Text(
+                                    text = data.connectionError ?: stringResource(data.connectionState.labelResId),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
                             }
                         }
                     },
@@ -225,8 +229,7 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                     },
                     actions = {
                         StatusBadge(
-                            isConnected = data.isConnected,
-                            wifiStatus = data.wifiStatus,
+                            state = data.connectionState,
                             onClick = { viewModel.connectToChronoWifi(context) }
                         )
                         Spacer(modifier = Modifier.width(16.dp))

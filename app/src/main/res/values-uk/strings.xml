@@ -125,4 +125,16 @@
     <string name="ht_x3000">HT-X3000</string>
     <string name="ht_50">HT-50</string>
     <string name="permissions_required_msg">Дозволи на доступ до місцезнаходження потрібні для підключення до Wi-Fi хронографа.</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Не підключено</string>
+    <string name="status_connecting">Підключення…</string>
+    <string name="status_waiting">Очікування даних хронографа…</string>
+    <string name="status_connected">Підключено до хронографа</string>
+    <string name="status_failed">Помилка підключення</string>
+    <string name="badge_live">НАЖИВО</string>
+    <string name="badge_connecting">ПІДКЛЮЧЕННЯ…</string>
+    <string name="badge_waiting">НЕМАЄ ДАНИХ - ТОРКНІТЬСЯ</string>
+    <string name="badge_offline">ОФЛАЙН - ТОРКНІТЬСЯ, ЩОБ ПІДКЛЮЧИТИСЯ</string>
+    <string name="badge_failed">ПОМИЛКА - ТОРКНІТЬСЯ ДЛЯ ПОВТОРУ</string>
 </resources>

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
+import com.example.chronomate.model.ConnectionState
 import com.example.chronomate.model.Shot
 
 @Composable
@@ -52,31 +53,27 @@ fun LogoImage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StatusBadge(isConnected: Boolean, wifiStatus: String, onClick: () -> Unit = {}) {
+fun StatusBadge(state: ConnectionState, onClick: () -> Unit = {}) {
     val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
     
     val green = if (isLight) Color(0xFF1B5E20) else Color(0xFF88FF11)
     val red = if (isLight) Color(0xFFB71C1C) else Color.Red
     val yellow = if (isLight) Color(0xFFFBC02D) else Color.Yellow
     
-    val isConnecting = wifiStatus == "Connecting..."
-    
-    val badgeColor = when {
-        isConnected -> green
-        isConnecting -> yellow
-        else -> red
+    val badgeColor = when (state) {
+        ConnectionState.CONNECTED -> green
+        ConnectionState.CONNECTING, ConnectionState.LINKED -> yellow
+        ConnectionState.DISCONNECTED, ConnectionState.FAILED -> red
     }
-    
-    val statusText = when {
-        isConnected -> "LIVE"
-        isConnecting -> "CONNECTING..."
-        else -> "OFFLINE - TAP TO RECONNECT"
-    }
-    
+
+    // Reconnecting only makes sense when we are not already live and no attempt
+    // is currently running.
+    val canReconnect = state != ConnectionState.CONNECTED && state != ConnectionState.CONNECTING
+
     Surface(
         color = badgeColor.copy(alpha = 0.15f),
         shape = CircleShape,
-        modifier = Modifier.clickable(enabled = !isConnected && !isConnecting) { onClick() }
+        modifier = Modifier.clickable(enabled = canReconnect) { onClick() }
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -92,7 +89,7 @@ fun StatusBadge(isConnected: Boolean, wifiStatus: String, onClick: () -> Unit = 
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = statusText,
+                text = stringResource(state.badgeResId),
                 style = MaterialTheme.typography.labelSmall,
                 color = badgeColor,
                 fontWeight = FontWeight.Black
