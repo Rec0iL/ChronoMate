@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="300 310 1440 1440" width="1440" height="1440" color="#000000">
+  <title>ChronoMate (mono)</title>
+  <desc>Single-colour ChronoMate mark for icons. Uses currentColor: set the CSS color to recolour it.</desc>
+  <defs>
+    <mask id="cut-bb" maskUnits="userSpaceOnUse" x="300" y="310" width="1440" height="1440">
+      <rect x="300" y="310" width="1440" height="1440" fill="#fff"/>
+      <circle cx="1320" cy="950" r="334" fill="#000"/>
+      <g transform="matrix(1 0 -0.22 1 308 0)" fill="#000" stroke="#000" stroke-width="80" stroke-linejoin="round">
+        <path d="M685 1117H885Q922 1117 922 1154V1196Q922 1220 898 1220H857V1182H713Q701 1182 701 1194V1328Q701 1340 713 1340H857V1300H898Q922 1300 922 1324V1363Q922 1400 885 1400H685Q637 1400 637 1352V1165Q637 1117 685 1117Z"/><path d="M1007 1117H1056L1160 1317L1270 1117H1317Q1347 1117 1347 1147V1392Q1347 1400 1339 1400H1289Q1281 1400 1281 1392V1209L1182 1400H1140L1041 1213V1392Q1041 1400 1033 1400H985Q977 1400 977 1392V1147Q977 1117 1007 1117Z"/>
+      </g>
+    </mask>
+    <mask id="cut-letters" maskUnits="userSpaceOnUse" x="300" y="310" width="1440" height="1440">
+      <rect x="300" y="310" width="1440" height="1440" fill="#fff"/>
+      <g transform="matrix(1 0 -0.22 1 308 0)" fill="#000" stroke="#000" stroke-width="80" stroke-linejoin="round">
+        <path d="M685 1117H885Q922 1117 922 1154V1196Q922 1220 898 1220H857V1182H713Q701 1182 701 1194V1328Q701 1340 713 1340H857V1300H898Q922 1300 922 1324V1363Q922 1400 885 1400H685Q637 1400 637 1352V1165Q637 1117 685 1117Z"/><path d="M1007 1117H1056L1160 1317L1270 1117H1317Q1347 1117 1347 1147V1392Q1347 1400 1339 1400H1289Q1281 1400 1281 1392V1209L1182 1400H1140L1041 1213V1392Q1041 1400 1033 1400H985Q977 1400 977 1392V1147Q977 1117 1007 1117Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g id="rings" mask="url(#cut-bb)" fill="none" stroke="currentColor" stroke-linecap="round">
+    <path id="ring-main" d="M1571.7 807.1A595 595 0 1 0 1612.7 1081.9" stroke-width="92"/>
+    <path id="ring-inner-2" d="M1115.1 698.4A345 345 0 0 0 693.8 1142.3" stroke-width="56"/>
+    <path id="ring-core" d="M1062.5 788.7A245 245 0 0 0 791.3 1117.8" stroke-width="56"/>
+  </g>
+  <g id="bb" mask="url(#cut-letters)">
+    <circle id="bb-body" cx="1320" cy="950" r="300" fill="currentColor"/>
+  </g>
+  <g id="lettering" transform="matrix(1 0 -0.22 1 308 0)" fill="currentColor" stroke="currentColor" stroke-width="16" stroke-linejoin="round">
+    <path id="letter-c" d="M685 1117H885Q922 1117 922 1154V1196Q922 1220 898 1220H857V1182H713Q701 1182 701 1194V1328Q701 1340 713 1340H857V1300H898Q922 1300 922 1324V1363Q922 1400 885 1400H685Q637 1400 637 1352V1165Q637 1117 685 1117Z"/>
+    <path id="letter-m" d="M1007 1117H1056L1160 1317L1270 1117H1317Q1347 1117 1347 1147V1392Q1347 1400 1339 1400H1289Q1281 1400 1281 1392V1209L1182 1400H1140L1041 1213V1392Q1041 1400 1033 1400H985Q977 1400 977 1392V1147Q977 1117 1007 1117Z"/>
+  </g>
+</svg>

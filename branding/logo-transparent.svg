@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" width="2048" height="2048">
+  <title>ChronoMate</title>
+  <desc>ChronoMate logo: glowing chrono rings, a white BB and the CM lettering. Every part is its own named group so it can be animated on its own.</desc>
+  <defs>
+    <radialGradient id="g-glow-disc" gradientUnits="userSpaceOnUse" cx="990" cy="1020" r="800">
+      <stop offset="0" stop-color="#ff8a2e"/>
+      <stop offset="0.3" stop-color="#ee4a08"/>
+      <stop offset="0.42" stop-color="#b42606"/>
+      <stop offset="0.52" stop-color="#7a1003"/>
+      <stop offset="0.7" stop-color="#6c0e03"/>
+      <stop offset="0.82" stop-color="#5a0c02"/>
+      <stop offset="0.91" stop-color="#5a0c02" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#5a0c02" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring-hot" gradientUnits="userSpaceOnUse" x1="420" y1="430" x2="1620" y2="1630">
+      <stop offset="0" stop-color="#ff6a26"/>
+      <stop offset="0.2" stop-color="#ffd9b8"/>
+      <stop offset="0.36" stop-color="#ff8a45"/>
+      <stop offset="0.6" stop-color="#ff5514"/>
+      <stop offset="0.8" stop-color="#ff9a5c"/>
+      <stop offset="0.89" stop-color="#ffd2a6"/>
+      <stop offset="1" stop-color="#ff6a26"/>
+    </linearGradient>
+    <linearGradient id="ring-warm" gradientUnits="userSpaceOnUse" x1="420" y1="430" x2="1620" y2="1630">
+      <stop offset="0" stop-color="#ff5a1c"/>
+      <stop offset="0.22" stop-color="#ffc49a"/>
+      <stop offset="0.45" stop-color="#ff7a3a"/>
+      <stop offset="0.7" stop-color="#ff4a10"/>
+      <stop offset="0.88" stop-color="#ff9a5c"/>
+      <stop offset="1" stop-color="#ff5a1c"/>
+    </linearGradient>
+    <linearGradient id="ring-white" gradientUnits="userSpaceOnUse" x1="760" y1="780" x2="1000" y2="1280">
+      <stop offset="0" stop-color="#fff3e2"/>
+      <stop offset="0.6" stop-color="#ffe2c0"/>
+      <stop offset="1" stop-color="#ffb47a"/>
+    </linearGradient>
+    <linearGradient id="g-ray">
+      <stop offset="0" stop-color="#ff4a10" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#ff5a1f" stop-opacity="0.85"/>
+      <stop offset="0.72" stop-color="#ffa070"/>
+      <stop offset="1" stop-color="#ff5a1f" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="g-spark">
+      <stop offset="0" stop-color="#ff5a1f" stop-opacity="0.5"/>
+      <stop offset="0.6" stop-color="#ff9a62"/>
+      <stop offset="1" stop-color="#ff5a1f" stop-opacity="0.6"/>
+    </linearGradient>
+    <radialGradient id="g-glint">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.25" stop-color="#fff0dc" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ffb070" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g-bloom" gradientUnits="userSpaceOnUse" cx="935" cy="990" r="330">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.22" stop-color="#fff6e6" stop-opacity="0.97"/>
+      <stop offset="0.4" stop-color="#ffbe78" stop-opacity="0.72"/>
+      <stop offset="0.6" stop-color="#ff6a1a" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#ff4a10" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="g-streak">
+      <stop offset="0" stop-color="#ff4a10" stop-opacity="0"/>
+      <stop offset="0.12" stop-color="#ff6a26" stop-opacity="0.9"/>
+      <stop offset="0.36" stop-color="#ffc090"/>
+      <stop offset="0.44" stop-color="#fff0e0"/>
+      <stop offset="0.467" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#fff0e0"/>
+      <stop offset="0.6" stop-color="#ffc090"/>
+      <stop offset="0.88" stop-color="#ff6a26" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ff4a10" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="g-xstreak">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#ffd0a0" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#ff6a26" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="g-bb-body" gradientUnits="userSpaceOnUse" cx="1320" cy="950" r="300" fx="1425" fy="815">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#f1f1ef"/>
+      <stop offset="0.6" stop-color="#e2e1df"/>
+      <stop offset="0.85" stop-color="#c3c0bd"/>
+      <stop offset="1" stop-color="#9c9693"/>
+    </radialGradient>
+    <linearGradient id="g-bb-reflect" gradientUnits="userSpaceOnUse" x1="0" y1="1080" x2="0" y2="1250">
+      <stop offset="0" stop-color="#ff7a3a" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ff7a3a" stop-opacity="0.35"/>
+    </linearGradient>
+    <radialGradient id="g-bb-highlight">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.7" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="g-bb-rim" gradientUnits="userSpaceOnUse" x1="0" y1="760" x2="0" y2="1160">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffd0a0" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="f-ring-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2048" height="2048">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <filter id="f-soft" filterUnits="userSpaceOnUse" x="0" y="0" width="2048" height="2048">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-letter-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2048" height="2048">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="7" result="b"/>
+      <feFlood flood-color="#ffc290" flood-opacity="0.6"/>
+      <feComposite in2="b" operator="in" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="g-bb-shade" gradientUnits="userSpaceOnUse" x1="1040" y1="1130" x2="1420" y2="760">
+      <stop offset="0" stop-color="#5a3428" stop-opacity="0.6"/>
+      <stop offset="0.45" stop-color="#6a5550" stop-opacity="0.2"/>
+      <stop offset="0.75" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="g-core">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#fff2e0" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="clip-bb"><circle cx="1320" cy="950" r="300"/></clipPath>
+  </defs>
+  <g id="glow-disc">
+    <circle cx="990" cy="1020" r="800" fill="url(#g-glow-disc)"/>
+  </g>
+  <g id="rings">
+    <g id="ring-main">
+      <path class="ring-glow" d="M1571.7 807.1A595 595 0 1 0 1612.7 1081.9" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="57.2" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1571.7 807.1A595 595 0 1 0 1612.7 1081.9" pathLength="100" fill="none" stroke="url(#ring-hot)" stroke-width="26" stroke-linecap="round"/>
+    </g>
+    <g id="ring-outer-1">
+      <path class="ring-glow" d="M996.7 362.4A668 668 0 0 0 352.4 1006.7" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="33" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M996.7 362.4A668 668 0 0 0 352.4 1006.7" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="15" stroke-linecap="round"/>
+    </g>
+    <g id="ring-outer-2">
+      <path class="ring-glow" d="M531.8 1469.6A657 657 0 0 0 1088.7 1683.4" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="28.6" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M531.8 1469.6A657 657 0 0 0 1088.7 1683.4" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="13" stroke-linecap="round"/>
+    </g>
+    <g id="ring-outer-3">
+      <path class="ring-glow" d="M1435.2 535.1A646 646 0 0 0 1042.5 384.4" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="24.2" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1435.2 535.1A646 646 0 0 0 1042.5 384.4" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="11" stroke-linecap="round"/>
+    </g>
+    <g id="ring-outer-4">
+      <path class="ring-glow" d="M803.2 1625.8A634 634 0 0 0 1632.4 1194.1" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="33" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M803.2 1625.8A634 634 0 0 0 1632.4 1194.1" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="15" stroke-linecap="round"/>
+    </g>
+    <g id="ring-mid-1">
+      <path class="ring-glow" d="M1020 470A560 560 0 0 0 540 1318.4" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="26.4" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1020 470A560 560 0 0 0 540 1318.4" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="12" stroke-linecap="round"/>
+    </g>
+    <g id="ring-mid-2">
+      <path class="ring-glow" d="M1020 1565A535 535 0 0 0 1539.1 1159.4" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="26.4" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1020 1565A535 535 0 0 0 1539.1 1159.4" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="12" stroke-linecap="round"/>
+    </g>
+    <g id="ring-mid-3">
+      <path class="ring-glow" d="M1282.5 625.8A482 482 0 0 0 771.8 616.8" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="26.4" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1282.5 625.8A482 482 0 0 0 771.8 616.8" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="12" stroke-linecap="round"/>
+    </g>
+    <g id="ring-mid-4">
+      <path class="ring-glow" d="M607.8 792A476 476 0 0 0 599.7 1253.5" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="26.4" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M607.8 792A476 476 0 0 0 599.7 1253.5" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="12" stroke-linecap="round"/>
+    </g>
+    <g id="ring-mid-5">
+      <path class="ring-glow" d="M859.3 1471.7A470 470 0 0 0 1449.4 1221.2" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="26.4" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M859.3 1471.7A470 470 0 0 0 1449.4 1221.2" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="12" stroke-linecap="round"/>
+    </g>
+    <g id="ring-inner-1">
+      <path class="ring-glow" d="M1020 614A416 416 0 0 0 659.7 1238" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="22" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1020 614A416 416 0 0 0 659.7 1238" pathLength="100" fill="none" stroke="url(#ring-warm)" stroke-width="10" stroke-linecap="round"/>
+    </g>
+    <g id="ring-inner-2">
+      <path class="ring-glow" d="M1115.1 698.4A345 345 0 0 0 693.8 1142.3" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="37.4" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1115.1 698.4A345 345 0 0 0 693.8 1142.3" pathLength="100" fill="none" stroke="url(#ring-hot)" stroke-width="17" stroke-linecap="round"/>
+    </g>
+    <g id="ring-core">
+      <path class="ring-glow" d="M1062.5 788.7A245 245 0 0 0 791.3 1117.8" fill="none" stroke="#ff3200" stroke-opacity="0.38" stroke-width="41.8" stroke-linecap="round" filter="url(#f-ring-glow)"/>
+      <path class="ring-line" d="M1062.5 788.7A245 245 0 0 0 791.3 1117.8" pathLength="100" fill="none" stroke="url(#ring-white)" stroke-width="19" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g id="glints">
+    <ellipse id="glint-top" cx="599.3" cy="609.3" rx="95" ry="40" transform="rotate(45 599.3 609.3)" fill="url(#g-glint)"/>
+    <ellipse id="glint-bottom" cx="1442.1" cy="1452.1" rx="80" ry="34" transform="rotate(45 1442.1 1452.1)" fill="url(#g-glint)"/>
+  </g>
+  <g id="rays" filter="url(#f-soft)">
+    <g id="rays-long">
+      <path id="ray-34" transform="translate(1020 1030) rotate(-34)" d="M560 0L784 -4L880 0L784 4Z" fill="url(#g-ray)"/>
+      <path id="ray-45" transform="translate(1020 1030) rotate(-44.6)" d="M380 0L835 -4.5L1030 0L835 4.5Z" fill="url(#g-ray)"/>
+      <path id="ray-53" transform="translate(1020 1030) rotate(-53)" d="M380 0L646 -3L760 0L646 3Z" fill="url(#g-ray)"/>
+      <path id="ray-90" transform="translate(1020 1030) rotate(-90)" d="M140 0L434 -3L560 0L434 3Z" fill="url(#g-ray)"/>
+      <path id="ray-125" transform="translate(1020 1030) rotate(-124.6)" d="M210 0L644 -3.5L830 0L644 3.5Z" fill="url(#g-ray)"/>
+      <path id="ray-134" transform="translate(1020 1030) rotate(-134.2)" d="M250 0L775 -4.5L1000 0L775 4.5Z" fill="url(#g-ray)"/>
+      <path id="ray-145" transform="translate(1020 1030) rotate(-145)" d="M300 0L692 -3L860 0L692 3Z" fill="url(#g-ray)"/>
+      <path id="ray-215" transform="translate(1020 1030) rotate(-215)" d="M300 0L692 -3L860 0L692 3Z" fill="url(#g-ray)"/>
+      <path id="ray-225" transform="translate(1020 1030) rotate(-224.8)" d="M260 0L771 -4.5L990 0L771 4.5Z" fill="url(#g-ray)"/>
+      <path id="ray-235" transform="translate(1020 1030) rotate(-235)" d="M300 0L636 -3L780 0L636 3Z" fill="url(#g-ray)"/>
+      <path id="ray-306" transform="translate(1020 1030) rotate(-306)" d="M300 0L666.8 -3.5L824 0L666.8 3.5Z" fill="url(#g-ray)"/>
+      <path id="ray-316" transform="translate(1020 1030) rotate(-315.8)" d="M250 0L775 -4.5L1000 0L775 4.5Z" fill="url(#g-ray)"/>
+      <path id="ray-325" transform="translate(1020 1030) rotate(-325)" d="M400 0L708 -3L840 0L708 3Z" fill="url(#g-ray)"/>
+    </g>
+    <g id="sparks">
+      <path id="spark-30" transform="translate(1020 1030) rotate(-30.4)" d="M716 0L797 -6L878 0L797 6Z" fill="url(#g-spark)"/>
+      <path id="spark-56" transform="translate(1020 1030) rotate(-56.5)" d="M745 0L810.5 -5.5L876 0L810.5 5.5Z" fill="url(#g-spark)"/>
+      <path id="spark-150" transform="translate(1020 1030) rotate(-150.4)" d="M736 0L771.5 -5.5L807 0L771.5 5.5Z" fill="url(#g-spark)"/>
+      <path id="spark-204" transform="translate(1020 1030) rotate(-204.3)" d="M689 0L767.5 -6L846 0L767.5 6Z" fill="url(#g-spark)"/>
+      <path id="spark-243" transform="translate(1020 1030) rotate(-242.6)" d="M739 0L798 -5.5L857 0L798 5.5Z" fill="url(#g-spark)"/>
+      <path id="spark-298" transform="translate(1020 1030) rotate(-297.6)" d="M704 0L744 -5.5L784 0L744 5.5Z" fill="url(#g-spark)"/>
+      <path id="spark-330" transform="translate(1020 1030) rotate(-329.5)" d="M748 0L789 -5.5L830 0L789 5.5Z" fill="url(#g-spark)"/>
+    </g>
+  </g>
+  <g id="flare">
+    <circle id="flare-bloom" cx="935" cy="990" r="330" fill="url(#g-bloom)"/>
+    <path id="flare-streak" transform="translate(954 1020)" d="M-790 0L0 -13L900 0L0 13Z" fill="url(#g-streak)"/>
+    <g id="flare-cross" transform="translate(935 990)">
+      <path transform="rotate(-38)" d="M0 -8L380 0L0 8Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-142)" d="M0 -8L400 0L0 8Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-218)" d="M0 -8L360 0L0 8Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-322)" d="M0 -8L300 0L0 8Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-20)" d="M0 -5L220 0L0 5Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-62)" d="M0 -5L260 0L0 5Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-118)" d="M0 -5L240 0L0 5Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-162)" d="M0 -5L230 0L0 5Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-198)" d="M0 -5L250 0L0 5Z" fill="url(#g-xstreak)"/>
+      <path transform="rotate(-245)" d="M0 -5L220 0L0 5Z" fill="url(#g-xstreak)"/>
+    </g>
+    <circle id="flare-core" cx="935" cy="990" r="80" fill="url(#g-core)"/>
+  </g>
+  <g id="bb">
+    <circle id="bb-body" cx="1320" cy="950" r="300" fill="url(#g-bb-body)"/>
+    <circle id="bb-shade" cx="1320" cy="950" r="300" fill="url(#g-bb-shade)"/>
+    <circle id="bb-reflect" cx="1320" cy="950" r="300" fill="url(#g-bb-reflect)"/>
+    <path id="bb-rim" d="M1094.8 761A294 294 0 0 0 1151.4 1190.8" fill="none" stroke="url(#g-bb-rim)" stroke-width="12" stroke-linecap="round" clip-path="url(#clip-bb)"/>
+    <ellipse id="bb-highlight" cx="1422" cy="824" rx="86" ry="76" transform="rotate(-28 1422 824)" fill="url(#g-bb-highlight)"/>
+    <circle id="bb-specular" cx="1160" cy="845" r="11" fill="#ffffff"/>
+  </g>
+  <g id="lettering" fill="#fffdf9" filter="url(#f-letter-glow)">
+    <g id="lettering-slant" transform="matrix(1 0 -0.22 1 308 0)">
+      <path id="letter-c" d="M685 1117H885Q922 1117 922 1154V1196Q922 1220 898 1220H857V1182H713Q701 1182 701 1194V1328Q701 1340 713 1340H857V1300H898Q922 1300 922 1324V1363Q922 1400 885 1400H685Q637 1400 637 1352V1165Q637 1117 685 1117Z"/>
+      <path id="letter-m" d="M1007 1117H1056L1160 1317L1270 1117H1317Q1347 1117 1347 1147V1392Q1347 1400 1339 1400H1289Q1281 1400 1281 1392V1209L1182 1400H1140L1041 1213V1392Q1041 1400 1033 1400H985Q977 1400 977 1392V1147Q977 1117 1007 1117Z"/>
+    </g>
+  </g>
+</svg>
