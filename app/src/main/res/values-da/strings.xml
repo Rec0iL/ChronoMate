@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Vægtkonfiguration</string>
     <string name="weight_type_bbs">BBs</string>
-    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_diablos">Diabolo og slugs</string>
     <string name="weight_type_custom">Brugerdefineret</string>
     <string name="custom_weights_list">Liste over egne vægte</string>
     <string name="no_custom_weights">Ingen egne vægte tilføjet</string>
@@ -240,4 +240,12 @@
     <string name="save">Gem</string>
     <string name="show_imperial">Vis også imperiale enheder (fps, ft-lb, grain, yards)</string>
     <string name="stat_wind_drift">Vindafdrift</string>
+    <string name="diabolo_caliber_label">Kaliber</string>
+    <string name="all_calibers">Alle</string>
+    <string name="pcp_bc_unknown">BC ukendt – mål den</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: producenten oplyser ingen BC. Den tidligere BC beholdes; mål den rigtige nedenfor.</string>
+    <string name="joule_grid_hint">★ = valgt vægt (bruges til skud og grænseadvarsel) · tryk på en flise for at vælge</string>
+    <string name="move_up">Flyt op</string>
+    <string name="move_down">Flyt ned</string>
 </resources>

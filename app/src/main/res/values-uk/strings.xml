@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Конфігурація ваги</string>
     <string name="weight_type_bbs">Кулі (BB)</string>
-    <string name="weight_type_diablos">Diablo</string>
+    <string name="weight_type_diablos">Діаболо та слаги</string>
     <string name="weight_type_custom">Власна</string>
     <string name="custom_weights_list">Список власних ваг</string>
     <string name="no_custom_weights">Власних ваг не додано</string>
@@ -240,4 +240,12 @@
     <string name="save">Зберегти</string>
     <string name="show_imperial">Також показувати імперські одиниці (fps, ft-lb, грани, ярди)</string>
     <string name="stat_wind_drift">Знос вітром</string>
+    <string name="diabolo_caliber_label">Калібр</string>
+    <string name="all_calibers">Усі</string>
+    <string name="pcp_bc_unknown">BC невідомий – виміряйте</string>
+    <string name="pcp_slug"> (слаг)</string>
+    <string name="pcp_bc_unknown_note">%1$s: виробник не вказує BC. Залишається попередній BC; виміряйте справжній нижче.</string>
+    <string name="joule_grid_hint">★ = вибрана вага (для пострілів і попередження про ліміт) · торкніться плитки, щоб вибрати</string>
+    <string name="move_up">Вгору</string>
+    <string name="move_down">Вниз</string>
 </resources>

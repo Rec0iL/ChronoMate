@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Viktkonfiguration</string>
     <string name="weight_type_bbs">BBs</string>
-    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_diablos">Diabolo och slugs</string>
     <string name="weight_type_custom">Anpassad</string>
     <string name="custom_weights_list">Lista över egna vikter</string>
     <string name="no_custom_weights">Inga egna vikter tillagda</string>
@@ -240,4 +240,12 @@
     <string name="save">Spara</string>
     <string name="show_imperial">Visa även brittiska enheter (fps, ft-lb, grain, yards)</string>
     <string name="stat_wind_drift">Vindavdrift</string>
+    <string name="diabolo_caliber_label">Kaliber</string>
+    <string name="all_calibers">Alla</string>
+    <string name="pcp_bc_unknown">BC okänd – mät den</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: tillverkaren anger ingen BC. Tidigare BC behålls; mät den riktiga nedan.</string>
+    <string name="joule_grid_hint">★ = vald vikt (används för skott och gränsvarning) · tryck på en ruta för att välja</string>
+    <string name="move_up">Flytta upp</string>
+    <string name="move_down">Flytta ned</string>
 </resources>

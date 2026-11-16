@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Gewichtskonfiguration</string>
     <string name="weight_type_bbs">BBs</string>
-    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_diablos">Diabolos &amp; Slugs</string>
     <string name="weight_type_custom">Benutzerdefiniert</string>
     <string name="custom_weights_list">Liste benutzerdef. Geschosse</string>
     <string name="no_custom_weights">Keine benutzerdef. Geschosse hinzugefügt</string>
@@ -243,4 +243,9 @@
     <string name="joule_grid_hint">★ = gewähltes Gewicht (für Schüsse und Warnung) · Kachel antippen zum Auswählen</string>
     <string name="move_up">Nach oben</string>
     <string name="move_down">Nach unten</string>
+    <string name="diabolo_caliber_label">Kaliber</string>
+    <string name="all_calibers">Alle</string>
+    <string name="pcp_bc_unknown">BC unbekannt – selbst messen</string>
+    <string name="pcp_slug"> (Slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: Der Hersteller nennt keinen BC. Der bisherige BC bleibt; den echten unten messen.</string>
 </resources>

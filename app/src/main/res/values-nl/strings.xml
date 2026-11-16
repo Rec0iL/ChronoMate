@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Gewichtconfiguratie</string>
     <string name="weight_type_bbs">BBs</string>
-    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_diablos">Diabolo\'s &amp; slugs</string>
     <string name="weight_type_custom">Aangepast</string>
     <string name="custom_weights_list">Lijst aangepaste gewichten</string>
     <string name="no_custom_weights">Geen aangepaste gewichten toegevoegd</string>
@@ -240,4 +240,12 @@
     <string name="save">Opslaan</string>
     <string name="show_imperial">Ook imperiale eenheden tonen (fps, ft-lb, grains, yards)</string>
     <string name="stat_wind_drift">Windafwijking</string>
+    <string name="diabolo_caliber_label">Kaliber</string>
+    <string name="all_calibers">Alle</string>
+    <string name="pcp_bc_unknown">BC onbekend – meet hem</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: de fabrikant geeft geen BC. De vorige BC blijft; meet de echte hieronder.</string>
+    <string name="joule_grid_hint">★ = gekozen gewicht (voor schoten en de limietwaarschuwing) · tik op een tegel om te kiezen</string>
+    <string name="move_up">Omhoog</string>
+    <string name="move_down">Omlaag</string>
 </resources>

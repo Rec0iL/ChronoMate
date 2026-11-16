@@ -94,6 +94,12 @@ data class ChronoData(
     val weightType: WeightType = WeightType.BB,
     val customWeights: List<CustomWeight> = emptyList(),
     val alwaysShowCustomWeights: Boolean = false,
+    /** Catalogue name when a pellet is selected (pellets can share a weight). */
+    val selectedPellet: String = "",
+    /** Caliber filter of the Diablos list (".177", ".22", ".25", ".30" or ALL). */
+    val diaboloCaliber: String = ".177",
+    /** Weight type restored when leaving PCP mode. */
+    val airsoftWeightType: WeightType = WeightType.BB,
 
     // Orga weapon classes (compliance board)
     val weaponClasses: List<WeaponClass> = DEFAULT_WEAPON_CLASSES,

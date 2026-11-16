@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.chronomate.model.WeightOption
-import com.example.chronomate.model.sameWeight
 
 /**
  * The weight chips (loaded weights of the active type, then custom weights when enabled).
@@ -28,16 +27,16 @@ import com.example.chronomate.model.sameWeight
 @Composable
 fun WeightChipRow(
     options: List<WeightOption>,
-    selectedWeight: Float,
-    onSelect: (Float) -> Unit,
+    isSelected: (WeightOption) -> Boolean,
+    onSelect: (WeightOption) -> Unit,
     modifier: Modifier = Modifier,
     wrap: Boolean = false
 ) {
     @Composable
     fun Chip(option: WeightOption) {
         FilterChip(
-            selected = sameWeight(option.weight, selectedWeight),
-            onClick = { onSelect(option.weight) },
+            selected = isSelected(option),
+            onClick = { onSelect(option) },
             label = { Text(option.label) },
             leadingIcon = if (option.isCustom) {
                 { Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp)) }

@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">重量設定</string>
     <string name="weight_type_bbs">BB弾</string>
-    <string name="weight_type_diablos">ディアブロ</string>
+    <string name="weight_type_diablos">ペレット・スラッグ</string>
     <string name="weight_type_custom">カスタム</string>
     <string name="custom_weights_list">カスタム重量リスト</string>
     <string name="no_custom_weights">カスタム重量が追加されていません</string>
@@ -240,4 +240,12 @@
     <string name="save">保存</string>
     <string name="show_imperial">ヤード・ポンド法も表示（fps、ft-lb、グレイン、ヤード）</string>
     <string name="stat_wind_drift">風偏</string>
+    <string name="diabolo_caliber_label">口径</string>
+    <string name="all_calibers">すべて</string>
+    <string name="pcp_bc_unknown">BC不明 – 測定してください</string>
+    <string name="pcp_slug">（スラッグ）</string>
+    <string name="pcp_bc_unknown_note">%1$s：メーカーはBCを公表していません。前のBCのままです。下で実際の値を測定してください。</string>
+    <string name="joule_grid_hint">★ = 選択中の重さ（射撃と上限警告に使用）・タイルをタップして選択</string>
+    <string name="move_up">上へ</string>
+    <string name="move_down">下へ</string>
 </resources>

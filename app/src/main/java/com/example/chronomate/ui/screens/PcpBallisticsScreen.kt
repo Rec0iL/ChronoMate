@@ -44,7 +44,10 @@ import com.example.chronomate.ballistics.PcpResult
 import com.example.chronomate.ballistics.PcpWarning
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.ClickUnit
-import com.example.chronomate.model.PCP_PRESETS
+import com.example.chronomate.model.CALIBERS
+import com.example.chronomate.model.PELLETS
+import com.example.chronomate.model.Pellet
+import com.example.chronomate.model.pelletsFor
 import com.example.chronomate.model.VelocitySource
 import com.example.chronomate.viewmodel.ChronoViewModel
 import com.example.chronomate.ui.components.EnvironmentSection
@@ -176,12 +179,11 @@ fun PcpBallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 
         // --- Projectile ---
         Section(stringResource(R.string.pcp_card_projectile)) {
-            ProjectilePicker(data, onPreset = { pr ->
-                viewModel.updatePcp {
-                    it.copy(projectileName = pr.name, massGrams = pr.massGrams, caliberMm = pr.caliberMm, bc = pr.bc, dragModel = pr.dragModel)
-                }
-            }, onCustom = { viewModel.usePcpCustomWeight(it) })
+            ProjectilePicker(data, onPellet = { viewModel.selectPellet(it) }, onCustom = { viewModel.usePcpCustomWeight(it) })
             Text(pc.projectileName, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            PELLETS.firstOrNull { it.name == pc.projectileName && it.bc == null }?.let {
+                Text(stringResource(R.string.pcp_bc_unknown_note, it.name), style = MaterialTheme.typography.bodySmall, color = Color(0xFFFF9800))
+            }
             NumberField(stringResource(R.string.pcp_mass), pc.massGrams, "g", 3, 0.1..20.0,
                 supporting = "= %.2f gr".format(pc.massGrams / PcpConstants.GRAIN_TO_GRAM)) { x -> viewModel.updatePcp { it.copy(massGrams = x) } }
             NumberField(stringResource(R.string.pcp_caliber), pc.caliberMm, "mm", 2, 4.0..12.0) { x -> viewModel.updatePcp { it.copy(caliberMm = x) } }
@@ -294,7 +296,7 @@ private fun Segmented(label: String, options: List<String>, selected: Int, onSel
 @Composable
 private fun ProjectilePicker(
     data: ChronoData,
-    onPreset: (com.example.chronomate.model.PcpPreset) -> Unit,
+    onPellet: (Pellet) -> Unit,
     onCustom: (Int) -> Unit
 ) {
     var open by remember { mutableStateOf(false) }
@@ -310,21 +312,34 @@ private fun ProjectilePicker(
                     onClick = { open = false; onCustom(i) }
                 )
             }
-            if (data.customWeights.isNotEmpty()) HorizontalDivider()
-            PCP_PRESETS.forEach { pr ->
-                DropdownMenuItem(
-                    text = {
-                        Column {
-                            Text(pr.name)
-                            Text(
-                                "%s gr / %.3f g · BC ≈%.3f · %s".format(pr.grains.toString().removeSuffix(".0"), pr.massGrams, pr.bc, pr.source),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    onClick = { open = false; onPreset(pr) }
+            // The catalogue is the Diablos weight list: the same pellets, grouped by caliber
+            CALIBERS.forEach { (key, mm) ->
+                HorizontalDivider()
+                Text(
+                    "%s mm (%s)".format(mm.toString().removeSuffix(".0"), key),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
+                pelletsFor(key).forEach { pr ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text(pr.name + if (pr.slug) stringResource(R.string.pcp_slug) else "")
+                                Text(
+                                    "%s gr / %.3f g · %s".format(
+                                        pr.grains.toString().removeSuffix(".0"), pr.massGrams,
+                                        pr.bc?.let { "BC ≈%.3f (%s, %s)".format(it, pr.bcModel.ifEmpty { "?" }, pr.source) }
+                                            ?: stringResource(R.string.pcp_bc_unknown)
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
+                        onClick = { open = false; onPellet(pr) }
+                    )
+                }
             }
         }
     }

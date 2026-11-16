@@ -51,6 +51,7 @@ import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.TrajectoryPoint
 import com.example.chronomate.model.WeightType
 import com.example.chronomate.model.availableWeights
+import com.example.chronomate.model.isSelected
 import com.example.chronomate.model.effectiveAirDensity
 import com.example.chronomate.ui.components.EnvironmentSection
 import com.example.chronomate.ui.components.WeightChipRow
@@ -354,8 +355,8 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         } else {
             WeightChipRow(
                 options = weights,
-                selectedWeight = data.selectedWeight,
-                onSelect = { viewModel.setWeight(it) }
+                isSelected = { data.isSelected(it) },
+                onSelect = { viewModel.selectWeightOption(it) }
             )
         }
 

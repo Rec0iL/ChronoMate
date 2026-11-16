@@ -50,7 +50,7 @@ import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.Compliance
 import com.example.chronomate.model.availableWeights
-import com.example.chronomate.model.sameWeight
+import com.example.chronomate.model.isSelected
 import com.example.chronomate.model.WeaponClass
 import com.example.chronomate.model.activeWeaponClass
 import com.example.chronomate.model.complianceOf
@@ -162,8 +162,8 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
             practicalWeight = practical,
             columns = if (isLandscape) 5 else 2,
             isDark = isDark,
-            selectedWeight = data.selectedWeight,
-            onSelect = { viewModel.setWeight(it) }
+            selectedIndex = options.indexOfFirst { data.isSelected(it) },
+            onSelect = { i -> viewModel.selectWeightOption(options[i]) }
         )
         Spacer(Modifier.height(6.dp))
         Text(
@@ -536,17 +536,18 @@ fun JouleGridStatic(
     practicalWeight: Float,
     columns: Int,
     isDark: Boolean,
-    selectedWeight: Float? = null,
-    onSelect: ((Float) -> Unit)? = null
+    selectedIndex: Int = -1,
+    onSelect: ((Int) -> Unit)? = null
 ) {
-    val rows = weights.chunked(columns)
+    val rows = weights.withIndex().toList().chunked(columns)
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         rows.forEach { rowWeights ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                rowWeights.forEach { (weight, label) ->
+                rowWeights.forEach { (index, item) ->
+                    val (weight, label) = item
                     val energy = 0.5f * (weight / 1000f) * velocity.pow(2)
-                    val selected = selectedWeight != null && sameWeight(weight, selectedWeight)
+                    val selected = index == selectedIndex
 
                     val (bgColor, borderColor) = when {
                         velocity <= 0f -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) to MaterialTheme.colorScheme.outline
@@ -558,7 +559,7 @@ fun JouleGridStatic(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .then(if (onSelect != null) Modifier.clickable { onSelect(weight) } else Modifier),
+                            .then(if (onSelect != null) Modifier.clickable { onSelect(index) } else Modifier),
                         colors = CardDefaults.cardColors(containerColor = bgColor),
                         border = if (selected) BorderStroke(3.dp, borderColor) else null
                     ) {

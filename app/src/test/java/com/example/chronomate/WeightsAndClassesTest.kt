@@ -19,11 +19,25 @@ class WeightsAndClassesTest {
 
     @Test
     fun switchingTypeMovesSelectionIntoTheList() {
-        val diablo = availableWeights(WeightType.DIABLO, custom, false)
-        assertEquals(0.50f, weightToKeep(0.20f, diablo))
-        assertEquals(0.52f, weightToKeep(0.52f, diablo))
+        val diablo = availableWeights(WeightType.DIABLO, custom, false, ".22")
+        val first = pelletsFor(".22").first()
+        assertEquals(first.massGrams.toFloat(), optionToKeep(0.20f, "", diablo)!!.weight)
+        assertEquals(first.name, optionToKeep(0.20f, "", diablo)!!.pellet!!.name)
         // a custom weight stays selected when custom weights are appended
-        assertEquals(0.27f, weightToKeep(0.27f, availableWeights(WeightType.DIABLO, custom, true)))
+        assertEquals(0.27f, optionToKeep(0.27f, "", availableWeights(WeightType.DIABLO, custom, true, ".22"))!!.weight)
+    }
+
+    @Test
+    fun diablosAreThePelletCatalogue() {
+        assertEquals(63, PELLETS.size)
+        assertEquals(PELLETS.size, CALIBERS.sumOf { pelletsFor(it.first).size })
+        val opts = availableWeights(WeightType.DIABLO, emptyList(), false, ".177")
+        // JSB Exact and Air Arms Field weigh the same: only the selected pellet is marked
+        val twins = opts.filter { sameWeight(it.weight, 0.547f) }
+        assertTrue(twins.size >= 2)
+        val chosen = twins[1].pellet!!.name
+        assertEquals(listOf(false, true), twins.take(2).map { isSelected(0.547f, chosen, it) })
+        assertEquals(0.033, findPellet(1.175f, ".22")!!.bc!!, 1e-9)
     }
 
     @Test

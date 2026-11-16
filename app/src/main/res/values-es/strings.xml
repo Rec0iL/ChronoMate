@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Configuración de Peso</string>
     <string name="weight_type_bbs">BBs</string>
-    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_diablos">Diábolos y slugs</string>
     <string name="weight_type_custom">Personalizado</string>
     <string name="custom_weights_list">Lista de Pesos Personalizados</string>
     <string name="no_custom_weights">No se han añadido pesos personalizados</string>
@@ -240,4 +240,12 @@
     <string name="save">Guardar</string>
     <string name="show_imperial">Mostrar también unidades imperiales (fps, ft-lb, grains, yardas)</string>
     <string name="stat_wind_drift">Deriva por viento</string>
+    <string name="diabolo_caliber_label">Calibre</string>
+    <string name="all_calibers">Todos</string>
+    <string name="pcp_bc_unknown">BC desconocido – mídelo</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: el fabricante no publica BC. Se mantiene el BC anterior; mide el real abajo.</string>
+    <string name="joule_grid_hint">★ = peso seleccionado (para los disparos y el aviso de límite) · toca una casilla para elegirla</string>
+    <string name="move_up">Subir</string>
+    <string name="move_down">Bajar</string>
 </resources>

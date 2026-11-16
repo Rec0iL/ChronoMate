@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Konfiguracja wag</string>
     <string name="weight_type_bbs">Kulki (BBs)</string>
-    <string name="weight_type_diablos">Diabolo</string>
+    <string name="weight_type_diablos">Diabolo i slugi</string>
     <string name="weight_type_custom">Niestandardowe</string>
     <string name="custom_weights_list">Lista niestandardowych wag</string>
     <string name="no_custom_weights">Nie dodano niestandardowych wag</string>
@@ -240,4 +240,12 @@
     <string name="save">Zapisz</string>
     <string name="show_imperial">Pokazuj też jednostki imperialne (fps, ft-lb, grainy, jardy)</string>
     <string name="stat_wind_drift">Znos wiatru</string>
+    <string name="diabolo_caliber_label">Kaliber</string>
+    <string name="all_calibers">Wszystkie</string>
+    <string name="pcp_bc_unknown">BC nieznany – zmierz go</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: producent nie podaje BC. Zostaje poprzedni BC; zmierz prawdziwy poniżej.</string>
+    <string name="joule_grid_hint">★ = wybrana waga (do strzałów i ostrzeżenia o limicie) · dotknij kafelka, aby wybrać</string>
+    <string name="move_up">W górę</string>
+    <string name="move_down">W dół</string>
 </resources>

@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Configurazione pesi</string>
     <string name="weight_type_bbs">Pallini (BBs)</string>
-    <string name="weight_type_diablos">Diablo</string>
+    <string name="weight_type_diablos">Diabolo e slug</string>
     <string name="weight_type_custom">Personalizzato</string>
     <string name="custom_weights_list">Elenco pesi personalizzati</string>
     <string name="no_custom_weights">Nessun peso personalizzato aggiunto</string>
@@ -240,4 +240,12 @@
     <string name="save">Salva</string>
     <string name="show_imperial">Mostra anche le unità imperiali (fps, ft-lb, grani, iarde)</string>
     <string name="stat_wind_drift">Deriva del vento</string>
+    <string name="diabolo_caliber_label">Calibro</string>
+    <string name="all_calibers">Tutti</string>
+    <string name="pcp_bc_unknown">BC sconosciuto – misuralo</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: il produttore non indica il BC. Resta il BC precedente; misura quello reale qui sotto.</string>
+    <string name="joule_grid_hint">★ = peso selezionato (per i tiri e l\'avviso di limite) · tocca una casella per selezionarla</string>
+    <string name="move_up">Sposta su</string>
+    <string name="move_down">Sposta giù</string>
 </resources>

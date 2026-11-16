@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">重量配置</string>
     <string name="weight_type_bbs">BB彈</string>
-    <string name="weight_type_diablos">鉛彈 (Diablos)</string>
+    <string name="weight_type_diablos">鉛彈與彈頭</string>
     <string name="weight_type_custom">自定義</string>
     <string name="custom_weights_list">自定義重量列表</string>
     <string name="no_custom_weights">未添加自定義重量</string>
@@ -240,4 +240,12 @@
     <string name="save">儲存</string>
     <string name="show_imperial">同時顯示英制單位（fps、ft-lb、格令、碼）</string>
     <string name="stat_wind_drift">風偏</string>
+    <string name="diabolo_caliber_label">口徑</string>
+    <string name="all_calibers">全部</string>
+    <string name="pcp_bc_unknown">BC 未知 – 請自行測量</string>
+    <string name="pcp_slug">（彈頭）</string>
+    <string name="pcp_bc_unknown_note">%1$s：製造商未公布 BC。保留先前的 BC；請在下方測量實際值。</string>
+    <string name="joule_grid_hint">★ = 已選重量（用於射擊與超限警告）· 點選方塊即可選擇</string>
+    <string name="move_up">上移</string>
+    <string name="move_down">下移</string>
 </resources>

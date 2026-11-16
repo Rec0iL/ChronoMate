@@ -33,7 +33,10 @@ import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.WeightType
 import com.example.chronomate.model.BallisticMode
+import com.example.chronomate.model.ALL_CALIBERS
+import com.example.chronomate.model.CALIBERS
 import com.example.chronomate.model.availableWeights
+import com.example.chronomate.model.isSelected
 import com.example.chronomate.ui.components.WeightChipRow
 import com.example.chronomate.viewmodel.ChronoViewModel
 
@@ -283,6 +286,22 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             )
         }
         
+        if (data.weightType == WeightType.DIABLO) {
+            // Caliber filter for the pellet & slug catalogue
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(stringResource(R.string.diabolo_caliber_label), style = MaterialTheme.typography.labelMedium)
+            val calibers = CALIBERS.map { it.first to "%s".format(it.first) } + (ALL_CALIBERS to stringResource(R.string.all_calibers))
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                calibers.forEachIndexed { i, (key, label) ->
+                    SegmentedButton(
+                        selected = data.diaboloCaliber == key,
+                        onClick = { viewModel.setDiaboloCaliber(key) },
+                        shape = SegmentedButtonDefaults.itemShape(i, calibers.size)
+                    ) { Text(label, maxLines = 1, fontSize = 12.sp) }
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
 
         // Always-show-custom switch (off = custom weights only appear with the Custom type)
@@ -317,8 +336,8 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         } else {
             WeightChipRow(
                 options = loaded,
-                selectedWeight = data.selectedWeight,
-                onSelect = { viewModel.setWeight(it) },
+                isSelected = { data.isSelected(it) },
+                onSelect = { viewModel.selectWeightOption(it) },
                 wrap = true
             )
         }

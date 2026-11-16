@@ -60,7 +60,7 @@
 
     <string name="weight_config_title">Weight Configuration</string>
     <string name="weight_type_bbs">BBs</string>
-    <string name="weight_type_diablos">Diablos</string>
+    <string name="weight_type_diablos">Diablos &amp; slugs</string>
     <string name="weight_type_custom">Custom</string>
     <string name="custom_weights_list">Custom Weights List</string>
     <string name="no_custom_weights">No custom weights added</string>
@@ -244,4 +244,9 @@
     <string name="joule_grid_hint">★ = selected weight (used for shots and the over-limit warning) · tap a tile to select it</string>
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
+    <string name="diabolo_caliber_label">Caliber</string>
+    <string name="all_calibers">All</string>
+    <string name="pcp_bc_unknown">BC unknown – measure it</string>
+    <string name="pcp_slug"> (slug)</string>
+    <string name="pcp_bc_unknown_note">%1$s: the maker publishes no BC. The last BC is kept; measure the real one below.</string>
 </resources>

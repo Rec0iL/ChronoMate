@@ -21,6 +21,7 @@ import com.example.chronomate.ui.components.ShotChart
 import com.example.chronomate.ui.components.StatsGrid
 import com.example.chronomate.ui.components.WeightChipRow
 import com.example.chronomate.model.availableWeights
+import com.example.chronomate.model.isSelected
 import com.example.chronomate.viewmodel.ChronoViewModel
 
 @Composable
@@ -70,8 +71,8 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
             } else {
                 WeightChipRow(
                     options = weights,
-                    selectedWeight = data.selectedWeight,
-                    onSelect = { viewModel.setWeight(it) }
+                    isSelected = { data.isSelected(it) },
+                    onSelect = { viewModel.selectWeightOption(it) }
                 )
             }
         }

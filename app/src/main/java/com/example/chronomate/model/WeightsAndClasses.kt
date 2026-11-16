@@ -9,26 +9,40 @@ import kotlin.math.pow
 // ---------------------------------------------------------------------------------------------
 
 val STANDARD_BB_WEIGHTS = listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
-val STANDARD_DIABLO_WEIGHTS = listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f)
 
 private const val WEIGHT_MATCH_TOLERANCE = 0.0005f
 
-data class WeightOption(val weight: Float, val label: String, val isCustom: Boolean = false)
+data class WeightOption(
+    val weight: Float,
+    val label: String,
+    val isCustom: Boolean = false,
+    /** Set for entries of the pellet catalogue (Diablos). */
+    val pellet: Pellet? = null
+)
 
 fun sameWeight(a: Float, b: Float): Boolean = abs(a - b) < WEIGHT_MATCH_TOLERANCE
 
-fun standardWeights(type: WeightType): List<Float> = when (type) {
-    WeightType.BB -> STANDARD_BB_WEIGHTS
-    WeightType.DIABLO -> STANDARD_DIABLO_WEIGHTS
-    WeightType.CUSTOM -> emptyList()
-}
+fun standardWeights(type: WeightType): List<Float> = if (type == WeightType.BB) STANDARD_BB_WEIGHTS else emptyList()
+
+fun pelletLabel(p: Pellet, caliberFilter: String): String =
+    (if (caliberFilter == ALL_CALIBERS) p.name else p.short) + " %.3f g".format(p.massGrams)
 
 /**
- * The loaded weights of the active type, then the custom weights. Custom weights always belong to
- * the CUSTOM type; for BB / Diablo they are appended only when [alwaysShowCustom] is on.
+ * The loaded weights of the active type, then the custom weights. BB: standard airsoft weights;
+ * Diablos: the pellet & slug catalogue filtered by [caliber]. Custom weights always belong to the
+ * CUSTOM type; for BB / Diablos they are appended only when [alwaysShowCustom] is on.
  */
-fun availableWeights(type: WeightType, custom: List<CustomWeight>, alwaysShowCustom: Boolean): List<WeightOption> {
-    val options = standardWeights(type).map { WeightOption(it, "%.2f".format(it)) }.toMutableList()
+fun availableWeights(
+    type: WeightType,
+    custom: List<CustomWeight>,
+    alwaysShowCustom: Boolean,
+    caliber: String = ".177"
+): List<WeightOption> {
+    val options = if (type == WeightType.DIABLO) {
+        pelletsFor(caliber).map { WeightOption(it.massGrams.toFloat(), pelletLabel(it, caliber), pellet = it) }.toMutableList()
+    } else {
+        standardWeights(type).map { WeightOption(it, "%.2f".format(it)) }.toMutableList()
+    }
     if (type == WeightType.CUSTOM || alwaysShowCustom) {
         options += custom.map {
             WeightOption(it.weight, "${it.name} ${it.caliber}${it.caliberUnit} %.2f g".format(it.weight), isCustom = true)
@@ -38,7 +52,22 @@ fun availableWeights(type: WeightType, custom: List<CustomWeight>, alwaysShowCus
 }
 
 fun ChronoData.availableWeights(): List<WeightOption> =
-    availableWeights(weightType, customWeights, alwaysShowCustomWeights)
+    availableWeights(weightType, customWeights, alwaysShowCustomWeights, diaboloCaliber)
+
+/** Same weight, and for pellets the same pellet (two pellets can weigh the same). */
+fun isSelected(selectedWeight: Float, selectedPellet: String, opt: WeightOption): Boolean {
+    if (!sameWeight(opt.weight, selectedWeight)) return false
+    val p = opt.pellet ?: return true
+    return selectedPellet.isEmpty() || p.name == selectedPellet
+}
+
+fun ChronoData.isSelected(opt: WeightOption): Boolean = isSelected(selectedWeight, selectedPellet, opt)
+
+/** The option to select after the list changed: the current one if still offered, else the first. */
+fun optionToKeep(selectedWeight: Float, selectedPellet: String, options: List<WeightOption>): WeightOption? =
+    options.firstOrNull { isSelected(selectedWeight, selectedPellet, it) }
+        ?: options.firstOrNull { sameWeight(it.weight, selectedWeight) }
+        ?: options.firstOrNull()
 
 /** Keeps [selected] if [options] still offer it, else the first offered weight. */
 fun weightToKeep(selected: Float, options: List<WeightOption>): Float =
