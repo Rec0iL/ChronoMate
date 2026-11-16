@@ -240,4 +240,5 @@
     <string name="ballistic_mode_airsoft">Airsoft BB (hop-up)</string>
     <string name="ballistic_mode_pcp">PCP airgun (pellet &amp; slug)</string>
     <string name="show_imperial">Also show imperial units (fps, ft-lb, grains, yards)</string>
+    <string name="stat_wind_drift">Wind drift</string>
 </resources>

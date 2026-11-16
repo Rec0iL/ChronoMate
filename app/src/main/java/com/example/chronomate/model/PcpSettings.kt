@@ -42,3 +42,13 @@ data class PcpSettings(
     /** 0 = off; e.g. 7.5 J (German F-mark) or 16.27 J (UK 12 ft-lb). */
     val energyLimitJ: Double = 0.0
 )
+
+/**
+ * Air density for the BB engine: the tuned value (Settings) scaled by today's weather against
+ * standard air, so the GWC-calibrated drag / Magnus constants stay valid (same as desktop).
+ */
+fun ChronoData.effectiveAirDensity(): Double {
+    val e = environment
+    val today = com.example.chronomate.ballistics.Atmosphere(e.temperatureC, e.pressureHpa, e.humidityPct, e.altitudeM, e.useAltitude)
+    return airDensityRho.toDouble() * today.density() / com.example.chronomate.ballistics.Atmosphere(15.0, 1013.25, 0.0).density()
+}

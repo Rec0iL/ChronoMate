@@ -51,6 +51,8 @@ import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.TrajectoryPoint
 import com.example.chronomate.model.WeightType
 import com.example.chronomate.model.availableWeights
+import com.example.chronomate.model.effectiveAirDensity
+import com.example.chronomate.ui.components.EnvironmentSection
 import com.example.chronomate.ui.components.WeightChipRow
 import com.example.chronomate.viewmodel.ChronoViewModel
 import kotlinx.coroutines.Dispatchers
@@ -116,7 +118,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 
     val engine = remember { BallisticsEngine() }
     val trajectory = remember(
-        data.selectedWeight, speedMps, hopUp, shooterHeight, aimAngleDeg,
+        data.selectedWeight, speedMps, hopUp, shooterHeight, aimAngleDeg, data.environment,
         data.diameterMm, data.airDensityRho, data.dragCoefficientCw, 
         data.magnusCoefficientK, data.spinDampingCr, data.gravity
     ) {
@@ -127,7 +129,9 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             startingHeightM = shooterHeight,
             launchAngleDeg = aimAngleDeg,
             diameterMm = data.diameterMm.toDouble(),
-            airDensityRho = data.airDensityRho.toDouble(),
+            airDensityRho = data.effectiveAirDensity(),
+            windSpeedMps = data.environment.windSpeedMps,
+            windClock = data.environment.windClock,
             dragCoefficientCw = data.dragCoefficientCw.toDouble(),
             magnusCoefficientK = data.magnusCoefficientK.toDouble(),
             spinDampingCr = data.spinDampingCr.toDouble(),
@@ -316,6 +320,17 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     StatItemSmall(stringResource(R.string.stat_max_oh), "%.1f cm".format(overhop * 100), onSurfaceColor)
                     StatItemSmall(stringResource(R.string.stat_oh_dist), "%.1f m".format(overhopDist), cyanColor)
                 }
+                if (data.environment.windSpeedMps > 0) {
+                    val driftCm = (ptAtTarget?.z ?: 0.0) * 100.0
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.1f))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        StatItemSmall(
+                            stringResource(R.string.stat_wind_drift),
+                            if (kotlin.math.abs(driftCm) < 0.05) "0.0 cm" else "%.1f cm %s".format(kotlin.math.abs(driftCm), if (driftCm < 0) "L" else "R"),
+                            cyanColor
+                        )
+                    }
+                }
             }
         }
 
@@ -489,7 +504,9 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                         startingHeightM = shooterHeight,
                         launchAngleDeg = aimAngleOptDeg,
                         diameterMm = data.diameterMm.toDouble(),
-                        airDensityRho = data.airDensityRho.toDouble(),
+                        airDensityRho = data.effectiveAirDensity(),
+                        windSpeedMps = data.environment.windSpeedMps,
+                        windClock = data.environment.windClock,
                         dragCoefficientCw = data.dragCoefficientCw.toDouble(),
                         magnusCoefficientK = data.magnusCoefficientK.toDouble(),
                         spinDampingCr = data.spinDampingCr.toDouble(),
@@ -551,6 +568,10 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Weather & wind (shared with the PCP calculator): air density and crosswind drift
+        EnvironmentSection(data.environment, viewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         val annotatedString = buildAnnotatedString {

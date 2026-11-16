@@ -39,6 +39,13 @@ class BallisticsEngine {
         
         var x = 0.0
         var y = params.startingHeightM
+        var z = 0.0      // sideways (+ right), only moves when there is a crosswind
+        var vz = 0.0
+
+        // Wind "from" clock direction (12 = from the target, 3 = from the right) -> air velocity
+        val theta = Math.toRadians((params.windClock % 12.0) * 30.0)
+        val wx = -params.windSpeedMps * cos(theta)
+        val wz = -params.windSpeedMps * sin(theta)
         
         // Pre-calculated area and drag coefficient part
         val areaA = pi * d.pow(2.0) / 4.0
@@ -52,19 +59,24 @@ class BallisticsEngine {
             val vx_start = vx
             val vy_now = vy
             val v_start = sqrt(vx_start.pow(2.0) + vy_now.pow(2.0))
+            // Air flows past the BB at its speed relative to the wind (= ground speed without wind)
+            val rx = vx_start - wx
+            val rz = vz - wz
+            val vAir = sqrt(rx * rx + vy_now * vy_now + rz * rz)
             
             // 1. Update Rotation (decay based on current velocity)
-            val decayCoeff = cr * v_start
+            val decayCoeff = cr * vAir
             omega *= exp(-decayCoeff * stepDt)
             
             // 2. Forces
             val fg = -m * g
-            val fdx = -coeffC * v_start * vx_start
-            val fdy = -coeffC * v_start * vy_now
+            val fdx = -coeffC * vAir * rx
+            val fdy = -coeffC * vAir * vy_now
+            val fdz = -coeffC * vAir * rz
             
             // Magnus Effect (Lift)
             val fmx = k * rho * areaA * vy_now * omega
-            val fmy = -k * rho * areaA * vx_start * omega
+            val fmy = -k * rho * areaA * rx * omega
             
             // 3. Acceleration (F = m*a)
             val ax = (fdx + fmx) / m
@@ -73,17 +85,19 @@ class BallisticsEngine {
             // 4. Update Position (using velocity from start of step)
             x += vx_start * stepDt
             y += vy_now * stepDt
+            z += vz * stepDt
             
             // 5. Update Velocity for the next step
             vx += ax * stepDt
             vy += ay * stepDt
+            vz += fdz / m * stepDt
             
             // Metrics for the new position reached
             val currentV = sqrt(vx.pow(2.0) + vy.pow(2.0))
             val currentE = 0.5 * m * v_start * v_start // JS pushes energy using v before update
             val currentTime = (i + 1) * stepDt
             
-            points.add(TrajectoryPoint(x, y, currentV, currentE, currentTime))
+            points.add(TrajectoryPoint(x, y, currentV, currentE, currentTime, z))
             
             // Stop if BB hits the ground
             if (y <= 0) break

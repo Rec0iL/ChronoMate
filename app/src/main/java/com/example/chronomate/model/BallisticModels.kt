@@ -13,7 +13,10 @@ data class BallisticParams(
     val dragCoefficientCw: Double = 0.35, // Optimized for GWC/High-performance Airsoft profiles
     val magnusCoefficientK: Double = 0.002, // Adjusted lift coefficient to match GWC Apex
     val spinDampingCr: Double = 0.01,
-    val gravity: Double = 9.81
+    val gravity: Double = 9.81,
+    val windSpeedMps: Double = 0.0,
+    /** Direction the wind comes FROM (12 = from the target, 3 = from the right). */
+    val windClock: Double = 3.0
 )
 
 data class TrajectoryPoint(
@@ -21,5 +24,7 @@ data class TrajectoryPoint(
     val y: Double,
     val velocity: Double,
     val energyJoules: Double,
-    val time: Double
+    val time: Double,
+    /** Sideways drift (m, + right). */
+    val z: Double = 0.0
 )

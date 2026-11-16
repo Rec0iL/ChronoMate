@@ -239,4 +239,5 @@
     <string name="ballistic_mode_airsoft">Airsoft-BB (Hop-up)</string>
     <string name="ballistic_mode_pcp">PCP-Luftgewehr (Diabolo &amp; Slug)</string>
     <string name="show_imperial">Zusätzlich imperiale Einheiten (fps, ft-lb, Grain, Yards)</string>
+    <string name="stat_wind_drift">Windabdrift</string>
 </resources>
