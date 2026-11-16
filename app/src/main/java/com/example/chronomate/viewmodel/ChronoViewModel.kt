@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chronomate.R
 import com.example.chronomate.model.*
+import com.example.chronomate.network.fetchChronoPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -744,21 +745,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
-    private fun fetch(url: String, client: OkHttpClient): String? {
-        return try {
-            val request = Request.Builder()
-                .url(url)
-                .header("Cache-Control", "no-cache")
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) return null
-                response.body?.string()?.takeIf { it.isNotEmpty() }
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
+    /** Tolerates the HT-X3000's truncated responses (see [fetchChronoPage]). */
+    private fun fetch(url: String, client: OkHttpClient): String? = fetchChronoPage(url, client)
 
     /** The chrono replied - this is the only place that reports CONNECTED. */
     private fun onChronoAnswered(html: String) {
