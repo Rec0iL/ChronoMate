@@ -776,19 +776,24 @@ fun TrajectoryCanvas(
 
 @Composable
 fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, targetHeightM: Double) {
+    val ptAtDist = trajectory.minByOrNull { abs(it.x - targetDistance) }
+    val relativeImpactCm = ((ptAtDist?.y ?: 0.0) - targetHeightM) * 100.0
+    val driftCm = (ptAtDist?.z ?: 0.0) * 100.0   // sideways from the wind, + right
+    ReticleView(relativeImpactCm, driftCm)
+}
+
+/**
+ * Round reticle with the point of impact: height relative to the aim point and sideways drift.
+ * Off the reticle a dotted line at a right angle from the centre line ends in a horizontal arrow
+ * at the impact height. Used by the airsoft and the PCP trajectory screens.
+ */
+@Composable
+fun ReticleView(relativeImpactCm: Double, driftCm: Double) {
     val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
-    
     val chronoGreen = if (isLight) Color(0xFF1B5E20) else Color(0xFF88FF11)
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
     val crosshairColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
     val surfaceColor = MaterialTheme.colorScheme.surface
-    
-    val ptAtDist = trajectory.minByOrNull { abs(it.x - targetDistance) }
-    val bbHeightM = ptAtDist?.y ?: 0.0
-    
-    val relativeImpactM = bbHeightM - targetHeightM
-    val relativeImpactCm = relativeImpactM * 100.0
-    val driftCm = (ptAtDist?.z ?: 0.0) * 100.0   // sideways from the wind, + right
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(

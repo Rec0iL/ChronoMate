@@ -265,4 +265,7 @@
     <string name="own_projectile_has_bc">BC bekannt</string>
     <string name="own_projectile_edit">Bearbeiten</string>
     <string name="own_projectile_confirm_delete">Dein Geschoss \'%1$s\' löschen?</string>
+    <string name="orga_detail">%1$.2f J bei %2$.2f g · max. %3$.2f g</string>
+    <string name="orga_no_weight">keins deiner Gewichte</string>
+    <string name="pcp_target_distance">Zielentfernung</string>
 </resources>

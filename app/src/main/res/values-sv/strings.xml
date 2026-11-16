@@ -265,4 +265,7 @@
     <string name="own_projectile_has_bc">Jag vet BC</string>
     <string name="own_projectile_edit">Redigera</string>
     <string name="own_projectile_confirm_delete">Ta bort projektilen \'%1$s\'?</string>
+    <string name="orga_detail">%1$.2f J vid %2$.2f g · max %3$.2f g</string>
+    <string name="orga_no_weight">ingen av dina vikter</string>
+    <string name="pcp_target_distance">Målavstånd</string>
 </resources>

@@ -266,4 +266,7 @@
     <string name="own_projectile_has_bc">I know its BC</string>
     <string name="own_projectile_edit">Edit</string>
     <string name="own_projectile_confirm_delete">Delete your projectile \'%1$s\'?</string>
+    <string name="orga_detail">%1$.2f J at %2$.2f g · max %3$.2f g</string>
+    <string name="orga_no_weight">none of your weights</string>
+    <string name="pcp_target_distance">Target distance</string>
 </resources>

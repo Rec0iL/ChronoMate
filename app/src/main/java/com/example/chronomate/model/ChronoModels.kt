@@ -101,6 +101,9 @@ data class ChronoData(
     val activeAirsoft: List<String> = DEFAULT_ACTIVE_BB,
     val activePcp: List<String> = DEFAULT_ACTIVE_PCP,
     val selectedItem: String = "bb:0.20",
+    /** Each mode keeps its own pick (switching modes restores it); Orga always uses the BB one. */
+    val selectedAirsoft: String = "bb:0.20",
+    val selectedPcp: String = "",
     /** Caliber filter when browsing the pellet library. */
     val libraryCaliber: String = ".177",
 

@@ -1,6 +1,8 @@
 package com.example.chronomate.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -61,16 +63,6 @@ fun ProjectilesSection(data: ChronoData, viewModel: ChronoViewModel) {
         modifier = Modifier.padding(top = 4.dp)
     )
 
-    Spacer(Modifier.height(12.dp))
-    Text(stringResource(R.string.loaded_weights), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-    Spacer(Modifier.height(4.dp))
-    WeightChipRow(
-        options = data.availableWeights(),
-        isSelected = { data.isSelected(it) },
-        onSelect = { viewModel.selectWeightOption(it) },
-        wrap = true
-    )
-
     // Active list
     Spacer(Modifier.height(12.dp))
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))) {
@@ -97,20 +89,23 @@ fun ProjectilesSection(data: ChronoData, viewModel: ChronoViewModel) {
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { showLibrary = !showLibrary }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.library_title), maxLines = 1)
-                }
-                OutlinedButton(onClick = { creating = true }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.own_projectile_new), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+            OutlinedButton(onClick = { creating = true }, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.own_projectile_new), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
 
-    // Library (BB weights or the pellet catalogue)
+    // Library (BB weights or the pellet catalogue), collapsed behind a chevron
+    Spacer(Modifier.height(4.dp))
+    Row(
+        Modifier.fillMaxWidth().clickable { showLibrary = !showLibrary }.padding(vertical = 10.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(if (showLibrary) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
+        Spacer(Modifier.width(6.dp))
+        Text(stringResource(R.string.library_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+    }
     if (showLibrary) {
         Spacer(Modifier.height(8.dp))
         LibraryList(data, viewModel, kind)

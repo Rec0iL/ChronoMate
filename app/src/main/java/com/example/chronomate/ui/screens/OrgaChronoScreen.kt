@@ -50,10 +50,12 @@ import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.Compliance
 import com.example.chronomate.model.availableWeights
-import com.example.chronomate.model.isSelected
+import com.example.chronomate.model.KIND_BB
+import com.example.chronomate.model.orgaSelection
 import com.example.chronomate.model.WeaponClass
 import com.example.chronomate.model.activeWeaponClass
-import com.example.chronomate.model.complianceOf
+import com.example.chronomate.model.OrgaVerdict
+import com.example.chronomate.model.judgeClass
 import com.example.chronomate.model.maxWeightGrams
 import com.example.chronomate.model.moved
 import com.example.chronomate.viewmodel.ChronoViewModel
@@ -64,7 +66,7 @@ import kotlin.math.roundToInt
 
 private val ActiveAccentDark = Color(0xFF00E5FF)
 private val ActiveAccentLight = Color(0xFF00838F)
-private val CARD_HEIGHT = 132.dp
+private val CARD_HEIGHT = 158.dp
 private val GRID_GAP = 10.dp
 
 /**
@@ -133,7 +135,9 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
         ) { wc, isDragged ->
             ClassComplianceCard(
                 wc = wc,
-                velocity = latestVelocity,
+                // Orga is always airsoft: judged at the BB pick, best weight from the BB list
+                verdict = judgeClass(wc, latestVelocity, data.orgaSelection().weight, data.availableWeights(KIND_BB)),
+                selectedWeight = data.orgaSelection().weight,
                 isActive = wc.name == active?.name,
                 isDragged = isDragged,
                 isDark = isDark,
@@ -152,7 +156,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
         )
         Spacer(Modifier.height(8.dp))
         // Same list as the Dashboard chips; tap a tile to make it the weight shots are judged with.
-        val options = data.availableWeights()
+        val options = data.availableWeights(KIND_BB)
         val weightItems = options.map { it.weight to if (it.isCustom) it.label else "%.2f g".format(it.weight) }
         val maxGrams = maxWeightGrams(limit, latestVelocity)
         val practical = options.map { it.weight }.filter { it <= maxGrams }.maxOrNull() ?: 0f
@@ -162,7 +166,7 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
             practicalWeight = practical,
             columns = if (isLandscape) 5 else 2,
             isDark = isDark,
-            selectedIndex = options.indexOfFirst { data.isSelected(it) },
+            selectedIndex = options.indexOfFirst { it.id == data.orgaSelection().id },
             onSelect = { i -> viewModel.selectWeightOption(options[i]) }
         )
         Spacer(Modifier.height(6.dp))
@@ -357,14 +361,15 @@ private fun ReorderableClassGrid(
 @Composable
 private fun ClassComplianceCard(
     wc: WeaponClass,
-    velocity: Float,
+    verdict: OrgaVerdict,
+    selectedWeight: Float,
     isActive: Boolean,
     isDragged: Boolean,
     isDark: Boolean,
     onClick: () -> Unit,
     onEdit: () -> Unit
 ) {
-    val compliance = complianceOf(wc, velocity)
+    val compliance = verdict.status
     val accent = if (isDark) ActiveAccentDark else ActiveAccentLight
     val green = if (isDark) Color(0xFF88FF11) else Color(0xFF1B5E20)
     val red = if (isDark) Color(0xFFF44336) else Color(0xFFC62828)
@@ -389,11 +394,9 @@ private fun ClassComplianceCard(
         Compliance.LEGAL -> stringResource(R.string.legal) + " ✓"
         Compliance.ILLEGAL -> stringResource(R.string.illegal) + " ✕"
     }
-    val detail = when (compliance) {
-        Compliance.AWAITING -> "--"
-        Compliance.LEGAL -> stringResource(R.string.max_bb_weight_label, maxWeightGrams(wc.maxJoules, velocity))
-        Compliance.ILLEGAL -> stringResource(R.string.exceeds_limit_20)
-    }
+    // Judged at the selected (field) weight; the energy there and the heaviest weight that passes
+    val detail = if (compliance == Compliance.AWAITING) "--"
+        else stringResource(R.string.orga_detail, verdict.energyJ, selectedWeight, verdict.maxWeightG)
 
     Surface(
         modifier = Modifier
@@ -437,7 +440,7 @@ private fun ClassComplianceCard(
             Text(wc.name, color = fg, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("≤ %.2f J".format(wc.maxJoules), color = neutral, fontSize = 11.sp, fontFamily = FontFamily.Monospace, maxLines = 1)
             Text(status, color = fg, fontWeight = FontWeight.Black, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Box(Modifier.fillMaxWidth().height(30.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().height(28.dp), contentAlignment = Alignment.Center) {
                 Text(
                     detail,
                     color = fg,
@@ -447,6 +450,23 @@ private fun ClassComplianceCard(
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )
+            }
+            // Small field: heaviest weight from the active list that keeps this gun legal (or none)
+            if (compliance != Compliance.AWAITING) {
+                val best = verdict.best
+                Box(
+                    Modifier.fillMaxWidth().padding(horizontal = 6.dp).height(22.dp)
+                        .background(if (best != null) Color(0xFF2E7D32) else Color(0xFFC62828), RoundedCornerShape(6.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        if (best != null) "✓ ${best.label}" else "✕ " + stringResource(R.string.orga_no_weight),
+                        color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                Spacer(Modifier.height(22.dp))
             }
         }
     }

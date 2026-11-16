@@ -120,6 +120,18 @@ fun PcpBallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Spacer(Modifier.height(8.dp))
 
         PcpChart(result, pc.maxRangeM, pc.killZoneCm, data.isDarkMode, onProbe = { probe = it })
+        // Target view at the chosen distance (drop against the line of sight, wind drift)
+        result?.pointAt(pc.targetDistanceM)?.let { tp ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.target_view_label).format(pc.targetDistanceM),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            Box(Modifier.fillMaxWidth().height(250.dp)) { ReticleView(tp.dropCm, tp.driftCm) }
+        }
         Text(
             probe?.let { p ->
                 stringResource(
@@ -219,6 +231,7 @@ fun PcpBallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             NumberField(stringResource(R.string.pcp_kill_zone), pc.killZoneCm, "cm", 1, 0.5..20.0) { x -> viewModel.updatePcp { it.copy(killZoneCm = x) } }
             NumberField(stringResource(R.string.pcp_step), pc.stepM, "m", 0, 1.0..25.0) { x -> viewModel.updatePcp { it.copy(stepM = x) } }
             NumberField(stringResource(R.string.pcp_max_range), pc.maxRangeM, "m", 0, 10.0..250.0) { x -> viewModel.updatePcp { it.copy(maxRangeM = x) } }
+            NumberField(stringResource(R.string.pcp_target_distance), pc.targetDistanceM, "m", 0, 5.0..250.0) { x -> viewModel.updatePcp { it.copy(targetDistanceM = x) } }
             NumberField(stringResource(R.string.pcp_energy_limit), pc.energyLimitJ, "J", 1, 0.0..200.0,
                 supporting = stringResource(R.string.pcp_energy_limit_tip)) { x -> viewModel.updatePcp { it.copy(energyLimitJ = x) } }
         }

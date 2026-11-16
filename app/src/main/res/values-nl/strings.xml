@@ -265,4 +265,7 @@
     <string name="own_projectile_has_bc">BC bekend</string>
     <string name="own_projectile_edit">Bewerken</string>
     <string name="own_projectile_confirm_delete">Projectiel \'%1$s\' verwijderen?</string>
+    <string name="orga_detail">%1$.2f J bij %2$.2f g · max. %3$.2f g</string>
+    <string name="orga_no_weight">geen van je gewichten</string>
+    <string name="pcp_target_distance">Doelafstand</string>
 </resources>

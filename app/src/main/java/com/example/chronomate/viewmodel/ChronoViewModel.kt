@@ -130,6 +130,10 @@ class ChronoViewModel(context: Context) : ViewModel() {
             customWeights = customWeights,
             selectedWeight = keep?.weight ?: savedWeight,
             selectedItem = keep?.id ?: savedItem,
+            selectedAirsoft = prefs.getString(KEY_SELECTED_AIRSOFT, null)
+                ?: (keep?.id?.takeIf { it.startsWith("bb:") || mode == BallisticMode.AIRSOFT } ?: "bb:0.20"),
+            selectedPcp = prefs.getString(KEY_SELECTED_PCP, null)
+                ?: (keep?.id?.takeIf { mode == BallisticMode.PCP } ?: ""),
             activeAirsoft = activeAirsoft,
             activePcp = activePcp,
             libraryCaliber = prefs.getString(KEY_LIBRARY_CALIBER, ".177") ?: ".177",
@@ -251,14 +255,25 @@ class ChronoViewModel(context: Context) : ViewModel() {
         if (mode == _uiState.value.ballisticMode) return
         _uiState.update { it.copy(ballisticMode = mode) }
         savePreference(appContext, KEY_BALLISTIC_MODE, mode.name)
+        // bring back this mode's last pick
+        val s = _uiState.value
+        val back = s.resolve(if (mode == BallisticMode.PCP) s.selectedPcp else s.selectedAirsoft)
+        if (back != null) _uiState.update { it.copy(selectedItem = back.id, selectedWeight = back.weight) }
         keepSelectionOffered()
     }
 
     /** Select a chip / grid tile / picker entry. A pellet (or own pellet with a BC) is the PCP projectile too. */
     fun selectWeightOption(opt: WeightOption) {
-        _uiState.update { it.copy(selectedItem = opt.id, selectedWeight = opt.weight) }
-        savePreference(appContext, KEY_SELECTED_ITEM, opt.id)
-        savePreference(appContext, KEY_SELECTED_WEIGHT, opt.weight)
+        // Remember it as its mode's pick; in the current mode it's the weight shots are recorded with
+        _uiState.update {
+            if (opt.kind == KIND_PELLET) it.copy(selectedPcp = opt.id) else it.copy(selectedAirsoft = opt.id)
+        }
+        savePreference(appContext, if (opt.kind == KIND_PELLET) KEY_SELECTED_PCP else KEY_SELECTED_AIRSOFT, opt.id)
+        if (opt.kind == _uiState.value.modeKind()) {
+            _uiState.update { it.copy(selectedItem = opt.id, selectedWeight = opt.weight) }
+            savePreference(appContext, KEY_SELECTED_ITEM, opt.id)
+            savePreference(appContext, KEY_SELECTED_WEIGHT, opt.weight)
+        }
         val p = opt.pellet
         if (p != null) {
             updatePcp {
@@ -288,8 +303,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
     private fun keepSelectionOffered() {
         val s = _uiState.value
-        optionToKeep(s.selectedItem, s.selectedWeight, s.availableWeights())
-            ?.takeIf { it.id != s.selectedItem }?.let { selectWeightOption(it) }
+        val opt = optionToKeep(s.selectedItem, s.selectedWeight, s.availableWeights()) ?: return
+        if (opt.id != s.selectedItem || !s.isSelected(opt)) selectWeightOption(opt)
     }
 
     private fun setActive(kind: String, ids: List<String>) {
@@ -1124,6 +1139,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
         const val KEY_BALLISTIC_MODE = "ballistic_mode"
         const val KEY_SELECTED_PELLET = "selected_pellet"   // before the library: migrated
         const val KEY_SELECTED_ITEM = "selected_item"
+        const val KEY_SELECTED_AIRSOFT = "selected_airsoft"
+        const val KEY_SELECTED_PCP = "selected_pcp"
         const val KEY_ACTIVE_AIRSOFT = "active_airsoft_json"
         const val KEY_ACTIVE_PCP = "active_pcp_json"
         const val KEY_LIBRARY_CALIBER = "library_caliber"
@@ -1141,7 +1158,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
             .put("manualVelocityMps", p.manualVelocityMps).put("zeroRangeM", p.zeroRangeM)
             .put("sightHeightCm", p.sightHeightCm).put("clickUnit", p.clickUnit.name)
             .put("shotAngleDeg", p.shotAngleDeg).put("killZoneCm", p.killZoneCm).put("stepM", p.stepM)
-            .put("maxRangeM", p.maxRangeM).put("energyLimitJ", p.energyLimitJ).toString()
+            .put("maxRangeM", p.maxRangeM).put("energyLimitJ", p.energyLimitJ)
+            .put("targetDistanceM", p.targetDistanceM).toString()
 
         fun parsePcp(json: String): PcpSettings? = try {
             val o = JSONObject(json)
@@ -1161,7 +1179,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 killZoneCm = o.optDouble("killZoneCm", d.killZoneCm),
                 stepM = o.optDouble("stepM", d.stepM),
                 maxRangeM = o.optDouble("maxRangeM", d.maxRangeM),
-                energyLimitJ = o.optDouble("energyLimitJ", d.energyLimitJ)
+                energyLimitJ = o.optDouble("energyLimitJ", d.energyLimitJ),
+                targetDistanceM = o.optDouble("targetDistanceM", d.targetDistanceM)
             )
         } catch (e: Exception) { null }
 

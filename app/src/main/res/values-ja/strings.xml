@@ -265,4 +265,7 @@
     <string name="own_projectile_has_bc">BCが分かる</string>
     <string name="own_projectile_edit">編集</string>
     <string name="own_projectile_confirm_delete">弾「%1$s」を削除しますか？</string>
+    <string name="orga_detail">%2$.2f gで%1$.2f J・最大 %3$.2f g</string>
+    <string name="orga_no_weight">該当する重さなし</string>
+    <string name="pcp_target_distance">標的距離</string>
 </resources>

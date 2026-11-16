@@ -41,8 +41,12 @@ class WeightsAndClassesTest {
         val d = data(BallisticMode.PCP)            // Baracuda Match .177 (0.690 g) is in the starter set
         val opts = d.availableWeights()
         val bara = opts.first { it.id == "pellet:H&N Baracuda Match .177" }
-        assertEquals(listOf(bara.id), opts.filter { d.copy(selectedItem = bara.id).isSelected(it) }.map { it.id })
-        assertEquals(listOf("own:hs"), opts.filter { d.copy(selectedItem = "own:hs").isSelected(it) }.map { it.id })
+        assertEquals(listOf(bara.id), opts.filter { d.copy(selectedPcp = bara.id).isSelected(it) }.map { it.id })
+        assertEquals(listOf("own:hs"), opts.filter { d.copy(selectedPcp = "own:hs").isSelected(it) }.map { it.id })
+        // each mode has its own pick; Orga always uses the BB one
+        val both = d.copy(selectedAirsoft = "bb:0.32", selectedPcp = bara.id)
+        assertEquals("bb:0.32", both.orgaSelection().id)
+        assertTrue(both.isSelected(both.resolve("bb:0.32")!!))
     }
 
     @Test
@@ -88,5 +92,21 @@ class WeightsAndClassesTest {
         val data = ChronoData(selectedWeaponClass = "DMR")
         assertEquals(2.0f, data.activeJouleLimit())
         assertEquals(1.0f, ChronoData(selectedWeaponClass = "GONE").activeJouleLimit()) // falls back to first class
+    }
+
+    @Test
+    fun marshalVerdictAtFieldWeight() {
+        // AR day, 0.32 g field weight; same numbers as the desktop's TestOrgaVerdict
+        val opts = data().availableWeights().filter { !it.isCustom }
+        val ar = judgeClass(DEFAULT_WEAPON_CLASSES.first { it.name == "AR" }, 99f, 0.32f, opts)
+        assertEquals(Compliance.ILLEGAL, ar.status)
+        assertEquals(0.306f, ar.maxWeightG, 0.001f)
+        assertEquals(0.30f, ar.best!!.weight)
+        val sniper = judgeClass(DEFAULT_WEAPON_CLASSES.first { it.name == "SNIPER" }, 99f, 0.32f, opts)
+        assertEquals(Compliance.LEGAL, sniper.status)
+        assertEquals(0.45f, sniper.best!!.weight)
+        val backup = judgeClass(DEFAULT_WEAPON_CLASSES.first { it.name == "BACKUP" }, 150f, 0.32f, opts)
+        assertEquals(Compliance.ILLEGAL, backup.status)
+        assertEquals(null, backup.best)
     }
 }

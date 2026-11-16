@@ -81,7 +81,14 @@ fun library(kind: String, caliber: String = ALL_CALIBERS, query: String = ""): L
     return items.filter { q.isEmpty() || q in it.label.lowercase() }
 }
 
-fun ChronoData.isSelected(opt: WeightOption): Boolean = opt.id == selectedItem
+fun ChronoData.isSelected(opt: WeightOption): Boolean =
+    opt.id == (if (opt.kind == KIND_PELLET) selectedPcp else selectedAirsoft)
+
+/** Orga is always airsoft: the BB selection, whatever mode the Trajectory screen is in. */
+fun ChronoData.orgaSelection(): WeightOption {
+    val opts = availableWeights(KIND_BB)
+    return opts.firstOrNull { it.id == selectedAirsoft } ?: opts.first()
+}
 
 /** The option to select after the list changed: the current one if offered, else same weight, else first. */
 fun optionToKeep(selectedId: String, selectedWeight: Float, options: List<WeightOption>): WeightOption? =
@@ -130,10 +137,25 @@ const val ORGA_REFERENCE_BB = 0.20f
 
 enum class Compliance { AWAITING, LEGAL, ILLEGAL }
 
-fun complianceOf(wc: WeaponClass, velocity: Float): Compliance = when {
+fun complianceOf(wc: WeaponClass, velocity: Float, weightG: Float = ORGA_REFERENCE_BB): Compliance = when {
     velocity <= 0f -> Compliance.AWAITING
-    0.5f * (ORGA_REFERENCE_BB / 1000f) * velocity.pow(2) <= wc.maxJoules -> Compliance.LEGAL
+    0.5f * (weightG / 1000f) * velocity.pow(2) <= wc.maxJoules + 1e-6f -> Compliance.LEGAL
     else -> Compliance.ILLEGAL
+}
+
+/**
+ * What a marshal reads on a class card (mirrors core/orga.py): the verdict at the selected (field)
+ * weight, the energy there, the heaviest weight that stays legal, and the heaviest weight from the
+ * active list that would pass (null: not even the lightest).
+ */
+data class OrgaVerdict(val status: Compliance, val energyJ: Float = 0f, val maxWeightG: Float = 0f, val best: WeightOption? = null)
+
+fun judgeClass(wc: WeaponClass, velocity: Float, weightG: Float, options: List<WeightOption>): OrgaVerdict {
+    if (velocity <= 0f) return OrgaVerdict(Compliance.AWAITING)
+    val energy = 0.5f * (weightG / 1000f) * velocity.pow(2)
+    val maxW = maxWeightGrams(wc.maxJoules, velocity)
+    val best = options.filter { it.weight <= maxW + 1e-6f }.maxByOrNull { it.weight }
+    return OrgaVerdict(complianceOf(wc, velocity, weightG), energy, maxW, best)
 }
 
 /** Heaviest BB (grams) that stays within the class limit at [velocity]. */

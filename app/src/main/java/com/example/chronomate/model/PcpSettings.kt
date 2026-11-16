@@ -40,7 +40,9 @@ data class PcpSettings(
     val stepM: Double = 5.0,
     val maxRangeM: Double = 100.0,
     /** 0 = off; e.g. 7.5 J (German F-mark) or 16.27 J (UK 12 ft-lb). */
-    val energyLimitJ: Double = 0.0
+    val energyLimitJ: Double = 0.0,
+    /** Where the target view shows the hit. */
+    val targetDistanceM: Double = 40.0
 )
 
 /**

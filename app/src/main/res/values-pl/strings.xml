@@ -265,4 +265,7 @@
     <string name="own_projectile_has_bc">Znam BC</string>
     <string name="own_projectile_edit">Edytuj</string>
     <string name="own_projectile_confirm_delete">Usunąć pocisk \'%1$s\'?</string>
+    <string name="orga_detail">%1$.2f J przy %2$.2f g · maks. %3$.2f g</string>
+    <string name="orga_no_weight">żadna z twoich wag</string>
+    <string name="pcp_target_distance">Odległość do celu</string>
 </resources>

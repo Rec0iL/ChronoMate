@@ -265,4 +265,7 @@
     <string name="own_projectile_has_bc">Conosco il BC</string>
     <string name="own_projectile_edit">Modifica</string>
     <string name="own_projectile_confirm_delete">Eliminare il proiettile \'%1$s\'?</string>
+    <string name="orga_detail">%1$.2f J a %2$.2f g · max %3$.2f g</string>
+    <string name="orga_no_weight">nessuno dei tuoi pesi</string>
+    <string name="pcp_target_distance">Distanza del bersaglio</string>
 </resources>
