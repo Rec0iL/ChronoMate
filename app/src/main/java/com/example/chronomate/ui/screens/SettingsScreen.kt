@@ -32,6 +32,7 @@ import com.example.chronomate.model.CalibrationEntry
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.WeightType
+import com.example.chronomate.model.BallisticMode
 import com.example.chronomate.model.availableWeights
 import com.example.chronomate.ui.components.WeightChipRow
 import com.example.chronomate.viewmodel.ChronoViewModel
@@ -391,6 +392,32 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Text(stringResource(R.string.ballistics_engine_params), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.fine_tune_physics), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Ballistic model for the Trajectory screen: airsoft hop-up or the PCP airgun calculator
+        Text(stringResource(R.string.ballistic_mode_label), style = MaterialTheme.typography.labelLarge)
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            WeightTypeButton(
+                label = stringResource(R.string.ballistic_mode_airsoft),
+                selected = data.ballisticMode == BallisticMode.AIRSOFT,
+                onClick = { viewModel.setBallisticMode(BallisticMode.AIRSOFT) },
+                modifier = Modifier.weight(1f)
+            )
+            WeightTypeButton(
+                label = stringResource(R.string.ballistic_mode_pcp),
+                selected = data.ballisticMode == BallisticMode.PCP,
+                onClick = { viewModel.setBallisticMode(BallisticMode.PCP) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(R.string.show_imperial), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Switch(checked = data.showImperial, onCheckedChange = { viewModel.setShowImperial(it) })
+        }
+        Spacer(modifier = Modifier.height(8.dp))
 
         BallisticSettingField(stringResource(R.string.ballistic_diameter), data.diameterMm.toString()) { viewModel.updateBallisticSettings(diameterMm = it) }
         BallisticSettingField(stringResource(R.string.ballistic_air_density), data.airDensityRho.toString()) { viewModel.updateBallisticSettings(airDensityRho = it) }

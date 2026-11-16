@@ -35,7 +35,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.chronomate.model.BallisticMode
 import com.example.chronomate.model.Screen
+import com.example.chronomate.ui.screens.PcpBallisticsScreen
 import com.example.chronomate.ui.components.LogoImage
 import com.example.chronomate.ui.components.StatusBadge
 import com.example.chronomate.ui.screens.DashboardScreen
@@ -241,7 +243,11 @@ fun ChronoApp(viewModel: ChronoViewModel) {
                 when (currentScreen) {
                     Screen.Dashboard -> DashboardScreen(data, viewModel)
                     Screen.OrgaChrono -> OrgaChronoScreen(data, viewModel)
-                    Screen.Trajectory -> BallisticsScreen(data, viewModel)
+                    Screen.Trajectory -> if (data.ballisticMode == BallisticMode.PCP) {
+                        PcpBallisticsScreen(data, viewModel)
+                    } else {
+                        BallisticsScreen(data, viewModel)
+                    }
                     Screen.History -> HistoryScreen(data)
                     Screen.Export -> ExportScreen(data, viewModel)
                     Screen.Settings -> SettingsScreen(data, viewModel)

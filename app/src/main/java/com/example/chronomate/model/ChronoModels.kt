@@ -32,7 +32,10 @@ data class CustomWeight(
     val name: String,
     val weight: Float,
     val caliber: Float = 6.0f,
-    val caliberUnit: String = "mm"
+    val caliberUnit: String = "mm",
+    /** Ballistic coefficient for PCP mode (lb/in²), if known. */
+    val bc: Float? = null,
+    val dragModel: com.example.chronomate.ballistics.DragModel = com.example.chronomate.ballistics.DragModel.G1
 )
 
 enum class ChronoType(val ssid: String, val displayName: String) {
@@ -98,6 +101,12 @@ data class ChronoData(
 
     // Export: EXPORT_CHOICE_DEFAULT, EXPORT_CHOICE_ALL or a fixed number of shots
     val exportShotChoice: Int = EXPORT_CHOICE_DEFAULT,
+
+    // Trajectory screen: airsoft hop-up model or the PCP airgun calculator
+    val ballisticMode: BallisticMode = BallisticMode.AIRSOFT,
+    val showImperial: Boolean = false,
+    val pcp: PcpSettings = PcpSettings(),
+    val environment: EnvironmentSettings = EnvironmentSettings(),
     
     // Ballistic Settings
     val diameterMm: Float = 5.95f,

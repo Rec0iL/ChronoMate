@@ -121,6 +121,10 @@ class ChronoViewModel(context: Context) : ViewModel() {
             selectedWeight = selectedWeight,
             weaponClasses = weaponClasses,
             selectedWeaponClass = prefs.getString(KEY_SELECTED_CLASS, "AR") ?: "AR",
+            ballisticMode = enumOr(prefs.getString(KEY_BALLISTIC_MODE, null), BallisticMode.AIRSOFT),
+            showImperial = prefs.getBoolean(KEY_SHOW_IMPERIAL, false),
+            pcp = prefs.getString(KEY_PCP, null)?.let { parsePcp(it) } ?: PcpSettings(),
+            environment = prefs.getString(KEY_ENVIRONMENT, null)?.let { parseEnvironment(it) } ?: EnvironmentSettings(),
             diameterMm = prefs.getFloat("diameter", 5.95f),
             airDensityRho = prefs.getFloat("air_density", 1.225f),
             dragCoefficientCw = prefs.getFloat("drag_coeff", 0.35f),
@@ -254,6 +258,56 @@ class ChronoViewModel(context: Context) : ViewModel() {
         _uiState.update { it.copy(exportShotChoice = choice) }
     }
 
+    // --- Ballistic mode / PCP calculator -------------------------------------------------------
+
+    fun setBallisticMode(mode: BallisticMode) {
+        _uiState.update { it.copy(ballisticMode = mode) }
+        savePreference(appContext, KEY_BALLISTIC_MODE, mode.name)
+    }
+
+    fun setShowImperial(enabled: Boolean) {
+        _uiState.update { it.copy(showImperial = enabled) }
+        savePreference(appContext, KEY_SHOW_IMPERIAL, enabled)
+    }
+
+    fun updatePcp(transform: (PcpSettings) -> PcpSettings) {
+        _uiState.update { it.copy(pcp = transform(it.pcp)) }
+        savePreference(appContext, KEY_PCP, pcpToJson(_uiState.value.pcp))
+    }
+
+    fun updateEnvironment(transform: (EnvironmentSettings) -> EnvironmentSettings) {
+        _uiState.update { it.copy(environment = transform(it.environment)) }
+        savePreference(appContext, KEY_ENVIRONMENT, environmentToJson(_uiState.value.environment))
+    }
+
+    /** A custom weight picked as PCP projectile is also the pellet on the chrono now. */
+    fun usePcpCustomWeight(index: Int) {
+        val cw = _uiState.value.customWeights.getOrNull(index) ?: return
+        updatePcp {
+            it.copy(
+                projectileName = cw.name,
+                massGrams = cw.weight.toDouble(),
+                caliberMm = if (cw.caliberUnit == "mm") cw.caliber.toDouble() else it.caliberMm,
+                bc = cw.bc?.toDouble() ?: it.bc,
+                dragModel = if (cw.bc != null) cw.dragModel else it.dragModel
+            )
+        }
+        setWeight(cw.weight)
+    }
+
+    /** "Save as custom weight": the PCP projectile (with its BC) becomes a selectable weight. */
+    fun savePcpAsCustomWeight() {
+        val pc = _uiState.value.pcp
+        val weight = (Math.round(pc.massGrams * 1000.0) / 1000.0).toFloat()
+        val list = _uiState.value.customWeights.toMutableList()
+        val i = list.indexOfFirst { it.name == pc.projectileName && sameWeight(it.weight, weight) }
+        val entry = CustomWeight(pc.projectileName.ifBlank { "Pellet" }, weight, pc.caliberMm.toFloat(), "mm", pc.bc.toFloat(), pc.dragModel)
+        if (i >= 0) list[i] = entry else list += entry
+        _uiState.update { it.copy(customWeights = list) }
+        saveCustomWeights(appContext, list)
+        setWeight(weight)
+    }
+
     // --- Orga weapon classes ---------------------------------------------------------------
 
     fun selectWeaponClass(name: String) {
@@ -325,7 +379,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
         val current = _uiState.value
         if (index !in current.customWeights.indices) return
         val old = current.customWeights[index]
-        val updated = CustomWeight(
+        val updated = old.copy(
             name = name,
             weight = weight,
             caliber = caliber ?: old.caliber,
@@ -1038,6 +1092,59 @@ class ChronoViewModel(context: Context) : ViewModel() {
         const val KEY_SELECTED_CLASS = "selected_weapon_class"
         const val KEY_SELECTED_WEIGHT = "selected_weight"
         const val KEY_ALWAYS_SHOW_CUSTOM = "always_show_custom_weights"
+        const val KEY_BALLISTIC_MODE = "ballistic_mode"
+        const val KEY_SHOW_IMPERIAL = "show_imperial"
+        const val KEY_PCP = "pcp_settings_json"
+        const val KEY_ENVIRONMENT = "environment_json"
+
+        fun pcpToJson(p: PcpSettings): String = JSONObject()
+            .put("projectileName", p.projectileName).put("massGrams", p.massGrams).put("caliberMm", p.caliberMm)
+            .put("bc", p.bc).put("dragModel", p.dragModel.name).put("velocitySource", p.velocitySource.name)
+            .put("manualVelocityMps", p.manualVelocityMps).put("zeroRangeM", p.zeroRangeM)
+            .put("sightHeightCm", p.sightHeightCm).put("clickUnit", p.clickUnit.name)
+            .put("shotAngleDeg", p.shotAngleDeg).put("killZoneCm", p.killZoneCm).put("stepM", p.stepM)
+            .put("maxRangeM", p.maxRangeM).put("energyLimitJ", p.energyLimitJ).toString()
+
+        fun parsePcp(json: String): PcpSettings? = try {
+            val o = JSONObject(json)
+            val d = PcpSettings()
+            PcpSettings(
+                projectileName = o.optString("projectileName", d.projectileName),
+                massGrams = o.optDouble("massGrams", d.massGrams),
+                caliberMm = o.optDouble("caliberMm", d.caliberMm),
+                bc = o.optDouble("bc", d.bc),
+                dragModel = enumOr(o.optString("dragModel"), d.dragModel),
+                velocitySource = enumOr(o.optString("velocitySource"), d.velocitySource),
+                manualVelocityMps = o.optDouble("manualVelocityMps", d.manualVelocityMps),
+                zeroRangeM = o.optDouble("zeroRangeM", d.zeroRangeM),
+                sightHeightCm = o.optDouble("sightHeightCm", d.sightHeightCm),
+                clickUnit = enumOr(o.optString("clickUnit"), d.clickUnit),
+                shotAngleDeg = o.optDouble("shotAngleDeg", d.shotAngleDeg),
+                killZoneCm = o.optDouble("killZoneCm", d.killZoneCm),
+                stepM = o.optDouble("stepM", d.stepM),
+                maxRangeM = o.optDouble("maxRangeM", d.maxRangeM),
+                energyLimitJ = o.optDouble("energyLimitJ", d.energyLimitJ)
+            )
+        } catch (e: Exception) { null }
+
+        fun environmentToJson(e: EnvironmentSettings): String = JSONObject()
+            .put("temperatureC", e.temperatureC).put("pressureHpa", e.pressureHpa).put("humidityPct", e.humidityPct)
+            .put("altitudeM", e.altitudeM).put("useAltitude", e.useAltitude).put("windSpeedMps", e.windSpeedMps)
+            .put("windClock", e.windClock).toString()
+
+        fun parseEnvironment(json: String): EnvironmentSettings? = try {
+            val o = JSONObject(json)
+            val d = EnvironmentSettings()
+            EnvironmentSettings(
+                temperatureC = o.optDouble("temperatureC", d.temperatureC),
+                pressureHpa = o.optDouble("pressureHpa", d.pressureHpa),
+                humidityPct = o.optDouble("humidityPct", d.humidityPct),
+                altitudeM = o.optDouble("altitudeM", d.altitudeM),
+                useAltitude = o.optBoolean("useAltitude", d.useAltitude),
+                windSpeedMps = o.optDouble("windSpeedMps", d.windSpeedMps),
+                windClock = o.optDouble("windClock", d.windClock)
+            )
+        } catch (e: Exception) { null }
 
         inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =
             name?.let { n -> enumValues<T>().firstOrNull { it.name == n } } ?: fallback
@@ -1045,7 +1152,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
         fun customWeightsToJson(list: List<CustomWeight>): String = JSONArray().apply {
             list.forEach {
                 put(JSONObject().put("name", it.name).put("weight", it.weight.toDouble())
-                    .put("caliber", it.caliber.toDouble()).put("caliberUnit", it.caliberUnit))
+                    .put("caliber", it.caliber.toDouble()).put("caliberUnit", it.caliberUnit)
+                    .put("bc", it.bc?.toDouble() ?: JSONObject.NULL).put("dragModel", it.dragModel.name))
             }
         }.toString()
 
@@ -1057,7 +1165,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     name = o.optString("name", "Custom"),
                     weight = o.optDouble("weight", 0.20).toFloat(),
                     caliber = o.optDouble("caliber", 6.0).toFloat(),
-                    caliberUnit = o.optString("caliberUnit", "mm")
+                    caliberUnit = o.optString("caliberUnit", "mm"),
+                    bc = if (o.isNull("bc")) null else o.optDouble("bc").toFloat().takeIf { !it.isNaN() },
+                    dragModel = enumOr(o.optString("dragModel"), com.example.chronomate.ballistics.DragModel.G1)
                 )
             }
         } catch (e: Exception) { null }
