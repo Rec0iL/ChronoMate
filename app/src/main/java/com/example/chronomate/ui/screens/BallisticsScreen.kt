@@ -50,8 +50,13 @@ import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.TrajectoryPoint
 import com.example.chronomate.model.WeightType
+import com.example.chronomate.model.availableWeights
+import com.example.chronomate.ui.components.WeightChipRow
 import com.example.chronomate.viewmodel.ChronoViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.pow
@@ -71,7 +76,8 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val isLight = MaterialTheme.colorScheme.surface == Color.White || MaterialTheme.colorScheme.surface.red > 0.9f
     
     // Auto-update speed when a new shot is recorded
-    var speedMps by rememberSaveable { mutableStateOf(data.velocity.toDoubleOrNull() ?: 100.0) }
+    // Read the number, not the display text: "99,50" (German) can't be parsed back.
+    var speedMps by rememberSaveable { mutableStateOf(data.shots.lastOrNull()?.velocity?.toDouble() ?: 100.0) }
     
     val lastShotVelocity = data.shots.lastOrNull()?.velocity?.toDouble() ?: 0.0
     LaunchedEffect(lastShotVelocity) {
@@ -94,6 +100,8 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
     var sightHeight by rememberSaveable { mutableStateOf(5.0) }
     
     var probeResult by remember { mutableStateOf<ProbeResult?>(null) }
+    var isOptimizing by remember { mutableStateOf(false) }
+    val optimizeScope = rememberCoroutineScope()
     
     // Auto-dismiss probe after 10 seconds
     LaunchedEffect(probeResult) {
@@ -324,27 +332,16 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 4.dp)
         )
-        val weights = when (data.weightType) {
-            WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f).map { it to "%.2f".format(it) }
-            WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f).map { it to "%.2f".format(it) }
-            WeightType.CUSTOM -> data.customWeights.map { it.weight to "${it.name} ${it.caliber}${it.caliberUnit} %.2f g".format(it.weight) }
-        }
+        val weights = data.availableWeights()
 
         if (weights.isEmpty() && data.weightType == WeightType.CUSTOM) {
             Text(stringResource(R.string.no_custom_weights_ballistics), style = MaterialTheme.typography.bodySmall)
         } else {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(weights) { (weight, label) ->
-                    FilterChip(
-                        selected = data.selectedWeight == weight,
-                        onClick = { viewModel.setWeight(weight) },
-                        label = { Text(label) }
-                    )
-                }
-            }
+            WeightChipRow(
+                options = weights,
+                selectedWeight = data.selectedWeight,
+                onSelect = { viewModel.setWeight(it) }
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -472,7 +469,12 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
+            enabled = !isOptimizing,
             onClick = {
+              isOptimizing = true
+              // ~400 simulations: run them off the main thread, or the screen freezes.
+              optimizeScope.launch {
+                val bestHop = withContext(Dispatchers.Default) {
                 var bestHop = 0.0
                 var maxRangeVal = 0.0
                 
@@ -503,12 +505,12 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     
                     if (currentOverhop <= (data.maxAllowedOverhopCm / 100.0)) {
                         val crossIdx = traj.indexOfFirst { pt ->
-                            val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightM)
+                            val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightOptM)
                             pt.y > aimY
                         }
                         val currentEffRange = if (crossIdx != -1) {
                             traj.drop(crossIdx).firstOrNull { pt ->
-                                val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightM)
+                                val aimY = eyeHeightOptM + (pt.x / targetDistance) * (targetHeight - eyeHeightOptM)
                                 pt.y <= aimY
                             }?.x ?: 0.0
                         } else 0.0
@@ -519,7 +521,11 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                         }
                     }
                 }
+                bestHop
+                }
                 hopUp = bestHop
+                isOptimizing = false
+              }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -535,7 +541,11 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White)
+                if (isOptimizing) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White)
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.optimize_hopup), color = Color.White, fontWeight = FontWeight.Bold)
             }

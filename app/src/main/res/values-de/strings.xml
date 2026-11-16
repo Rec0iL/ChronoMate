@@ -19,7 +19,7 @@
     <string name="room_to_limit">mit %.1f%% Spielraum zum Limit</string>
     <string name="over_limit">ÜBER LIMIT</string>
     <string name="too_hot_for_20">Zu stark selbst für 0.20g</string>
-    <string name="orga_limits">Orga Limits</string>
+    <string name="orga_limits">Orga Limits &amp; Waffenklassen</string>
     <string name="max_allowed_joule_label">Max. erlaubte Joule (J)</string>
     <string name="no_weights_orga">Keine Gewichte verfügbar. Einstellungen prüfen.</string>
     
@@ -137,4 +137,31 @@
     <string name="badge_waiting">KEINE DATEN - TIPPEN</string>
     <string name="badge_offline">OFFLINE - ZUM VERBINDEN TIPPEN</string>
     <string name="badge_failed">FEHLER - ZUM WIEDERHOLEN TIPPEN</string>
+    <string name="reset_weapon_classes">Klassen zurücksetzen</string>
+    <string name="add_weapon_class_short">Klasse</string>
+    <string name="measured_velocity">GEMESSENE GESCHWINDIGKEIT</string>
+    <string name="compliance_board_title">WAFFENKLASSEN-ZULÄSSIGKEIT</string>
+    <string name="drag_to_reorder_hint">Karte antippen = Referenz · lang drücken und ziehen = umsortieren</string>
+    <string name="active_reference">AKTIVE REF</string>
+    <string name="awaiting_shot">WARTE AUF SCHUSS</string>
+    <string name="legal">ZULÄSSIG</string>
+    <string name="illegal">UNZULÄSSIG</string>
+    <string name="max_bb_weight_label">Max. BB: %1$.2f g</string>
+    <string name="exceeds_limit_20">Überschreitet Limit selbst mit 0,20 g</string>
+    <string name="joule_grid_for_class">Joule-Tabelle — %1$s (≤ %2$.2f J)</string>
+    <string name="dialog_add_weapon_class">Waffenklasse hinzufügen</string>
+    <string name="dialog_edit_weapon_class">Waffenklasse bearbeiten</string>
+    <string name="edit_weapon_class">Waffenklasse bearbeiten</string>
+    <string name="class_name_label">Klassenname</string>
+    <string name="max_joules_label">Max. Energie</string>
+    <string name="description_label">Beschreibung</string>
+    <string name="delete">Löschen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="confirm_delete_class">Waffenklasse \'%1$s\' wirklich löschen?</string>
+    <string name="confirm_reset_classes">Alle Waffenklassen auf die Standardwerte zurücksetzen (BACKUP, AR, LMG, DMR, SNIPER)?</string>
+    <string name="over_class_limit">Über dem %1$s-Limit (≤ %2$.2f J)</string>
+    <string name="loaded_weights">Geladene Gewichte (antippen zum Auswählen)</string>
+    <string name="always_show_custom">Eigene Gewichte immer anzeigen</string>
+    <string name="always_show_custom_desc">Eigene Gewichte an die BB- / Diabolo-Liste anhängen</string>
 </resources>

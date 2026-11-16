@@ -2,8 +2,6 @@ package com.example.chronomate.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -21,6 +19,8 @@ import com.example.chronomate.model.WeightType
 import com.example.chronomate.ui.components.HeroSection
 import com.example.chronomate.ui.components.ShotChart
 import com.example.chronomate.ui.components.StatsGrid
+import com.example.chronomate.ui.components.WeightChipRow
+import com.example.chronomate.model.availableWeights
 import com.example.chronomate.viewmodel.ChronoViewModel
 
 @Composable
@@ -29,11 +29,7 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val scrollState = rememberScrollState()
 
-    val weights = when (data.weightType) {
-        WeightType.BB -> listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f).map { it to "%.2f".format(it) }
-        WeightType.DIABLO -> listOf(0.50f, 0.51f, 0.52f, 0.53f, 0.54f).map { it to "%.2f".format(it) }
-        WeightType.CUSTOM -> data.customWeights.map { it.weight to "${it.name} ${it.caliber}${it.caliberUnit} %.2f g".format(it.weight) }
-    }
+    val weights = data.availableWeights()
 
     Column(
         modifier = Modifier
@@ -72,18 +68,11 @@ fun DashboardScreen(data: ChronoData, viewModel: ChronoViewModel) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             } else {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(weights) { (weight, label) ->
-                        FilterChip(
-                            selected = data.selectedWeight == weight,
-                            onClick = { viewModel.setWeight(weight) },
-                            label = { Text(label) }
-                        )
-                    }
-                }
+                WeightChipRow(
+                    options = weights,
+                    selectedWeight = data.selectedWeight,
+                    onSelect = { viewModel.setWeight(it) }
+                )
             }
         }
 

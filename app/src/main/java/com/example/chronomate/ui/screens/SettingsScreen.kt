@@ -32,6 +32,8 @@ import com.example.chronomate.model.CalibrationEntry
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.CompensationMode
 import com.example.chronomate.model.WeightType
+import com.example.chronomate.model.availableWeights
+import com.example.chronomate.ui.components.WeightChipRow
 import com.example.chronomate.viewmodel.ChronoViewModel
 
 @Composable
@@ -280,6 +282,46 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             )
         }
         
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Always-show-custom switch (off = custom weights only appear with the Custom type)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.always_show_custom), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.always_show_custom_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(
+                checked = data.alwaysShowCustomWeights,
+                onCheckedChange = { viewModel.setAlwaysShowCustomWeights(it) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Loaded weights: exactly what the chips everywhere else offer right now (tap = select)
+        Text(
+            stringResource(R.string.loaded_weights),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        val loaded = data.availableWeights()
+        if (loaded.isEmpty()) {
+            Text(stringResource(R.string.no_custom_weights), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            WeightChipRow(
+                options = loaded,
+                selectedWeight = data.selectedWeight,
+                onSelect = { viewModel.setWeight(it) },
+                wrap = true
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
         
         // Expandable Custom Weights Table

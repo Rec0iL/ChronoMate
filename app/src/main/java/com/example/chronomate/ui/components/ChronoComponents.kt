@@ -30,6 +30,8 @@ import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.ConnectionState
 import com.example.chronomate.model.Shot
+import com.example.chronomate.model.activeJouleLimit
+import com.example.chronomate.model.activeWeaponClass
 
 @Composable
 fun LogoImage(modifier: Modifier = Modifier) {
@@ -359,11 +361,22 @@ fun HeroSection(data: ChronoData) {
                     fontWeight = FontWeight.Bold
                 )
             }
+            // Over the active Orga class's limit (not a fixed 1.50 J): show it in red.
+            val active = data.activeWeaponClass()
+            val limit = data.activeJouleLimit()
+            val over = data.shots.isNotEmpty() && data.currentEnergy > limit
+            val danger = if (isLight) Color(0xFFC62828) else Color(0xFFF44336)
             Text(
                 text = "%.2f J".format(data.currentEnergy),
                 fontSize = 24.sp,
-                color = contentColor,
+                color = if (over) danger else contentColor,
                 fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = if (over) stringResource(R.string.over_class_limit, active?.name ?: "", limit) else " ",
+                style = MaterialTheme.typography.labelSmall,
+                color = danger,
+                maxLines = 1
             )
         }
     }

@@ -90,6 +90,14 @@ data class ChronoData(
     // Weight Settings
     val weightType: WeightType = WeightType.BB,
     val customWeights: List<CustomWeight> = emptyList(),
+    val alwaysShowCustomWeights: Boolean = false,
+
+    // Orga weapon classes (compliance board)
+    val weaponClasses: List<WeaponClass> = DEFAULT_WEAPON_CLASSES,
+    val selectedWeaponClass: String = "AR",
+
+    // Export: EXPORT_CHOICE_DEFAULT, EXPORT_CHOICE_ALL or a fixed number of shots
+    val exportShotChoice: Int = EXPORT_CHOICE_DEFAULT,
     
     // Ballistic Settings
     val diameterMm: Float = 5.95f,

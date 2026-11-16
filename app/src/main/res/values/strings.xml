@@ -19,7 +19,7 @@
     <string name="room_to_limit">with %.1f%% room to limit</string>
     <string name="over_limit">OVER LIMIT</string>
     <string name="too_hot_for_20">Too hot for even 0.20g</string>
-    <string name="orga_limits">Orga Limits</string>
+    <string name="orga_limits">Orga Limits &amp; Weapon Classes</string>
     <string name="max_allowed_joule_label">Max Allowed Joule (J)</string>
     <string name="no_weights_orga">No weights available. Check settings.</string>
     
@@ -138,4 +138,31 @@
     <string name="badge_waiting">NO DATA - TAP TO RETRY</string>
     <string name="badge_offline">OFFLINE - TAP TO CONNECT</string>
     <string name="badge_failed">FAILED - TAP TO RETRY</string>
+    <string name="reset_weapon_classes">Reset classes</string>
+    <string name="add_weapon_class_short">Class</string>
+    <string name="measured_velocity">MEASURED VELOCITY</string>
+    <string name="compliance_board_title">WEAPON CLASS COMPLIANCE BOARD</string>
+    <string name="drag_to_reorder_hint">Tap a card to make it the reference · long-press and drag to reorder</string>
+    <string name="active_reference">ACTIVE REF</string>
+    <string name="awaiting_shot">AWAITING SHOT</string>
+    <string name="legal">LEGAL</string>
+    <string name="illegal">ILLEGAL</string>
+    <string name="max_bb_weight_label">Max BB: %1$.2f g</string>
+    <string name="exceeds_limit_20">Exceeds limit even with 0.20 g</string>
+    <string name="joule_grid_for_class">Joule Reference Grid — %1$s (≤ %2$.2f J)</string>
+    <string name="dialog_add_weapon_class">Add weapon class</string>
+    <string name="dialog_edit_weapon_class">Edit weapon class</string>
+    <string name="edit_weapon_class">Edit weapon class</string>
+    <string name="class_name_label">Class name</string>
+    <string name="max_joules_label">Max. energy</string>
+    <string name="description_label">Description</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="confirm_delete_class">Delete the weapon class \'%1$s\'?</string>
+    <string name="confirm_reset_classes">Reset all weapon classes to the defaults (BACKUP, AR, LMG, DMR, SNIPER)?</string>
+    <string name="over_class_limit">Over the %1$s limit (≤ %2$.2f J)</string>
+    <string name="loaded_weights">Loaded weights (tap to select)</string>
+    <string name="always_show_custom">Always show custom weights</string>
+    <string name="always_show_custom_desc">Append your custom weights to the BB / Diablo list</string>
 </resources>

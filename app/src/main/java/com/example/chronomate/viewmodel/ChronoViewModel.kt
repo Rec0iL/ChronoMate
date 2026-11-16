@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONArray
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,6 +50,9 @@ class ChronoViewModel(context: Context) : ViewModel() {
     // This client will be swapped when the specific network is available
     @Volatile
     private var activeClient: OkHttpClient = baseClient
+
+    /** Application context: settings are saved from places that have no Activity at hand. */
+    private val appContext: Context = context.applicationContext
 
     private var lastSeenRawShots = emptyList<Float>()
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
@@ -72,27 +77,16 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private var missedPolls = 0
 
     init {
-        startPolling()
+        // Settings first: discovery needs the chrono model (Wi-Fi name) from them.
         loadPreferences(context)
+        startPolling()
     }
 
     private fun loadPreferences(context: Context) {
         val prefs = context.getSharedPreferences("chrono_prefs", Context.MODE_PRIVATE)
         
-        val customWeightsJson = prefs.getString("custom_weights", "[]") ?: "[]"
-        val customWeights = if (customWeightsJson != "[]" && customWeightsJson.isNotEmpty()) {
-            customWeightsJson.split(";").mapNotNull {
-                val parts = it.split(":")
-                if (parts.size >= 2) {
-                    CustomWeight(
-                        name = parts[0],
-                        weight = parts[1].toFloatOrNull() ?: 0.20f,
-                        caliber = if (parts.size >= 3) parts[2].toFloatOrNull() ?: 6.0f else 6.0f,
-                        caliberUnit = if (parts.size >= 4) parts[3] else "mm"
-                    )
-                } else null
-            }
-        } else emptyList()
+        val customWeights = prefs.getString(KEY_CUSTOM_WEIGHTS_JSON, null)?.let { parseCustomWeights(it) }
+            ?: loadLegacyCustomWeights(prefs)
 
         val calibrationEntriesJson = prefs.getString("calibration_entries", "[]") ?: "[]"
         val calibrationEntries = if (calibrationEntriesJson != "[]" && calibrationEntriesJson.isNotEmpty()) {
@@ -106,8 +100,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
             }
         } else emptyList()
 
-        val compMode = CompensationMode.valueOf(prefs.getString("comp_mode", CompensationMode.NONE.name) ?: CompensationMode.NONE.name)
-        val chronoType = ChronoType.valueOf(prefs.getString("chrono_type", ChronoType.HT_X3000.name) ?: ChronoType.HT_X3000.name)
+        val compMode = enumOr(prefs.getString("comp_mode", null), CompensationMode.NONE)
+        val chronoType = enumOr(prefs.getString("chrono_type", null), ChronoType.HT_X3000)
+        val weightType = enumOr(prefs.getString("weight_type", null), WeightType.BB)
+        val weaponClasses = prefs.getString(KEY_WEAPON_CLASSES, null)?.let { parseWeaponClasses(it) }
+            ?.takeIf { it.isNotEmpty() } ?: DEFAULT_WEAPON_CLASSES
+        val alwaysShowCustom = prefs.getBoolean(KEY_ALWAYS_SHOW_CUSTOM, false)
+        val savedWeight = prefs.getFloat(KEY_SELECTED_WEIGHT, 0.20f)
+        val selectedWeight = weightToKeep(savedWeight, availableWeights(weightType, customWeights, alwaysShowCustom))
 
         _uiState.update { it.copy(
             isDarkMode = prefs.getBoolean("dark_mode", true),
@@ -115,8 +115,12 @@ class ChronoViewModel(context: Context) : ViewModel() {
             language = prefs.getString("language", "en") ?: "en",
             maxAllowedJoule = prefs.getFloat("max_joule", 1.5f),
             maxAllowedOverhopCm = prefs.getFloat("max_overhop", 15f),
-            weightType = WeightType.valueOf(prefs.getString("weight_type", WeightType.BB.name) ?: WeightType.BB.name),
+            weightType = weightType,
             customWeights = customWeights,
+            alwaysShowCustomWeights = alwaysShowCustom,
+            selectedWeight = selectedWeight,
+            weaponClasses = weaponClasses,
+            selectedWeaponClass = prefs.getString(KEY_SELECTED_CLASS, "AR") ?: "AR",
             diameterMm = prefs.getFloat("diameter", 5.95f),
             airDensityRho = prefs.getFloat("air_density", 1.225f),
             dragCoefficientCw = prefs.getFloat("drag_coeff", 0.35f),
@@ -127,12 +131,30 @@ class ChronoViewModel(context: Context) : ViewModel() {
             calibrationEntries = calibrationEntries,
             chronoType = chronoType
         ) }
-        
+
         updateCompensationFactor()
 
         if (_uiState.value.keepScreenOn) {
             applyKeepScreenOn(context, true)
         }
+    }
+
+    /** Settings written by app versions before 1.0.7: "name:weight:caliber:unit;…". */
+    private fun loadLegacyCustomWeights(prefs: android.content.SharedPreferences): List<CustomWeight> {
+        val customWeightsJson = prefs.getString("custom_weights", "[]") ?: "[]"
+        return if (customWeightsJson != "[]" && customWeightsJson.isNotEmpty()) {
+            customWeightsJson.split(";").mapNotNull {
+                val parts = it.split(":")
+                if (parts.size >= 2) {
+                    CustomWeight(
+                        name = parts[0],
+                        weight = parts[1].toFloatOrNull() ?: 0.20f,
+                        caliber = if (parts.size >= 3) parts[2].toFloatOrNull() ?: 6.0f else 6.0f,
+                        caliberUnit = if (parts.size >= 4) parts[3] else "mm"
+                    )
+                } else null
+            }
+        } else emptyList()
     }
 
     private fun savePreference(context: Context, key: String, value: Any) {
@@ -148,8 +170,13 @@ class ChronoViewModel(context: Context) : ViewModel() {
     }
 
     private fun saveCustomWeights(context: Context, weights: List<CustomWeight>) {
-        val serialized = weights.joinToString(";") { "${it.name}:${it.weight}:${it.caliber}:${it.caliberUnit}" }
-        savePreference(context, "custom_weights", serialized)
+        // JSON, so names may contain ':' or ';' (the old "a:b;c:d" format broke on those).
+        savePreference(context, KEY_CUSTOM_WEIGHTS_JSON, customWeightsToJson(weights))
+    }
+
+    private fun saveWeaponClasses(classes: List<WeaponClass>, selected: String) {
+        savePreference(appContext, KEY_WEAPON_CLASSES, weaponClassesToJson(classes))
+        savePreference(appContext, KEY_SELECTED_CLASS, selected)
     }
 
     private fun saveCalibration(context: Context) {
@@ -201,11 +228,84 @@ class ChronoViewModel(context: Context) : ViewModel() {
 
     fun setWeight(weight: Float) {
         _uiState.update { it.copy(selectedWeight = weight) }
+        savePreference(appContext, KEY_SELECTED_WEIGHT, weight)
     }
 
+    /** Switching type keeps the selected weight only if the new list offers it. */
     fun setWeightType(context: Context, type: WeightType) {
         _uiState.update { it.copy(weightType = type) }
         savePreference(context, "weight_type", type.name)
+        keepSelectedWeightOffered()
+    }
+
+    fun setAlwaysShowCustomWeights(enabled: Boolean) {
+        _uiState.update { it.copy(alwaysShowCustomWeights = enabled) }
+        savePreference(appContext, KEY_ALWAYS_SHOW_CUSTOM, enabled)
+        keepSelectedWeightOffered()
+    }
+
+    private fun keepSelectedWeightOffered() {
+        val state = _uiState.value
+        val keep = weightToKeep(state.selectedWeight, state.availableWeights())
+        if (keep != state.selectedWeight) setWeight(keep)
+    }
+
+    fun setExportShotChoice(choice: Int) {
+        _uiState.update { it.copy(exportShotChoice = choice) }
+    }
+
+    // --- Orga weapon classes ---------------------------------------------------------------
+
+    fun selectWeaponClass(name: String) {
+        _uiState.update { it.copy(selectedWeaponClass = name) }
+        savePreference(appContext, KEY_SELECTED_CLASS, name)
+    }
+
+    fun addWeaponClass(wc: WeaponClass) {
+        val clean = wc.copy(name = uniqueClassName(wc.name.trim().uppercase().ifEmpty { "CUSTOM" }, null))
+        _uiState.update { it.copy(weaponClasses = it.weaponClasses + clean, selectedWeaponClass = clean.name) }
+        saveWeaponClasses(_uiState.value.weaponClasses, clean.name)
+    }
+
+    fun updateWeaponClass(oldName: String, updated: WeaponClass) {
+        val name = uniqueClassName(updated.name.trim().uppercase().ifEmpty { oldName }, oldName)
+        _uiState.update { s ->
+            s.copy(
+                weaponClasses = s.weaponClasses.map { if (it.name == oldName) updated.copy(name = name) else it },
+                selectedWeaponClass = if (s.selectedWeaponClass == oldName) name else s.selectedWeaponClass
+            )
+        }
+        saveWeaponClasses(_uiState.value.weaponClasses, _uiState.value.selectedWeaponClass)
+    }
+
+    fun deleteWeaponClass(name: String) {
+        _uiState.update { s ->
+            if (s.weaponClasses.size <= 1) return@update s
+            val rest = s.weaponClasses.filterNot { it.name == name }
+            s.copy(
+                weaponClasses = rest,
+                selectedWeaponClass = if (s.selectedWeaponClass == name) rest.first().name else s.selectedWeaponClass
+            )
+        }
+        saveWeaponClasses(_uiState.value.weaponClasses, _uiState.value.selectedWeaponClass)
+    }
+
+    fun moveWeaponClass(from: Int, to: Int) {
+        _uiState.update { it.copy(weaponClasses = it.weaponClasses.moved(from, to)) }
+        saveWeaponClasses(_uiState.value.weaponClasses, _uiState.value.selectedWeaponClass)
+    }
+
+    fun resetWeaponClasses() {
+        _uiState.update { it.copy(weaponClasses = DEFAULT_WEAPON_CLASSES, selectedWeaponClass = "AR") }
+        saveWeaponClasses(DEFAULT_WEAPON_CLASSES, "AR")
+    }
+
+    private fun uniqueClassName(wanted: String, ignore: String?): String {
+        val taken = _uiState.value.weaponClasses.map { it.name }.filter { it != ignore }.toSet()
+        if (wanted !in taken) return wanted
+        var i = 2
+        while ("$wanted $i" in taken) i++
+        return "$wanted $i"
     }
 
     fun setChronoType(context: Context, type: ChronoType) {
@@ -222,19 +322,21 @@ class ChronoViewModel(context: Context) : ViewModel() {
     }
 
     fun updateCustomWeight(context: Context, index: Int, name: String, weight: Float, caliber: Float? = null, unit: String? = null) {
-        _uiState.update { current ->
-            val newList = current.customWeights.toMutableList()
-            if (index in newList.indices) {
-                val old = newList[index]
-                newList[index] = CustomWeight(
-                    name = name,
-                    weight = weight,
-                    caliber = caliber ?: old.caliber,
-                    caliberUnit = unit ?: old.caliberUnit
-                )
-                saveCustomWeights(context, newList)
-            }
-            current.copy(customWeights = newList)
+        val current = _uiState.value
+        if (index !in current.customWeights.indices) return
+        val old = current.customWeights[index]
+        val updated = CustomWeight(
+            name = name,
+            weight = weight,
+            caliber = caliber ?: old.caliber,
+            caliberUnit = unit ?: old.caliberUnit
+        )
+        val newList = current.customWeights.toMutableList().also { it[index] = updated }
+        _uiState.update { it.copy(customWeights = newList) }
+        saveCustomWeights(context, newList)
+        // Editing the weight that is selected moves the selection along with it.
+        if (sameWeight(old.weight, current.selectedWeight) && !sameWeight(old.weight, weight)) {
+            setWeight(weight)
         }
     }
 
@@ -247,14 +349,17 @@ class ChronoViewModel(context: Context) : ViewModel() {
             }
             current.copy(customWeights = newList)
         }
+        keepSelectedWeightOffered()
     }
 
     fun setMaxAllowedJoule(joule: Float) {
         _uiState.update { it.copy(maxAllowedJoule = joule) }
+        savePreference(appContext, "max_joule", joule)
     }
 
     fun setMaxAllowedOverhop(cm: Float) {
         _uiState.update { it.copy(maxAllowedOverhopCm = cm) }
+        savePreference(appContext, "max_overhop", cm)
     }
 
     fun updateBallisticSettings(
@@ -275,6 +380,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 gravity = gravity ?: current.gravity
             )
         }
+        // These were loaded on start but never written, so every change was lost on restart.
+        val s = _uiState.value
+        savePreference(appContext, "diameter", s.diameterMm)
+        savePreference(appContext, "air_density", s.airDensityRho)
+        savePreference(appContext, "drag_coeff", s.dragCoefficientCw)
+        savePreference(appContext, "magnus_coeff", s.magnusCoefficientK)
+        savePreference(appContext, "spin_damping", s.spinDampingCr)
+        savePreference(appContext, "gravity", s.gravity)
     }
 
     // Calibration Methods
@@ -552,6 +665,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
     private fun onChronoAnswered(html: String) {
         missedPolls = 0
         parseHtml(html)
+        saveCalibrationIfDirty()
         if (_uiState.value.connectionState != ConnectionState.CONNECTED) {
             setConnectionState(ConnectionState.CONNECTED)
         }
@@ -648,6 +762,7 @@ class ChronoViewModel(context: Context) : ViewModel() {
             }
 
             lastSeenRawShots = updatedLastSeen
+            if (currentCalibrationEntries.size != current.calibrationEntries.size) calibrationDirty = true
 
             val latestShot = currentSessionShots.lastOrNull()
             val currentVelocityString = latestShot?.velocity?.let { "%.2f".format(it) } ?: "0.00"
@@ -678,6 +793,17 @@ class ChronoViewModel(context: Context) : ViewModel() {
                 variance = varVal,
                 currentEnergy = currentEnergy
             )
+        }
+    }
+
+    /** Set by the poller when calibration mode recorded new entries; saved outside the state update. */
+    @Volatile
+    private var calibrationDirty = false
+
+    private fun saveCalibrationIfDirty() {
+        if (calibrationDirty) {
+            calibrationDirty = false
+            saveCalibration(appContext)
         }
     }
 
@@ -907,6 +1033,50 @@ class ChronoViewModel(context: Context) : ViewModel() {
     }
 
     private companion object {
+        const val KEY_CUSTOM_WEIGHTS_JSON = "custom_weights_json"
+        const val KEY_WEAPON_CLASSES = "weapon_classes_json"
+        const val KEY_SELECTED_CLASS = "selected_weapon_class"
+        const val KEY_SELECTED_WEIGHT = "selected_weight"
+        const val KEY_ALWAYS_SHOW_CUSTOM = "always_show_custom_weights"
+
+        inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =
+            name?.let { n -> enumValues<T>().firstOrNull { it.name == n } } ?: fallback
+
+        fun customWeightsToJson(list: List<CustomWeight>): String = JSONArray().apply {
+            list.forEach {
+                put(JSONObject().put("name", it.name).put("weight", it.weight.toDouble())
+                    .put("caliber", it.caliber.toDouble()).put("caliberUnit", it.caliberUnit))
+            }
+        }.toString()
+
+        fun parseCustomWeights(json: String): List<CustomWeight>? = try {
+            val arr = JSONArray(json)
+            (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                CustomWeight(
+                    name = o.optString("name", "Custom"),
+                    weight = o.optDouble("weight", 0.20).toFloat(),
+                    caliber = o.optDouble("caliber", 6.0).toFloat(),
+                    caliberUnit = o.optString("caliberUnit", "mm")
+                )
+            }
+        } catch (e: Exception) { null }
+
+        fun weaponClassesToJson(list: List<WeaponClass>): String = JSONArray().apply {
+            list.forEach {
+                put(JSONObject().put("name", it.name).put("maxJoules", it.maxJoules.toDouble())
+                    .put("description", it.description))
+            }
+        }.toString()
+
+        fun parseWeaponClasses(json: String): List<WeaponClass>? = try {
+            val arr = JSONArray(json)
+            (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                WeaponClass(o.optString("name", "AR"), o.optDouble("maxJoules", 1.5).toFloat(), o.optString("description", ""))
+            }
+        } catch (e: Exception) { null }
+
         /** Addresses the supported chrono models are known to serve their page on. */
         val CANDIDATE_HOSTS = listOf("8.8.8.8", "192.168.4.1", "192.168.1.1", "192.168.0.1")
 

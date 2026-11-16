@@ -18,11 +18,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
+import com.example.chronomate.model.exportChoiceFor
+import com.example.chronomate.model.shotsToInclude
 import com.example.chronomate.viewmodel.ChronoViewModel
 
 @Composable
 fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
-    var shotCount by remember { mutableStateOf(data.shots.size.coerceAtMost(10).coerceAtLeast(1)) }
+    // The choice lives in the view model: it survives new shots and leaving the screen.
+    val total = data.shots.size
+    val shotCount = shotsToInclude(data.exportShotChoice, total)
     var gunName by remember { mutableStateOf("") }
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -92,7 +96,7 @@ fun ExportScreen(data: ChronoData, viewModel: ChronoViewModel) {
                 
                 Slider(
                     value = shotCount.toFloat(),
-                    onValueChange = { shotCount = it.toInt() },
+                    onValueChange = { viewModel.setExportShotChoice(exportChoiceFor(Math.round(it), total)) },
                     valueRange = 1f..data.shots.size.coerceAtLeast(1).toFloat(),
                     steps = (data.shots.size - 1).coerceAtLeast(0)
                 )
