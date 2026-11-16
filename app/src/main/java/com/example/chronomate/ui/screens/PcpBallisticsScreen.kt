@@ -309,6 +309,7 @@ private fun Segmented(label: String, options: List<String>, selected: Int, onSel
 @Composable
 private fun ProjectilePicker(data: ChronoData, onPick: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
+    var libraryOpen by remember { mutableStateOf(false) }
     Box {
         OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.pcp_pick_projectile), modifier = Modifier.weight(1f))
@@ -337,13 +338,18 @@ private fun ProjectilePicker(data: ChronoData, onPick: (String) -> Unit) {
                     onClick = { open = false; onPick(opt.id) }
                 )
             }
-            // Your active list first (what the chips show), then the library; picking adds it
-            Header(stringResource(R.string.active_list_title))
+            // Your active projectiles; the library stays collapsed behind "Library ▸" (picking adds it)
             data.availableWeights(com.example.chronomate.model.KIND_PELLET).forEach { Entry(it) }
-            CALIBERS.forEach { (key, mm) ->
-                HorizontalDivider()
-                Header(stringResource(R.string.library_title) + " · %s mm (%s)".format(mm.toString().removeSuffix(".0"), key))
-                library(com.example.chronomate.model.KIND_PELLET, key).forEach { Entry(it) }
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.library_title) + if (libraryOpen) "  ▾" else "  ▸", fontWeight = FontWeight.Bold) },
+                onClick = { libraryOpen = !libraryOpen }
+            )
+            if (libraryOpen) {
+                CALIBERS.forEach { (key, mm) ->
+                    Header("%s mm (%s)".format(mm.toString().removeSuffix(".0"), key))
+                    library(com.example.chronomate.model.KIND_PELLET, key).forEach { Entry(it) }
+                }
             }
         }
     }
