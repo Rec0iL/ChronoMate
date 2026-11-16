@@ -394,6 +394,15 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
+    /** Sort the custom weights (the chips follow this order). */
+    fun moveCustomWeight(index: Int, step: Int) {
+        val list = _uiState.value.customWeights
+        val newList = list.moved(index, index + step)
+        if (newList === list) return
+        _uiState.update { it.copy(customWeights = newList) }
+        saveCustomWeights(appContext, newList)
+    }
+
     fun removeCustomWeight(context: Context, index: Int) {
         _uiState.update { current ->
             val newList = current.customWeights.toMutableList()

@@ -49,7 +49,8 @@ import androidx.compose.ui.zIndex
 import com.example.chronomate.R
 import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.Compliance
-import com.example.chronomate.model.STANDARD_BB_WEIGHTS
+import com.example.chronomate.model.availableWeights
+import com.example.chronomate.model.sameWeight
 import com.example.chronomate.model.WeaponClass
 import com.example.chronomate.model.activeWeaponClass
 import com.example.chronomate.model.complianceOf
@@ -150,15 +151,25 @@ fun OrgaChronoScreen(data: ChronoData, viewModel: ChronoViewModel) {
             color = if (isDark) ActiveAccentDark else ActiveAccentLight
         )
         Spacer(Modifier.height(8.dp))
-        val weightItems = STANDARD_BB_WEIGHTS.map { it to "%.2f g".format(it) }
+        // Same list as the Dashboard chips; tap a tile to make it the weight shots are judged with.
+        val options = data.availableWeights()
+        val weightItems = options.map { it.weight to if (it.isCustom) it.label else "%.2f g".format(it.weight) }
         val maxGrams = maxWeightGrams(limit, latestVelocity)
-        val practical = STANDARD_BB_WEIGHTS.lastOrNull { it <= maxGrams } ?: 0f
+        val practical = options.map { it.weight }.filter { it <= maxGrams }.maxOrNull() ?: 0f
         JouleGridStatic(
             velocity = latestVelocity,
             weights = weightItems,
             practicalWeight = practical,
             columns = if (isLandscape) 5 else 2,
-            isDark = isDark
+            isDark = isDark,
+            selectedWeight = data.selectedWeight,
+            onSelect = { viewModel.setWeight(it) }
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            stringResource(R.string.joule_grid_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(32.dp))
     }
@@ -513,8 +524,21 @@ private fun WeaponClassDialog(
     }
 }
 
+/**
+ * Joule reference grid. Shows the same weights as the Dashboard chips; the selected weight (the one
+ * shots and the over-limit check use) has a star and a thick border, and tapping a tile selects it.
+ * Numbers are white with a dark outline so they stay readable on red, orange and green.
+ */
 @Composable
-fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practicalWeight: Float, columns: Int, isDark: Boolean) {
+fun JouleGridStatic(
+    velocity: Float,
+    weights: List<Pair<Float, String>>,
+    practicalWeight: Float,
+    columns: Int,
+    isDark: Boolean,
+    selectedWeight: Float? = null,
+    onSelect: ((Float) -> Unit)? = null
+) {
     val rows = weights.chunked(columns)
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -522,41 +546,37 @@ fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practic
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowWeights.forEach { (weight, label) ->
                     val energy = 0.5f * (weight / 1000f) * velocity.pow(2)
+                    val selected = selectedWeight != null && sameWeight(weight, selectedWeight)
 
-                    val (bgColor, contentColor) = when {
-                        velocity <= 0f -> {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) to
-                                (if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color.Black)
-                        }
-                        weight < practicalWeight -> {
-                            if (isDark) Color(0xFF1B5E20) to Color(0xFF4CAF50)
-                            else Color(0xFF2E7D32) to Color.White
-                        }
-                        weight == practicalWeight -> {
-                            if (isDark) Color(0xFFE65100) to Color(0xFFFFEB3B)
-                            else Color(0xFFEF6C00) to Color.White
-                        }
-                        else -> {
-                            if (isDark) Color(0xFFB71C1C) to Color(0xFFF44336)
-                            else Color(0xFFC62828) to Color.White
-                        }
+                    val (bgColor, borderColor) = when {
+                        velocity <= 0f -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) to MaterialTheme.colorScheme.outline
+                        weight < practicalWeight -> Color(0xFF2E7D32) to Color(0xFF88FF11)
+                        weight == practicalWeight -> Color(0xFFE65100) to Color(0xFFFFCC80)
+                        else -> Color(0xFFB71C1C) to Color(0xFFFF8A80)
                     }
 
                     Card(
-                        modifier = Modifier.weight(1f),
-                        colors = CardDefaults.cardColors(containerColor = bgColor)
+                        modifier = Modifier
+                            .weight(1f)
+                            .then(if (onSelect != null) Modifier.clickable { onSelect(weight) } else Modifier),
+                        colors = CardDefaults.cardColors(containerColor = bgColor),
+                        border = if (selected) BorderStroke(3.dp, borderColor) else null
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(label, style = MaterialTheme.typography.labelSmall, color = contentColor.copy(alpha = 0.8f), maxLines = 1)
-                            Text(
+                            OutlinedText(
+                                if (selected) "★ $label" else label,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                dim = velocity <= 0f && !isDark
+                            )
+                            OutlinedText(
                                 if (velocity > 0f) "%.2f J".format(energy) else "-- J",
-                                style = MaterialTheme.typography.titleMedium,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Black,
-                                color = contentColor,
-                                maxLines = 1
+                                dim = velocity <= 0f && !isDark
                             )
                         }
                     }
@@ -566,5 +586,21 @@ fun JouleGridStatic(velocity: Float, weights: List<Pair<Float, String>>, practic
                 }
             }
         }
+    }
+}
+
+/** White text with a dark outline (dark text on the light, empty tiles). */
+@Composable
+private fun OutlinedText(text: String, fontSize: androidx.compose.ui.unit.TextUnit, fontWeight: FontWeight, dim: Boolean) {
+    if (dim) {
+        Text(text, fontSize = fontSize, fontWeight = fontWeight, color = Color(0xFF263238), maxLines = 1)
+        return
+    }
+    Box(contentAlignment = Alignment.Center) {
+        Text(
+            text, fontSize = fontSize, fontWeight = fontWeight, maxLines = 1, color = Color(0xCC000000),
+            style = LocalTextStyle.current.copy(drawStyle = androidx.compose.ui.graphics.drawscope.Stroke(width = 5f, join = androidx.compose.ui.graphics.StrokeJoin.Round))
+        )
+        Text(text, fontSize = fontSize, fontWeight = fontWeight, maxLines = 1, color = Color.White)
     }
 }

@@ -241,4 +241,7 @@
     <string name="ballistic_mode_pcp">PCP airgun (pellet &amp; slug)</string>
     <string name="show_imperial">Also show imperial units (fps, ft-lb, grains, yards)</string>
     <string name="stat_wind_drift">Wind drift</string>
+    <string name="joule_grid_hint">★ = selected weight (used for shots and the over-limit warning) · tap a tile to select it</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
 </resources>

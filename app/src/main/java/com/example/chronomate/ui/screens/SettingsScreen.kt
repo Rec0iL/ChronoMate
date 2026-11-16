@@ -362,7 +362,9 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
                                     onUpdate = { name, w, cal, u ->
                                         viewModel.updateCustomWeight(context, index, name, w, cal, u)
                                     },
-                                    onDelete = { viewModel.removeCustomWeight(context, index) }
+                                    onDelete = { viewModel.removeCustomWeight(context, index) },
+                                    onMoveUp = if (index > 0) ({ viewModel.moveCustomWeight(index, -1) }) else null,
+                                    onMoveDown = if (index < data.customWeights.size - 1) ({ viewModel.moveCustomWeight(index, 1) }) else null
                                 )
                                 if (index < data.customWeights.size - 1) {
                                     HorizontalDivider(
@@ -515,7 +517,9 @@ fun CustomWeightEntry(
     caliber: Float,
     unit: String,
     onUpdate: (String, Float, Float, String) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onMoveUp: (() -> Unit)? = null,
+    onMoveDown: (() -> Unit)? = null
 ) {
     var nameText by remember(name) { mutableStateOf(name) }
     var weightValue by remember(weight) { 
@@ -546,6 +550,12 @@ fun CustomWeightEntry(
                 textStyle = MaterialTheme.typography.bodySmall,
                 singleLine = true
             )
+            IconButton(onClick = { onMoveUp?.invoke() }, enabled = onMoveUp != null) {
+                Icon(Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.move_up))
+            }
+            IconButton(onClick = { onMoveDown?.invoke() }, enabled = onMoveDown != null) {
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.move_down))
+            }
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
             }
