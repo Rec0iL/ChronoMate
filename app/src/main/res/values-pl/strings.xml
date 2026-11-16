@@ -160,7 +160,7 @@
     <string name="illegal">NIEDOZWOLONE</string>
     <string name="joule_grid_for_class">Siatka referencyjna dżuli — %1$s (≤ %2$.2f J)</string>
     <string name="legal">DOZWOLONE</string>
-    <string name="loaded_weights">Wczytane wagi (dotknij, aby wybrać)</string>
+    <string name="loaded_weights">Wybrana waga (dotknij, aby wybrać)</string>
     <string name="max_bb_weight_label">Maks. BB: %1$.2f g</string>
     <string name="max_joules_label">Maks. energia</string>
     <string name="measured_velocity">ZMIERZONA PRĘDKOŚĆ</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = wybrana waga (do strzałów i ostrzeżenia o limicie) · dotknij kafelka, aby wybrać</string>
     <string name="move_up">W górę</string>
     <string name="move_down">W dół</string>
+    <string name="projectiles_title">Pociski</string>
+    <string name="mode_airsoft">Airsoft (kulki · hop-up)</string>
+    <string name="mode_pcp">PCP (śrut i slugi)</string>
+    <string name="mode_hint_airsoft">Wagi kulek i symulacja toru lotu z hop-upem.</string>
+    <string name="mode_hint_pcp">Śrut i slugi oraz kalkulator balistyczny PCP.</string>
+    <string name="active_list_title">Twoja aktywna lista</string>
+    <string name="library_title">Biblioteka</string>
+    <string name="library_search">Szukaj…</string>
+    <string name="add_to_active">Dodaj do aktywnej listy</string>
+    <string name="in_active">Już na aktywnej liście</string>
+    <string name="remove_from_active">Usuń z aktywnej listy (zostaje w bibliotece)</string>
+    <string name="own_projectile_new">Własny pocisk</string>
+    <string name="own_projectile_title">Własny pocisk</string>
+    <string name="own_projectile_name_hint">np. Bio 0.28 albo moje slugi</string>
+    <string name="own_projectile_has_bc">Znam BC</string>
+    <string name="own_projectile_edit">Edytuj</string>
+    <string name="own_projectile_confirm_delete">Usunąć pocisk \'%1$s\'?</string>
 </resources>

@@ -37,7 +37,7 @@ import com.example.chronomate.model.ALL_CALIBERS
 import com.example.chronomate.model.CALIBERS
 import com.example.chronomate.model.availableWeights
 import com.example.chronomate.model.isSelected
-import com.example.chronomate.ui.components.WeightChipRow
+import com.example.chronomate.ui.components.ProjectilesSection
 import com.example.chronomate.viewmodel.ChronoViewModel
 
 @Composable
@@ -257,156 +257,8 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        // Weight Type Selection
-        Text(stringResource(R.string.weight_config_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(), 
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            WeightTypeButton(
-                label = stringResource(R.string.weight_type_bbs),
-                selected = data.weightType == WeightType.BB,
-                onClick = { viewModel.setWeightType(context, WeightType.BB) },
-                modifier = Modifier.weight(1f)
-            )
-            WeightTypeButton(
-                label = stringResource(R.string.weight_type_diablos),
-                selected = data.weightType == WeightType.DIABLO,
-                onClick = { viewModel.setWeightType(context, WeightType.DIABLO) },
-                modifier = Modifier.weight(1f)
-            )
-            WeightTypeButton(
-                label = stringResource(R.string.weight_type_custom),
-                selected = data.weightType == WeightType.CUSTOM,
-                onClick = { viewModel.setWeightType(context, WeightType.CUSTOM) },
-                modifier = Modifier.weight(1f)
-            )
-        }
-        
-        if (data.weightType == WeightType.DIABLO) {
-            // Caliber filter for the pellet & slug catalogue
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(stringResource(R.string.diabolo_caliber_label), style = MaterialTheme.typography.labelMedium)
-            val calibers = CALIBERS.map { it.first to "%s".format(it.first) } + (ALL_CALIBERS to stringResource(R.string.all_calibers))
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                calibers.forEachIndexed { i, (key, label) ->
-                    SegmentedButton(
-                        selected = data.diaboloCaliber == key,
-                        onClick = { viewModel.setDiaboloCaliber(key) },
-                        shape = SegmentedButtonDefaults.itemShape(i, calibers.size)
-                    ) { Text(label, maxLines = 1, fontSize = 12.sp) }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Always-show-custom switch (off = custom weights only appear with the Custom type)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.always_show_custom), style = MaterialTheme.typography.titleSmall)
-                Text(stringResource(R.string.always_show_custom_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Switch(
-                checked = data.alwaysShowCustomWeights,
-                onCheckedChange = { viewModel.setAlwaysShowCustomWeights(it) }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Loaded weights: exactly what the chips everywhere else offer right now (tap = select)
-        Text(
-            stringResource(R.string.loaded_weights),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        val loaded = data.availableWeights()
-        if (loaded.isEmpty()) {
-            Text(stringResource(R.string.no_custom_weights), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        } else {
-            WeightChipRow(
-                options = loaded,
-                isSelected = { data.isSelected(it) },
-                onSelect = { viewModel.selectWeightOption(it) },
-                wrap = true
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Expandable Custom Weights Table
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-        ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().clickable { weightsExpanded = !weightsExpanded }.padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(stringResource(R.string.custom_weights_list), style = MaterialTheme.typography.titleSmall)
-                    Icon(
-                        if (weightsExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = null
-                    )
-                }
-                
-                AnimatedVisibility(visible = weightsExpanded) {
-                    Column {
-                        if (data.customWeights.isEmpty()) {
-                            Text(
-                                stringResource(R.string.no_custom_weights),
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally)
-                            )
-                        } else {
-                            data.customWeights.forEachIndexed { index, custom ->
-                                CustomWeightEntry(
-                                    index = index,
-                                    name = custom.name,
-                                    weight = custom.weight,
-                                    caliber = custom.caliber,
-                                    unit = custom.caliberUnit,
-                                    onUpdate = { name, w, cal, u ->
-                                        viewModel.updateCustomWeight(context, index, name, w, cal, u)
-                                    },
-                                    onDelete = { viewModel.removeCustomWeight(context, index) },
-                                    onMoveUp = if (index > 0) ({ viewModel.moveCustomWeight(index, -1) }) else null,
-                                    onMoveDown = if (index < data.customWeights.size - 1) ({ viewModel.moveCustomWeight(index, 1) }) else null
-                                )
-                                if (index < data.customWeights.size - 1) {
-                                    HorizontalDivider(
-                                        modifier = Modifier.padding(vertical = 8.dp),
-                                        color = MaterialTheme.colorScheme.outlineVariant
-                                    )
-                                }
-                            }
-                        }
-                        
-                        Button(
-                            onClick = { viewModel.addCustomWeight(context) },
-                            modifier = Modifier.fillMaxWidth().padding(8.dp),
-                            colors = ButtonDefaults.buttonColors()
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.add_row_button))
-                        }
-                    }
-                }
-            }
-        }
+        // Projectiles: Airsoft / PCP switch, chips, active list, library, own projectiles
+        ProjectilesSection(data, viewModel)
 
         Spacer(modifier = Modifier.height(32.dp))
         
@@ -414,23 +266,7 @@ fun SettingsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Text(stringResource(R.string.fine_tune_physics), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Ballistic model for the Trajectory screen: airsoft hop-up or the PCP airgun calculator
-        Text(stringResource(R.string.ballistic_mode_label), style = MaterialTheme.typography.labelLarge)
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            WeightTypeButton(
-                label = stringResource(R.string.ballistic_mode_airsoft),
-                selected = data.ballisticMode == BallisticMode.AIRSOFT,
-                onClick = { viewModel.setBallisticMode(BallisticMode.AIRSOFT) },
-                modifier = Modifier.weight(1f)
-            )
-            WeightTypeButton(
-                label = stringResource(R.string.ballistic_mode_pcp),
-                selected = data.ballisticMode == BallisticMode.PCP,
-                onClick = { viewModel.setBallisticMode(BallisticMode.PCP) },
-                modifier = Modifier.weight(1f)
-            )
-        }
+        // Units (the Airsoft / PCP switch lives in Projectiles above)
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -525,115 +361,6 @@ fun CalibrationRow(
         IconButton(onClick = onDelete) {
             Icon(Icons.Default.Close, contentDescription = "Delete", tint = MaterialTheme.colorScheme.outline)
         }
-    }
-}
-
-@Composable
-fun CustomWeightEntry(
-    index: Int,
-    name: String,
-    weight: Float,
-    caliber: Float,
-    unit: String,
-    onUpdate: (String, Float, Float, String) -> Unit,
-    onDelete: () -> Unit,
-    onMoveUp: (() -> Unit)? = null,
-    onMoveDown: (() -> Unit)? = null
-) {
-    var nameText by remember(name) { mutableStateOf(name) }
-    var weightValue by remember(weight) { 
-        mutableStateOf(TextFieldValue(
-            text = weight.toString(),
-            selection = TextRange(weight.toString().length)
-        )) 
-    }
-    var caliberValue by remember(caliber) { 
-        mutableStateOf(TextFieldValue(
-            text = caliber.toString(),
-            selection = TextRange(caliber.toString().length)
-        )) 
-    }
-    var unitExpanded by remember { mutableStateOf(false) }
-    val units = listOf("mm", "inch", "cal", "ga")
-
-    Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            TextField(
-                value = nameText,
-                onValueChange = { 
-                    nameText = it
-                    onUpdate(it, weight, caliber, unit)
-                },
-                modifier = Modifier.weight(1f),
-                label = { Text(stringResource(R.string.weight_name_label), fontSize = 10.sp) },
-                textStyle = MaterialTheme.typography.bodySmall,
-                singleLine = true
-            )
-            IconButton(onClick = { onMoveUp?.invoke() }, enabled = onMoveUp != null) {
-                Icon(Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.move_up))
-            }
-            IconButton(onClick = { onMoveDown?.invoke() }, enabled = onMoveDown != null) {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.move_down))
-            }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextField(
-                value = caliberValue,
-                onValueChange = { 
-                    caliberValue = it
-                    it.text.toFloatOrNull()?.let { c -> onUpdate(name, weight, c, unit) }
-                },
-                modifier = Modifier.weight(1f),
-                label = { Text(stringResource(R.string.caliber_label), fontSize = 10.sp) },
-                textStyle = MaterialTheme.typography.bodySmall,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true
-            )
-            
-            Box(modifier = Modifier.weight(0.6f)) {
-                OutlinedButton(
-                    onClick = { unitExpanded = true },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(4.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp)
-                ) {
-                    Text(unit, style = MaterialTheme.typography.bodySmall)
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-                DropdownMenu(expanded = unitExpanded, onDismissRequest = { unitExpanded = false }) {
-                    units.forEach { u ->
-                        DropdownMenuItem(
-                            text = { Text(u) },
-                            onClick = {
-                                onUpdate(name, weight, caliber, u)
-                                unitExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        TextField(
-            value = weightValue,
-            onValueChange = { 
-                weightValue = it
-                it.text.toFloatOrNull()?.let { w -> onUpdate(name, w, caliber, unit) }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(R.string.weight_value_label), fontSize = 10.sp) },
-            textStyle = MaterialTheme.typography.bodySmall,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true
-        )
     }
 }
 

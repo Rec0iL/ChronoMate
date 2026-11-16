@@ -160,7 +160,7 @@
     <string name="illegal">ЗАБОРОНЕНО</string>
     <string name="joule_grid_for_class">Довідкова таблиця Джоулів — %1$s (≤ %2$.2f J)</string>
     <string name="legal">ДОЗВОЛЕНО</string>
-    <string name="loaded_weights">Завантажені ваги (торкніться, щоб вибрати)</string>
+    <string name="loaded_weights">Вибрана вага (торкніться, щоб вибрати)</string>
     <string name="max_bb_weight_label">Макс. BB: %1$.2f g</string>
     <string name="max_joules_label">Макс. енергія</string>
     <string name="measured_velocity">ВИМІРЯНА ШВИДКІСТЬ</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = вибрана вага (для пострілів і попередження про ліміт) · торкніться плитки, щоб вибрати</string>
     <string name="move_up">Вгору</string>
     <string name="move_down">Вниз</string>
+    <string name="projectiles_title">Снаряди</string>
+    <string name="mode_airsoft">Страйкбол (кулі · хоп-ап)</string>
+    <string name="mode_pcp">PCP (діаболо та слаги)</string>
+    <string name="mode_hint_airsoft">Ваги куль і симуляція траєкторії з хоп-апом.</string>
+    <string name="mode_hint_pcp">Діаболо та слаги і балістичний калькулятор PCP.</string>
+    <string name="active_list_title">Ваш активний список</string>
+    <string name="library_title">Бібліотека</string>
+    <string name="library_search">Пошук…</string>
+    <string name="add_to_active">Додати до активного списку</string>
+    <string name="in_active">Уже в активному списку</string>
+    <string name="remove_from_active">Прибрати з активного списку (лишається в бібліотеці)</string>
+    <string name="own_projectile_new">Власний снаряд</string>
+    <string name="own_projectile_title">Власний снаряд</string>
+    <string name="own_projectile_name_hint">напр. Bio 0.28 або мої слаги</string>
+    <string name="own_projectile_has_bc">Відомий BC</string>
+    <string name="own_projectile_edit">Редагувати</string>
+    <string name="own_projectile_confirm_delete">Видалити снаряд \'%1$s\'?</string>
 </resources>

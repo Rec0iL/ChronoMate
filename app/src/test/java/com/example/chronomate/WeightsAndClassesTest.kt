@@ -6,37 +6,50 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class WeightsAndClassesTest {
-    private val custom = listOf(CustomWeight("Bio", 0.27f), CustomWeight("Tracer", 0.30f))
+    private val own = listOf(
+        CustomWeight("Bio", 0.27f, kind = KIND_BB, id = "bio"),
+        CustomWeight("HeavySniper", 0.69f, 4.5f, kind = KIND_PELLET, id = "hs")
+    )
+    private fun data(mode: BallisticMode = BallisticMode.AIRSOFT) = ChronoData(
+        ballisticMode = mode, customWeights = own,
+        activeAirsoft = normalizedActive(DEFAULT_ACTIVE_BB, KIND_BB, own),
+        activePcp = normalizedActive(DEFAULT_ACTIVE_PCP, KIND_PELLET, own)
+    )
 
     @Test
-    fun customWeightsAppearOnlyWhenWanted() {
-        assertEquals(STANDARD_BB_WEIGHTS, availableWeights(WeightType.BB, custom, false).map { it.weight })
-        val withCustom = availableWeights(WeightType.BB, custom, true)
-        assertEquals(STANDARD_BB_WEIGHTS + listOf(0.27f, 0.30f), withCustom.map { it.weight })
-        assertTrue(withCustom.takeLast(2).all { it.isCustom })
-        assertEquals(listOf(0.27f, 0.30f), availableWeights(WeightType.CUSTOM, custom, false).map { it.weight })
+    fun activeListsPerModeWithOwnProjectiles() {
+        assertEquals(DEFAULT_ACTIVE_BB + "own:bio", data().availableWeights().map { it.id })
+        assertEquals(DEFAULT_ACTIVE_PCP + "own:hs", data(BallisticMode.PCP).availableWeights().map { it.id })
+        assertTrue(DEFAULT_ACTIVE_PCP.all { data().resolve(it) != null })      // starter set exists
+        // same ids as the desktop
+        assertEquals("bb:0.20", DEFAULT_ACTIVE_BB.first())
+        assertEquals("pellet:JSB Exact .177", DEFAULT_ACTIVE_PCP.first())
     }
 
     @Test
-    fun switchingTypeMovesSelectionIntoTheList() {
-        val diablo = availableWeights(WeightType.DIABLO, custom, false, ".22")
-        val first = pelletsFor(".22").first()
-        assertEquals(first.massGrams.toFloat(), optionToKeep(0.20f, "", diablo)!!.weight)
-        assertEquals(first.name, optionToKeep(0.20f, "", diablo)!!.pellet!!.name)
-        // a custom weight stays selected when custom weights are appended
-        assertEquals(0.27f, optionToKeep(0.27f, "", availableWeights(WeightType.DIABLO, custom, true, ".22"))!!.weight)
-    }
-
-    @Test
-    fun diablosAreThePelletCatalogue() {
+    fun libraryFilterAndSearch() {
+        val bbs = library(KIND_BB)
+        assertEquals("bb:0.12", bbs.first().id)
+        assertEquals("bb:0.48", bbs.last().id)
+        assertTrue(library(KIND_PELLET, ".22").all { it.pellet!!.caliber == ".22" })
+        assertEquals(3, library(KIND_PELLET, ALL_CALIBERS, "baracuda match").size)
         assertEquals(63, PELLETS.size)
-        assertEquals(PELLETS.size, CALIBERS.sumOf { pelletsFor(it.first).size })
-        val opts = availableWeights(WeightType.DIABLO, emptyList(), false, ".177")
-        // JSB Exact and Air Arms Field weigh the same: only the selected pellet is marked
-        val twins = opts.filter { sameWeight(it.weight, 0.547f) }
-        assertTrue(twins.size >= 2)
-        val chosen = twins[1].pellet!!.name
-        assertEquals(listOf(false, true), twins.take(2).map { isSelected(0.547f, chosen, it) })
+    }
+
+    @Test
+    fun selectionByIdNeverMarksTwo() {
+        val d = data(BallisticMode.PCP)            // Baracuda Match .177 (0.690 g) is in the starter set
+        val opts = d.availableWeights()
+        val bara = opts.first { it.id == "pellet:H&N Baracuda Match .177" }
+        assertEquals(listOf(bara.id), opts.filter { d.copy(selectedItem = bara.id).isSelected(it) }.map { it.id })
+        assertEquals(listOf("own:hs"), opts.filter { d.copy(selectedItem = "own:hs").isSelected(it) }.map { it.id })
+    }
+
+    @Test
+    fun keepSelectionWhenListChanges() {
+        val pcp = data(BallisticMode.PCP).availableWeights()
+        assertEquals(DEFAULT_ACTIVE_PCP.first(), optionToKeep("bb:0.20", 0.20f, pcp)!!.id)   // BB not offered: first
+        assertEquals("pellet:H&N Baracuda Match .177", optionToKeep("gone", 0.69f, pcp)!!.id) // first with same weight
         assertEquals(0.033, findPellet(1.175f, ".22")!!.bc!!, 1e-9)
     }
 

@@ -160,7 +160,7 @@
     <string name="illegal">NON CONFORME</string>
     <string name="joule_grid_for_class">Griglia di riferimento Joule — %1$s (≤ %2$.2f J)</string>
     <string name="legal">CONFORME</string>
-    <string name="loaded_weights">Pesi caricati (tocca per selezionare)</string>
+    <string name="loaded_weights">Peso selezionato (tocca per scegliere)</string>
     <string name="max_bb_weight_label">BB max: %1$.2f g</string>
     <string name="max_joules_label">Energia max</string>
     <string name="measured_velocity">VELOCITÀ MISURATA</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = peso selezionato (per i tiri e l\'avviso di limite) · tocca una casella per selezionarla</string>
     <string name="move_up">Sposta su</string>
     <string name="move_down">Sposta giù</string>
+    <string name="projectiles_title">Proiettili</string>
+    <string name="mode_airsoft">Softair (pallini · hop-up)</string>
+    <string name="mode_pcp">PCP (diabolo e slug)</string>
+    <string name="mode_hint_airsoft">Pesi dei pallini e la simulazione della traiettoria con hop-up.</string>
+    <string name="mode_hint_pcp">Diabolo e slug e il calcolatore balistico PCP.</string>
+    <string name="active_list_title">La tua lista attiva</string>
+    <string name="library_title">Libreria</string>
+    <string name="library_search">Cerca…</string>
+    <string name="add_to_active">Aggiungi alla lista attiva</string>
+    <string name="in_active">Già nella lista attiva</string>
+    <string name="remove_from_active">Rimuovi dalla lista attiva (resta nella libreria)</string>
+    <string name="own_projectile_new">Proiettile proprio</string>
+    <string name="own_projectile_title">Proiettile proprio</string>
+    <string name="own_projectile_name_hint">es. Bio 0.28 o i miei slug</string>
+    <string name="own_projectile_has_bc">Conosco il BC</string>
+    <string name="own_projectile_edit">Modifica</string>
+    <string name="own_projectile_confirm_delete">Eliminare il proiettile \'%1$s\'?</string>
 </resources>

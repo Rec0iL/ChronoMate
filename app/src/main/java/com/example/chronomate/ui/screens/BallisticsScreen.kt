@@ -338,11 +338,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = when(data.weightType) {
-                WeightType.BB -> stringResource(R.string.bb_weight_label)
-                WeightType.DIABLO -> stringResource(R.string.diablo_weight_label)
-                WeightType.CUSTOM -> stringResource(R.string.custom_weight_label)
-            },
+            text = if (data.ballisticMode == com.example.chronomate.model.BallisticMode.PCP) stringResource(R.string.diablo_weight_label) else stringResource(R.string.bb_weight_label),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
@@ -350,7 +346,7 @@ fun BallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
         )
         val weights = data.availableWeights()
 
-        if (weights.isEmpty() && data.weightType == WeightType.CUSTOM) {
+        if (weights.isEmpty()) {
             Text(stringResource(R.string.no_custom_weights_ballistics), style = MaterialTheme.typography.bodySmall)
         } else {
             WeightChipRow(

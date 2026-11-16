@@ -160,7 +160,7 @@
     <string name="illegal">不適合</string>
     <string name="joule_grid_for_class">ジュール参照グリッド — %1$s（≤ %2$.2f J）</string>
     <string name="legal">適合</string>
-    <string name="loaded_weights">読み込まれた重量（タップで選択）</string>
+    <string name="loaded_weights">選択中の重さ（タップで選択）</string>
     <string name="max_bb_weight_label">最大BB: %1$.2f g</string>
     <string name="max_joules_label">最大エネルギー</string>
     <string name="measured_velocity">測定初速</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = 選択中の重さ（射撃と上限警告に使用）・タイルをタップして選択</string>
     <string name="move_up">上へ</string>
     <string name="move_down">下へ</string>
+    <string name="projectiles_title">弾</string>
+    <string name="mode_airsoft">エアソフト（BB弾・ホップアップ）</string>
+    <string name="mode_pcp">PCP（ペレット・スラッグ）</string>
+    <string name="mode_hint_airsoft">BB弾の重さとホップアップ弾道シミュレーション。</string>
+    <string name="mode_hint_pcp">ペレット・スラッグとPCP弾道計算機。</string>
+    <string name="active_list_title">アクティブリスト</string>
+    <string name="library_title">ライブラリ</string>
+    <string name="library_search">検索…</string>
+    <string name="add_to_active">アクティブリストに追加</string>
+    <string name="in_active">アクティブリストに追加済み</string>
+    <string name="remove_from_active">アクティブリストから外す（ライブラリには残る）</string>
+    <string name="own_projectile_new">自分の弾を追加</string>
+    <string name="own_projectile_title">自分の弾</string>
+    <string name="own_projectile_name_hint">例：Bio 0.28、自作スラッグ</string>
+    <string name="own_projectile_has_bc">BCが分かる</string>
+    <string name="own_projectile_edit">編集</string>
+    <string name="own_projectile_confirm_delete">弾「%1$s」を削除しますか？</string>
 </resources>

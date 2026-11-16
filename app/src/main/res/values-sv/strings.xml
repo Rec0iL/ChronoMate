@@ -160,7 +160,7 @@
     <string name="illegal">EJ TILLÅTEN</string>
     <string name="joule_grid_for_class">Joule-referenstabell — %1$s (≤ %2$.2f J)</string>
     <string name="legal">TILLÅTEN</string>
-    <string name="loaded_weights">Laddade vikter (tryck för att välja)</string>
+    <string name="loaded_weights">Vald vikt (tryck för att välja)</string>
     <string name="max_bb_weight_label">Max BB: %1$.2f g</string>
     <string name="max_joules_label">Max energi</string>
     <string name="measured_velocity">UPPMÄTT HASTIGHET</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = vald vikt (används för skott och gränsvarning) · tryck på en ruta för att välja</string>
     <string name="move_up">Flytta upp</string>
     <string name="move_down">Flytta ned</string>
+    <string name="projectiles_title">Projektiler</string>
+    <string name="mode_airsoft">Airsoft (kulor · hop-up)</string>
+    <string name="mode_pcp">PCP (diabolo och slugs)</string>
+    <string name="mode_hint_airsoft">BB-vikter och hop-up-banesimulering.</string>
+    <string name="mode_hint_pcp">Diabolo och slugs och PCP-ballistikräknaren.</string>
+    <string name="active_list_title">Din aktiva lista</string>
+    <string name="library_title">Bibliotek</string>
+    <string name="library_search">Sök…</string>
+    <string name="add_to_active">Lägg till i aktiv lista</string>
+    <string name="in_active">Redan i aktiv lista</string>
+    <string name="remove_from_active">Ta bort från aktiv lista (finns kvar i biblioteket)</string>
+    <string name="own_projectile_new">Egen projektil</string>
+    <string name="own_projectile_title">Egen projektil</string>
+    <string name="own_projectile_name_hint">t.ex. Bio 0.28 eller mina slugs</string>
+    <string name="own_projectile_has_bc">Jag vet BC</string>
+    <string name="own_projectile_edit">Redigera</string>
+    <string name="own_projectile_confirm_delete">Ta bort projektilen \'%1$s\'?</string>
 </resources>

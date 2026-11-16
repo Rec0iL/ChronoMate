@@ -160,7 +160,7 @@
     <string name="illegal">不合規</string>
     <string name="joule_grid_for_class">焦耳參考表 — %1$s（≤ %2$.2f J）</string>
     <string name="legal">合規</string>
-    <string name="loaded_weights">已載入的重量（點選以選擇）</string>
+    <string name="loaded_weights">已選重量（點選以選擇）</string>
     <string name="max_bb_weight_label">最大 BB：%1$.2f g</string>
     <string name="max_joules_label">最大能量</string>
     <string name="measured_velocity">測得速度</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = 已選重量（用於射擊與超限警告）· 點選方塊即可選擇</string>
     <string name="move_up">上移</string>
     <string name="move_down">下移</string>
+    <string name="projectiles_title">彈丸</string>
+    <string name="mode_airsoft">氣槍（BB彈・Hop-up）</string>
+    <string name="mode_pcp">PCP（鉛彈與彈頭）</string>
+    <string name="mode_hint_airsoft">BB彈重量與 Hop-up 彈道模擬。</string>
+    <string name="mode_hint_pcp">鉛彈與彈頭，以及 PCP 彈道計算器。</string>
+    <string name="active_list_title">你的使用清單</string>
+    <string name="library_title">資料庫</string>
+    <string name="library_search">搜尋…</string>
+    <string name="add_to_active">加入使用清單</string>
+    <string name="in_active">已在使用清單中</string>
+    <string name="remove_from_active">從使用清單移除（仍保留在資料庫）</string>
+    <string name="own_projectile_new">新增自訂彈丸</string>
+    <string name="own_projectile_title">自訂彈丸</string>
+    <string name="own_projectile_name_hint">例如 Bio 0.28 或我的彈頭</string>
+    <string name="own_projectile_has_bc">已知 BC</string>
+    <string name="own_projectile_edit">編輯</string>
+    <string name="own_projectile_confirm_delete">刪除彈丸「%1$s」？</string>
 </resources>

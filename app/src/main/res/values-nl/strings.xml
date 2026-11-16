@@ -160,7 +160,7 @@
     <string name="illegal">NIET TOEGESTAAN</string>
     <string name="joule_grid_for_class">Joule referentietabel — %1$s (≤ %2$.2f J)</string>
     <string name="legal">TOEGESTAAN</string>
-    <string name="loaded_weights">Geladen gewichten (tik om te kiezen)</string>
+    <string name="loaded_weights">Gekozen gewicht (tik om te kiezen)</string>
     <string name="max_bb_weight_label">Max BB: %1$.2f g</string>
     <string name="max_joules_label">Max. energie</string>
     <string name="measured_velocity">GEMETEN SNELHEID</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = gekozen gewicht (voor schoten en de limietwaarschuwing) · tik op een tegel om te kiezen</string>
     <string name="move_up">Omhoog</string>
     <string name="move_down">Omlaag</string>
+    <string name="projectiles_title">Projectielen</string>
+    <string name="mode_airsoft">Airsoft (BB\'s · hop-up)</string>
+    <string name="mode_pcp">PCP (diabolo\'s &amp; slugs)</string>
+    <string name="mode_hint_airsoft">BB-gewichten en de hop-up-baansimulatie.</string>
+    <string name="mode_hint_pcp">Diabolo\'s &amp; slugs en de PCP-ballistiekcalculator.</string>
+    <string name="active_list_title">Jouw actieve lijst</string>
+    <string name="library_title">Bibliotheek</string>
+    <string name="library_search">Zoeken…</string>
+    <string name="add_to_active">Toevoegen aan actieve lijst</string>
+    <string name="in_active">Al in de actieve lijst</string>
+    <string name="remove_from_active">Uit actieve lijst halen (blijft in de bibliotheek)</string>
+    <string name="own_projectile_new">Eigen projectiel</string>
+    <string name="own_projectile_title">Eigen projectiel</string>
+    <string name="own_projectile_name_hint">bijv. Bio 0.28 of mijn slugs</string>
+    <string name="own_projectile_has_bc">BC bekend</string>
+    <string name="own_projectile_edit">Bewerken</string>
+    <string name="own_projectile_confirm_delete">Projectiel \'%1$s\' verwijderen?</string>
 </resources>

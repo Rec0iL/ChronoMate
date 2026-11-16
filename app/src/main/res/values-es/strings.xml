@@ -160,7 +160,7 @@
     <string name="illegal">NO PERMITIDO</string>
     <string name="joule_grid_for_class">Tabla de Referencia Joule — %1$s (≤ %2$.2f J)</string>
     <string name="legal">PERMITIDO</string>
-    <string name="loaded_weights">Pesos cargados (toca para seleccionar)</string>
+    <string name="loaded_weights">Peso seleccionado (toca para elegir)</string>
     <string name="max_bb_weight_label">BB máx.: %1$.2f g</string>
     <string name="max_joules_label">Energía máx.</string>
     <string name="measured_velocity">VELOCIDAD MEDIDA</string>
@@ -248,4 +248,21 @@
     <string name="joule_grid_hint">★ = peso seleccionado (para los disparos y el aviso de límite) · toca una casilla para elegirla</string>
     <string name="move_up">Subir</string>
     <string name="move_down">Bajar</string>
+    <string name="projectiles_title">Proyectiles</string>
+    <string name="mode_airsoft">Airsoft (bolas · hop-up)</string>
+    <string name="mode_pcp">PCP (diábolos y slugs)</string>
+    <string name="mode_hint_airsoft">Pesos de bolas y la simulación de trayectoria con hop-up.</string>
+    <string name="mode_hint_pcp">Diábolos y slugs y la calculadora balística PCP.</string>
+    <string name="active_list_title">Tu lista activa</string>
+    <string name="library_title">Biblioteca</string>
+    <string name="library_search">Buscar…</string>
+    <string name="add_to_active">Añadir a la lista activa</string>
+    <string name="in_active">Ya en la lista activa</string>
+    <string name="remove_from_active">Quitar de la lista activa (sigue en la biblioteca)</string>
+    <string name="own_projectile_new">Proyectil propio</string>
+    <string name="own_projectile_title">Proyectil propio</string>
+    <string name="own_projectile_name_hint">p. ej. Bio 0.28 o mis slugs</string>
+    <string name="own_projectile_has_bc">Conozco su BC</string>
+    <string name="own_projectile_edit">Editar</string>
+    <string name="own_projectile_confirm_delete">¿Eliminar el proyectil \'%1$s\'?</string>
 </resources>

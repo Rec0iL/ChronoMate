@@ -46,8 +46,8 @@ import com.example.chronomate.model.ChronoData
 import com.example.chronomate.model.ClickUnit
 import com.example.chronomate.model.CALIBERS
 import com.example.chronomate.model.PELLETS
-import com.example.chronomate.model.Pellet
-import com.example.chronomate.model.pelletsFor
+import com.example.chronomate.model.availableWeights
+import com.example.chronomate.model.library
 import com.example.chronomate.model.VelocitySource
 import com.example.chronomate.viewmodel.ChronoViewModel
 import com.example.chronomate.ui.components.EnvironmentSection
@@ -179,7 +179,7 @@ fun PcpBallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
 
         // --- Projectile ---
         Section(stringResource(R.string.pcp_card_projectile)) {
-            ProjectilePicker(data, onPellet = { viewModel.selectPellet(it) }, onCustom = { viewModel.usePcpCustomWeight(it) })
+            ProjectilePicker(data, onPick = { viewModel.pickProjectile(it) })
             Text(pc.projectileName, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             PELLETS.firstOrNull { it.name == pc.projectileName && it.bc == null }?.let {
                 Text(stringResource(R.string.pcp_bc_unknown_note, it.name), style = MaterialTheme.typography.bodySmall, color = Color(0xFFFF9800))
@@ -191,7 +191,7 @@ fun PcpBallisticsScreen(data: ChronoData, viewModel: ChronoViewModel) {
             Segmented(stringResource(R.string.pcp_drag_model), DragModel.entries.map { it.name }, pc.dragModel.ordinal) { i ->
                 viewModel.updatePcp { it.copy(dragModel = DragModel.entries[i]) }
             }
-            OutlinedButton(onClick = { viewModel.savePcpAsCustomWeight() }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { viewModel.savePcpAsOwnProjectile() }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.pcp_save_custom))
             }
             Text(stringResource(R.string.pcp_preset_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -294,11 +294,7 @@ private fun Segmented(label: String, options: List<String>, selected: Int, onSel
 }
 
 @Composable
-private fun ProjectilePicker(
-    data: ChronoData,
-    onPellet: (Pellet) -> Unit,
-    onCustom: (Int) -> Unit
-) {
+private fun ProjectilePicker(data: ChronoData, onPick: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) {
@@ -306,40 +302,35 @@ private fun ProjectilePicker(
             Icon(Icons.Default.ArrowDropDown, null)
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            data.customWeights.forEachIndexed { i, cw ->
+            @Composable
+            fun Header(text: String) = Text(
+                text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            )
+            @Composable
+            fun Entry(opt: com.example.chronomate.model.WeightOption) {
+                val p = opt.pellet
                 DropdownMenuItem(
-                    text = { Text("★ ${cw.name} (%.3f g%s)".format(cw.weight, cw.bc?.let { ", BC %.3f".format(it) } ?: "")) },
-                    onClick = { open = false; onCustom(i) }
+                    text = {
+                        Column {
+                            Text((if (opt.isCustom) "★ " else "") + opt.label + if (p?.slug == true) stringResource(R.string.pcp_slug) else "")
+                            if (p != null) Text(
+                                "%s gr · %s".format(p.grains.toString().removeSuffix(".0"),
+                                    p.bc?.let { "BC ≈%.3f (%s, %s)".format(it, p.bcModel.ifEmpty { "?" }, p.source) } ?: stringResource(R.string.pcp_bc_unknown)),
+                                style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    },
+                    onClick = { open = false; onPick(opt.id) }
                 )
             }
-            // The catalogue is the Diablos weight list: the same pellets, grouped by caliber
+            // Your active list first (what the chips show), then the library; picking adds it
+            Header(stringResource(R.string.active_list_title))
+            data.availableWeights(com.example.chronomate.model.KIND_PELLET).forEach { Entry(it) }
             CALIBERS.forEach { (key, mm) ->
                 HorizontalDivider()
-                Text(
-                    "%s mm (%s)".format(mm.toString().removeSuffix(".0"), key),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                )
-                pelletsFor(key).forEach { pr ->
-                    DropdownMenuItem(
-                        text = {
-                            Column {
-                                Text(pr.name + if (pr.slug) stringResource(R.string.pcp_slug) else "")
-                                Text(
-                                    "%s gr / %.3f g · %s".format(
-                                        pr.grains.toString().removeSuffix(".0"), pr.massGrams,
-                                        pr.bc?.let { "BC ≈%.3f (%s, %s)".format(it, pr.bcModel.ifEmpty { "?" }, pr.source) }
-                                            ?: stringResource(R.string.pcp_bc_unknown)
-                                    ),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        onClick = { open = false; onPellet(pr) }
-                    )
-                }
+                Header(stringResource(R.string.library_title) + " · %s mm (%s)".format(mm.toString().removeSuffix(".0"), key))
+                library(com.example.chronomate.model.KIND_PELLET, key).forEach { Entry(it) }
             }
         }
     }

@@ -161,7 +161,7 @@
     <string name="confirm_delete_class">Waffenklasse \'%1$s\' wirklich löschen?</string>
     <string name="confirm_reset_classes">Alle Waffenklassen auf die Standardwerte zurücksetzen (BACKUP, AR, LMG, DMR, SNIPER)?</string>
     <string name="over_class_limit">Über dem %1$s-Limit (≤ %2$.2f J)</string>
-    <string name="loaded_weights">Geladene Gewichte (antippen zum Auswählen)</string>
+    <string name="loaded_weights">Gewähltes Gewicht (antippen zum Auswählen)</string>
     <string name="always_show_custom">Eigene Gewichte immer anzeigen</string>
     <string name="always_show_custom_desc">Eigene Gewichte an die BB- / Diabolo-Liste anhängen</string>
     <string name="pcp_title">PCP-Ballistik (Diabolos &amp; Slugs)</string>
@@ -248,4 +248,21 @@
     <string name="pcp_bc_unknown">BC unbekannt – selbst messen</string>
     <string name="pcp_slug"> (Slug)</string>
     <string name="pcp_bc_unknown_note">%1$s: Der Hersteller nennt keinen BC. Der bisherige BC bleibt; den echten unten messen.</string>
+    <string name="projectiles_title">Geschosse</string>
+    <string name="mode_airsoft">Airsoft (BBs · Hop-up)</string>
+    <string name="mode_pcp">PCP (Diabolos &amp; Slugs)</string>
+    <string name="mode_hint_airsoft">BB-Gewichte und die Hop-up-Flugbahnsimulation.</string>
+    <string name="mode_hint_pcp">Diabolos &amp; Slugs und der PCP-Ballistikrechner.</string>
+    <string name="active_list_title">Deine aktive Liste</string>
+    <string name="library_title">Bibliothek</string>
+    <string name="library_search">Suchen…</string>
+    <string name="add_to_active">Zur aktiven Liste hinzufügen</string>
+    <string name="in_active">Schon in der aktiven Liste</string>
+    <string name="remove_from_active">Aus der aktiven Liste entfernen (bleibt in der Bibliothek)</string>
+    <string name="own_projectile_new">Eigenes Geschoss</string>
+    <string name="own_projectile_title">Eigenes Geschoss</string>
+    <string name="own_projectile_name_hint">z. B. Bio 0.28 oder meine Slugs</string>
+    <string name="own_projectile_has_bc">BC bekannt</string>
+    <string name="own_projectile_edit">Bearbeiten</string>
+    <string name="own_projectile_confirm_delete">Dein Geschoss \'%1$s\' löschen?</string>
 </resources>

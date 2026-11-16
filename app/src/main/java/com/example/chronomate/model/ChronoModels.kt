@@ -35,7 +35,11 @@ data class CustomWeight(
     val caliberUnit: String = "mm",
     /** Ballistic coefficient for PCP mode (lb/in²), if known. */
     val bc: Float? = null,
-    val dragModel: com.example.chronomate.ballistics.DragModel = com.example.chronomate.ballistics.DragModel.G1
+    val dragModel: com.example.chronomate.ballistics.DragModel = com.example.chronomate.ballistics.DragModel.G1,
+    /** Stable id ("own:<id>" in the active lists). */
+    val id: String = java.util.UUID.randomUUID().toString().take(8),
+    /** "BB" (airsoft) or "PELLET" (PCP). */
+    val kind: String = if (bc != null) "PELLET" else "BB"
 )
 
 enum class ChronoType(val ssid: String, val displayName: String) {
@@ -93,13 +97,12 @@ data class ChronoData(
     // Weight Settings
     val weightType: WeightType = WeightType.BB,
     val customWeights: List<CustomWeight> = emptyList(),
-    val alwaysShowCustomWeights: Boolean = false,
-    /** Catalogue name when a pellet is selected (pellets can share a weight). */
-    val selectedPellet: String = "",
-    /** Caliber filter of the Diablos list (".177", ".22", ".25", ".30" or ALL). */
-    val diaboloCaliber: String = ".177",
-    /** Weight type restored when leaving PCP mode. */
-    val airsoftWeightType: WeightType = WeightType.BB,
+    // Projectiles: ordered active lists per mode (ids, see WeightsAndClasses.kt) and the selection
+    val activeAirsoft: List<String> = DEFAULT_ACTIVE_BB,
+    val activePcp: List<String> = DEFAULT_ACTIVE_PCP,
+    val selectedItem: String = "bb:0.20",
+    /** Caliber filter when browsing the pellet library. */
+    val libraryCaliber: String = ".177",
 
     // Orga weapon classes (compliance board)
     val weaponClasses: List<WeaponClass> = DEFAULT_WEAPON_CLASSES,

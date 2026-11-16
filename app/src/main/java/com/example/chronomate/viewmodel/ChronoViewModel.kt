@@ -105,13 +105,20 @@ class ChronoViewModel(context: Context) : ViewModel() {
         val weightType = enumOr(prefs.getString("weight_type", null), WeightType.BB)
         val weaponClasses = prefs.getString(KEY_WEAPON_CLASSES, null)?.let { parseWeaponClasses(it) }
             ?.takeIf { it.isNotEmpty() } ?: DEFAULT_WEAPON_CLASSES
-        val alwaysShowCustom = prefs.getBoolean(KEY_ALWAYS_SHOW_CUSTOM, false)
-        val caliber = prefs.getString(KEY_DIABOLO_CALIBER, ".177") ?: ".177"
+        // Projectiles: own weights need an id and a kind (with a BC = pellet); active lists default
+        // to the standard BBs / the PCP starter set; the old pellet selection becomes an id.
+        val own = customWeights
+        val mode = enumOr(prefs.getString(KEY_BALLISTIC_MODE, null), BallisticMode.AIRSOFT)
+        val oldPellet = prefs.getString(KEY_SELECTED_PELLET, "") ?: ""
+        val activeAirsoft = normalizedActive(prefs.getString(KEY_ACTIVE_AIRSOFT, null)?.let { parseIds(it) } ?: DEFAULT_ACTIVE_BB, KIND_BB, own)
+        val pcpIds = prefs.getString(KEY_ACTIVE_PCP, null)?.let { parseIds(it) }
+            ?: (DEFAULT_ACTIVE_PCP + listOfNotNull(oldPellet.takeIf { n -> n.isNotEmpty() && PELLETS.any { it.name == n } }?.let { "pellet:$it" }))
+        val activePcp = normalizedActive(pcpIds, KIND_PELLET, own)
         val savedWeight = prefs.getFloat(KEY_SELECTED_WEIGHT, 0.20f)
-        val savedPellet = prefs.getString(KEY_SELECTED_PELLET, "") ?: ""
-        val keep = optionToKeep(savedWeight, savedPellet, availableWeights(weightType, customWeights, alwaysShowCustom, caliber))
-        val selectedWeight = keep?.weight ?: savedWeight
-        val selectedPellet = keep?.pellet?.name ?: ""
+        val savedItem = prefs.getString(KEY_SELECTED_ITEM, null)
+            ?: if (oldPellet.isNotEmpty() && mode == BallisticMode.PCP) "pellet:$oldPellet" else ""
+        val offered = (if (mode == BallisticMode.PCP) activePcp else activeAirsoft).mapNotNull { resolve(it, own) }
+        val keep = optionToKeep(savedItem, savedWeight, offered)
 
         _uiState.update { it.copy(
             isDarkMode = prefs.getBoolean("dark_mode", true),
@@ -121,14 +128,14 @@ class ChronoViewModel(context: Context) : ViewModel() {
             maxAllowedOverhopCm = prefs.getFloat("max_overhop", 15f),
             weightType = weightType,
             customWeights = customWeights,
-            alwaysShowCustomWeights = alwaysShowCustom,
-            selectedWeight = selectedWeight,
-            selectedPellet = selectedPellet,
-            diaboloCaliber = caliber,
-            airsoftWeightType = enumOr(prefs.getString(KEY_AIRSOFT_WEIGHT_TYPE, null), WeightType.BB),
+            selectedWeight = keep?.weight ?: savedWeight,
+            selectedItem = keep?.id ?: savedItem,
+            activeAirsoft = activeAirsoft,
+            activePcp = activePcp,
+            libraryCaliber = prefs.getString(KEY_LIBRARY_CALIBER, ".177") ?: ".177",
             weaponClasses = weaponClasses,
             selectedWeaponClass = prefs.getString(KEY_SELECTED_CLASS, "AR") ?: "AR",
-            ballisticMode = enumOr(prefs.getString(KEY_BALLISTIC_MODE, null), BallisticMode.AIRSOFT),
+            ballisticMode = mode,
             showImperial = prefs.getBoolean(KEY_SHOW_IMPERIAL, false),
             pcp = prefs.getString(KEY_PCP, null)?.let { parsePcp(it) } ?: PcpSettings(),
             environment = prefs.getString(KEY_ENVIRONMENT, null)?.let { parseEnvironment(it) } ?: EnvironmentSettings(),
@@ -237,22 +244,21 @@ class ChronoViewModel(context: Context) : ViewModel() {
         }
     }
 
-    /** Select a plain weight (BB, custom weight, or the PCP projectile saved as custom). */
-    fun setWeight(weight: Float) {
-        _uiState.update { it.copy(selectedWeight = weight, selectedPellet = "") }
-        savePreference(appContext, KEY_SELECTED_WEIGHT, weight)
-        savePreference(appContext, KEY_SELECTED_PELLET, "")
+    // --- Projectiles: mode, active lists, library, own projectiles, selection ----------------------
+
+    /** One switch: Airsoft = BBs + hop-up trajectory, PCP = pellets & slugs + PCP calculator. */
+    fun setMode(mode: BallisticMode) {
+        if (mode == _uiState.value.ballisticMode) return
+        _uiState.update { it.copy(ballisticMode = mode) }
+        savePreference(appContext, KEY_BALLISTIC_MODE, mode.name)
+        keepSelectionOffered()
     }
 
-    /** Select a chip / grid tile. A pellet (or custom weight with a BC) also becomes the PCP projectile. */
+    /** Select a chip / grid tile / picker entry. A pellet (or own pellet with a BC) is the PCP projectile too. */
     fun selectWeightOption(opt: WeightOption) {
-        _uiState.update { it.copy(selectedWeight = opt.weight, selectedPellet = opt.pellet?.name ?: "") }
+        _uiState.update { it.copy(selectedItem = opt.id, selectedWeight = opt.weight) }
+        savePreference(appContext, KEY_SELECTED_ITEM, opt.id)
         savePreference(appContext, KEY_SELECTED_WEIGHT, opt.weight)
-        savePreference(appContext, KEY_SELECTED_PELLET, opt.pellet?.name ?: "")
-        syncPcpWithSelection(opt)
-    }
-
-    private fun syncPcpWithSelection(opt: WeightOption) {
         val p = opt.pellet
         if (p != null) {
             updatePcp {
@@ -262,55 +268,92 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     dragModel = if (p.bc != null) com.example.chronomate.ballistics.DragModel.G1 else it.dragModel
                 )
             }
-            return
-        }
-        if (opt.isCustom) {
-            val cw = _uiState.value.customWeights.firstOrNull { sameWeight(it.weight, opt.weight) && it.bc != null } ?: return
+        } else if (opt.isCustom && opt.kind == KIND_PELLET) {
+            val cw = _uiState.value.customWeights.firstOrNull { "own:${it.id}" == opt.id } ?: return
             updatePcp {
                 it.copy(
                     projectileName = cw.name, massGrams = cw.weight.toDouble(),
                     caliberMm = if (cw.caliberUnit == "mm") cw.caliber.toDouble() else it.caliberMm,
-                    bc = cw.bc!!.toDouble(), dragModel = cw.dragModel
+                    bc = cw.bc?.toDouble() ?: it.bc, dragModel = if (cw.bc != null) cw.dragModel else it.dragModel
                 )
             }
         }
     }
 
-    /** A pellet picked on the PCP screen: switch to Diablos / its caliber and select it there too. */
-    fun selectPellet(p: Pellet) {
+    /** Picked on the PCP screen: from the library it also joins the active list. */
+    fun pickProjectile(id: String) {
+        addToActive(id)
+        _uiState.value.resolve(id)?.let { selectWeightOption(it) }
+    }
+
+    private fun keepSelectionOffered() {
         val s = _uiState.value
-        if (s.weightType != WeightType.DIABLO) {
-            _uiState.update { it.copy(weightType = WeightType.DIABLO) }
-            savePreference(appContext, "weight_type", WeightType.DIABLO.name)
-        }
-        if (s.diaboloCaliber != ALL_CALIBERS && s.diaboloCaliber != p.caliber) setDiaboloCaliber(p.caliber, keepSelection = false)
-        selectWeightOption(WeightOption(p.massGrams.toFloat(), p.name, pellet = p))
+        optionToKeep(s.selectedItem, s.selectedWeight, s.availableWeights())
+            ?.takeIf { it.id != s.selectedItem }?.let { selectWeightOption(it) }
     }
 
-    fun setDiaboloCaliber(caliber: String, keepSelection: Boolean = true) {
-        _uiState.update { it.copy(diaboloCaliber = caliber) }
-        savePreference(appContext, KEY_DIABOLO_CALIBER, caliber)
-        if (keepSelection) keepSelectedWeightOffered()
+    private fun setActive(kind: String, ids: List<String>) {
+        val own = _uiState.value.customWeights
+        val clean = normalizedActive(ids, kind, own)
+        _uiState.update { if (kind == KIND_PELLET) it.copy(activePcp = clean) else it.copy(activeAirsoft = clean) }
+        savePreference(appContext, if (kind == KIND_PELLET) KEY_ACTIVE_PCP else KEY_ACTIVE_AIRSOFT, JSONArray(clean).toString())
     }
 
-    /** Switching type keeps the selected weight only if the new list offers it. */
-    fun setWeightType(context: Context, type: WeightType) {
-        _uiState.update { it.copy(weightType = type) }
-        savePreference(context, "weight_type", type.name)
-        keepSelectedWeightOffered()
+    fun addToActive(id: String) {
+        val opt = _uiState.value.resolve(id) ?: return
+        val ids = _uiState.value.activeIds(opt.kind)
+        if (id !in ids) setActive(opt.kind, ids + id)
     }
 
-    fun setAlwaysShowCustomWeights(enabled: Boolean) {
-        _uiState.update { it.copy(alwaysShowCustomWeights = enabled) }
-        savePreference(appContext, KEY_ALWAYS_SHOW_CUSTOM, enabled)
-        keepSelectedWeightOffered()
+    /** Library entries leave the active list; own projectiles stay (delete them instead). */
+    fun removeFromActive(id: String) {
+        if (id.startsWith("own:")) return
+        val opt = _uiState.value.resolve(id) ?: return
+        setActive(opt.kind, _uiState.value.activeIds(opt.kind) - id)
+        keepSelectionOffered()
     }
 
-    private fun keepSelectedWeightOffered() {
-        val state = _uiState.value
-        val options = state.availableWeights()
-        if (options.any { state.isSelected(it) }) return
-        optionToKeep(state.selectedWeight, state.selectedPellet, options)?.let { selectWeightOption(it) }
+    fun moveActive(id: String, step: Int) {
+        val opt = _uiState.value.resolve(id) ?: return
+        val ids = _uiState.value.activeIds(opt.kind)
+        val i = ids.indexOf(id)
+        setActive(opt.kind, ids.moved(i, i + step))
+    }
+
+    fun setLibraryCaliber(caliber: String) {
+        _uiState.update { it.copy(libraryCaliber = caliber) }
+        savePreference(appContext, KEY_LIBRARY_CALIBER, caliber)
+    }
+
+    /** Create or update one of your own projectiles; it always sits in the active list of its kind. */
+    fun saveOwnProjectile(cw: CustomWeight) {
+        val list = _uiState.value.customWeights.toMutableList()
+        val i = list.indexOfFirst { it.id == cw.id }
+        if (i >= 0) list[i] = cw else list += cw
+        _uiState.update { it.copy(customWeights = list) }
+        saveCustomWeights(appContext, list)
+        setActive(cw.kind, _uiState.value.activeIds(cw.kind))
+        if (_uiState.value.selectedItem == "own:${cw.id}") _uiState.value.resolve("own:${cw.id}")?.let { selectWeightOption(it) }
+    }
+
+    fun deleteOwnProjectile(id: String) {
+        val cw = _uiState.value.customWeights.firstOrNull { it.id == id } ?: return
+        val list = _uiState.value.customWeights - cw
+        _uiState.update { it.copy(customWeights = list) }
+        saveCustomWeights(appContext, list)
+        setActive(cw.kind, _uiState.value.activeIds(cw.kind) - "own:$id")
+        keepSelectionOffered()
+    }
+
+    /** "Save as custom weight" on the PCP screen: the projectile (with its BC) becomes your own pellet. */
+    fun savePcpAsOwnProjectile() {
+        val pc = _uiState.value.pcp
+        val weight = (Math.round(pc.massGrams * 1000.0) / 1000.0).toFloat()
+        val existing = _uiState.value.customWeights.firstOrNull { it.kind == KIND_PELLET && it.name == pc.projectileName && sameWeight(it.weight, weight) }
+        val cw = (existing ?: CustomWeight(pc.projectileName.ifBlank { "Pellet" }, weight, kind = KIND_PELLET))
+            .copy(caliber = pc.caliberMm.toFloat(), caliberUnit = "mm", bc = pc.bc.toFloat(), dragModel = pc.dragModel, kind = KIND_PELLET)
+        saveOwnProjectile(cw)
+        _uiState.value.resolve("own:${cw.id}")?.let { selectWeightOption(it) }
     }
 
     fun setExportShotChoice(choice: Int) {
@@ -318,22 +361,6 @@ class ChronoViewModel(context: Context) : ViewModel() {
     }
 
     // --- Ballistic mode / PCP calculator -------------------------------------------------------
-
-    /** PCP shoots pellets, not BBs: switch the weights to the Diablos catalogue, and back again. */
-    fun setBallisticMode(mode: BallisticMode) {
-        val s = _uiState.value
-        if (mode == s.ballisticMode) return
-        _uiState.update { it.copy(ballisticMode = mode) }
-        savePreference(appContext, KEY_BALLISTIC_MODE, mode.name)
-        val newType = if (mode == BallisticMode.PCP) {
-            if (s.weightType != WeightType.DIABLO) {
-                _uiState.update { it.copy(airsoftWeightType = s.weightType) }
-                savePreference(appContext, KEY_AIRSOFT_WEIGHT_TYPE, s.weightType.name)
-            }
-            WeightType.DIABLO
-        } else s.airsoftWeightType
-        if (newType != _uiState.value.weightType) setWeightType(appContext, newType)
-    }
 
     fun setShowImperial(enabled: Boolean) {
         _uiState.update { it.copy(showImperial = enabled) }
@@ -348,34 +375,6 @@ class ChronoViewModel(context: Context) : ViewModel() {
     fun updateEnvironment(transform: (EnvironmentSettings) -> EnvironmentSettings) {
         _uiState.update { it.copy(environment = transform(it.environment)) }
         savePreference(appContext, KEY_ENVIRONMENT, environmentToJson(_uiState.value.environment))
-    }
-
-    /** A custom weight picked as PCP projectile is also the pellet on the chrono now. */
-    fun usePcpCustomWeight(index: Int) {
-        val cw = _uiState.value.customWeights.getOrNull(index) ?: return
-        updatePcp {
-            it.copy(
-                projectileName = cw.name,
-                massGrams = cw.weight.toDouble(),
-                caliberMm = if (cw.caliberUnit == "mm") cw.caliber.toDouble() else it.caliberMm,
-                bc = cw.bc?.toDouble() ?: it.bc,
-                dragModel = if (cw.bc != null) cw.dragModel else it.dragModel
-            )
-        }
-        setWeight(cw.weight)
-    }
-
-    /** "Save as custom weight": the PCP projectile (with its BC) becomes a selectable weight. */
-    fun savePcpAsCustomWeight() {
-        val pc = _uiState.value.pcp
-        val weight = (Math.round(pc.massGrams * 1000.0) / 1000.0).toFloat()
-        val list = _uiState.value.customWeights.toMutableList()
-        val i = list.indexOfFirst { it.name == pc.projectileName && sameWeight(it.weight, weight) }
-        val entry = CustomWeight(pc.projectileName.ifBlank { "Pellet" }, weight, pc.caliberMm.toFloat(), "mm", pc.bc.toFloat(), pc.dragModel)
-        if (i >= 0) list[i] = entry else list += entry
-        _uiState.update { it.copy(customWeights = list) }
-        saveCustomWeights(appContext, list)
-        setWeight(weight)
     }
 
     // --- Orga weapon classes ---------------------------------------------------------------
@@ -435,54 +434,6 @@ class ChronoViewModel(context: Context) : ViewModel() {
     fun setChronoType(context: Context, type: ChronoType) {
         _uiState.update { it.copy(chronoType = type) }
         savePreference(context, "chrono_type", type.name)
-    }
-
-    fun addCustomWeight(context: Context) {
-        _uiState.update { current ->
-            val newList = current.customWeights + CustomWeight("New Weight", 0.20f)
-            saveCustomWeights(context, newList)
-            current.copy(customWeights = newList)
-        }
-    }
-
-    fun updateCustomWeight(context: Context, index: Int, name: String, weight: Float, caliber: Float? = null, unit: String? = null) {
-        val current = _uiState.value
-        if (index !in current.customWeights.indices) return
-        val old = current.customWeights[index]
-        val updated = old.copy(
-            name = name,
-            weight = weight,
-            caliber = caliber ?: old.caliber,
-            caliberUnit = unit ?: old.caliberUnit
-        )
-        val newList = current.customWeights.toMutableList().also { it[index] = updated }
-        _uiState.update { it.copy(customWeights = newList) }
-        saveCustomWeights(context, newList)
-        // Editing the weight that is selected moves the selection along with it.
-        if (sameWeight(old.weight, current.selectedWeight) && !sameWeight(old.weight, weight)) {
-            setWeight(weight)
-        }
-    }
-
-    /** Sort the custom weights (the chips follow this order). */
-    fun moveCustomWeight(index: Int, step: Int) {
-        val list = _uiState.value.customWeights
-        val newList = list.moved(index, index + step)
-        if (newList === list) return
-        _uiState.update { it.copy(customWeights = newList) }
-        saveCustomWeights(appContext, newList)
-    }
-
-    fun removeCustomWeight(context: Context, index: Int) {
-        _uiState.update { current ->
-            val newList = current.customWeights.toMutableList()
-            if (index in newList.indices) {
-                newList.removeAt(index)
-                saveCustomWeights(context, newList)
-            }
-            current.copy(customWeights = newList)
-        }
-        keepSelectedWeightOffered()
     }
 
     fun setMaxAllowedJoule(joule: Float) {
@@ -1170,11 +1121,16 @@ class ChronoViewModel(context: Context) : ViewModel() {
         const val KEY_WEAPON_CLASSES = "weapon_classes_json"
         const val KEY_SELECTED_CLASS = "selected_weapon_class"
         const val KEY_SELECTED_WEIGHT = "selected_weight"
-        const val KEY_ALWAYS_SHOW_CUSTOM = "always_show_custom_weights"
         const val KEY_BALLISTIC_MODE = "ballistic_mode"
-        const val KEY_SELECTED_PELLET = "selected_pellet"
-        const val KEY_DIABOLO_CALIBER = "diabolo_caliber"
-        const val KEY_AIRSOFT_WEIGHT_TYPE = "airsoft_weight_type"
+        const val KEY_SELECTED_PELLET = "selected_pellet"   // before the library: migrated
+        const val KEY_SELECTED_ITEM = "selected_item"
+        const val KEY_ACTIVE_AIRSOFT = "active_airsoft_json"
+        const val KEY_ACTIVE_PCP = "active_pcp_json"
+        const val KEY_LIBRARY_CALIBER = "library_caliber"
+
+        fun parseIds(json: String): List<String>? = try {
+            val arr = JSONArray(json); (0 until arr.length()).map { arr.getString(it) }
+        } catch (e: Exception) { null }
         const val KEY_SHOW_IMPERIAL = "show_imperial"
         const val KEY_PCP = "pcp_settings_json"
         const val KEY_ENVIRONMENT = "environment_json"
@@ -1235,7 +1191,8 @@ class ChronoViewModel(context: Context) : ViewModel() {
             list.forEach {
                 put(JSONObject().put("name", it.name).put("weight", it.weight.toDouble())
                     .put("caliber", it.caliber.toDouble()).put("caliberUnit", it.caliberUnit)
-                    .put("bc", it.bc?.toDouble() ?: JSONObject.NULL).put("dragModel", it.dragModel.name))
+                    .put("bc", it.bc?.toDouble() ?: JSONObject.NULL).put("dragModel", it.dragModel.name)
+                    .put("id", it.id).put("kind", it.kind))
             }
         }.toString()
 
@@ -1250,7 +1207,13 @@ class ChronoViewModel(context: Context) : ViewModel() {
                     caliberUnit = o.optString("caliberUnit", "mm"),
                     bc = if (o.isNull("bc")) null else o.optDouble("bc").toFloat().takeIf { !it.isNaN() },
                     dragModel = enumOr(o.optString("dragModel"), com.example.chronomate.ballistics.DragModel.G1)
-                )
+                ).let { cw ->
+                    // weights saved before the library have no id / kind yet
+                    cw.copy(
+                        id = o.optString("id").ifEmpty { cw.id },
+                        kind = o.optString("kind").ifEmpty { if (cw.bc != null) KIND_PELLET else KIND_BB }
+                    )
+                }
             }
         } catch (e: Exception) { null }
 

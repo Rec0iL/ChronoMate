@@ -4,76 +4,90 @@ import kotlin.math.abs
 import kotlin.math.pow
 
 // ---------------------------------------------------------------------------------------------
-// Weights: one place that decides which weights the chips offer (mirrors core/weights.py on the
-// desktop), so Dashboard, Trajectory and Settings always show the same list.
+// Projectiles: library + active lists (mirrors core/weights.py on the desktop).
+// The mode (Airsoft / PCP) picks the kind: Airsoft = BBs, PCP = pellets & slugs. Each mode has an
+// ordered active list (what the chips show) made of library entries plus the user's own projectiles
+// of that kind, which are always in it. Ids: "bb:0.25", "pellet:<catalogue name>", "own:<id>".
 // ---------------------------------------------------------------------------------------------
 
+/** The 10 classic airsoft BB weights (Orga reference grid, tests). */
 val STANDARD_BB_WEIGHTS = listOf(0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.36f, 0.40f, 0.43f, 0.45f)
+
+const val KIND_BB = "BB"
+const val KIND_PELLET = "PELLET"
+
+val BB_LIBRARY = listOf(0.12f, 0.20f, 0.23f, 0.25f, 0.28f, 0.30f, 0.32f, 0.33f, 0.36f, 0.40f, 0.43f, 0.45f, 0.46f, 0.48f)
+val DEFAULT_ACTIVE_BB = STANDARD_BB_WEIGHTS.map { bbId(it) }
+/** Starter set for PCP: the common .177 and .22 pellets on the German market. */
+val DEFAULT_ACTIVE_PCP = listOf(
+    "JSB Exact .177", "JSB Exact Heavy .177", "H&N Field Target Trophy .177", "H&N Baracuda Match .177",
+    "RWS Superdome .177", "JSB Exact Jumbo .22", "JSB Exact Jumbo Heavy .22",
+    "H&N Field Target Trophy .22", "H&N Baracuda Match .22", "RWS Superdome .22"
+).map { "pellet:$it" }
 
 private const val WEIGHT_MATCH_TOLERANCE = 0.0005f
 
+fun bbId(w: Float) = "bb:" + "%.2f".format(java.util.Locale.ROOT, w)
+
 data class WeightOption(
+    val id: String,
     val weight: Float,
     val label: String,
+    val kind: String = KIND_BB,
+    /** The user's own projectile. */
     val isCustom: Boolean = false,
-    /** Set for entries of the pellet catalogue (Diablos). */
     val pellet: Pellet? = null
 )
 
 fun sameWeight(a: Float, b: Float): Boolean = abs(a - b) < WEIGHT_MATCH_TOLERANCE
 
-fun standardWeights(type: WeightType): List<Float> = if (type == WeightType.BB) STANDARD_BB_WEIGHTS else emptyList()
+fun ChronoData.modeKind(): String = if (ballisticMode == BallisticMode.PCP) KIND_PELLET else KIND_BB
 
-fun pelletLabel(p: Pellet, caliberFilter: String): String =
-    (if (caliberFilter == ALL_CALIBERS) p.name else p.short) + " %.3f g".format(p.massGrams)
+fun ChronoData.activeIds(kind: String = modeKind()): List<String> = if (kind == KIND_PELLET) activePcp else activeAirsoft
 
-/**
- * The loaded weights of the active type, then the custom weights. BB: standard airsoft weights;
- * Diablos: the pellet & slug catalogue filtered by [caliber]. Custom weights always belong to the
- * CUSTOM type; for BB / Diablos they are appended only when [alwaysShowCustom] is on.
- */
-fun availableWeights(
-    type: WeightType,
-    custom: List<CustomWeight>,
-    alwaysShowCustom: Boolean,
-    caliber: String = ".177"
-): List<WeightOption> {
-    val options = if (type == WeightType.DIABLO) {
-        pelletsFor(caliber).map { WeightOption(it.massGrams.toFloat(), pelletLabel(it, caliber), pellet = it) }.toMutableList()
-    } else {
-        standardWeights(type).map { WeightOption(it, "%.2f".format(it)) }.toMutableList()
+fun resolve(id: String, own: List<CustomWeight>): WeightOption? = when {
+    id.startsWith("bb:") -> id.drop(3).toFloatOrNull()?.let { WeightOption(id, it, "%.2f".format(it), KIND_BB) }
+    id.startsWith("pellet:") -> PELLETS.firstOrNull { it.name == id.drop(7) }?.let {
+        WeightOption(id, it.massGrams.toFloat(), "${it.name} %.3f g".format(it.massGrams), KIND_PELLET, pellet = it)
     }
-    if (type == WeightType.CUSTOM || alwaysShowCustom) {
-        options += custom.map {
-            WeightOption(it.weight, "${it.name} ${it.caliber}${it.caliberUnit} %.2f g".format(it.weight), isCustom = true)
-        }
+    id.startsWith("own:") -> own.firstOrNull { it.id == id.drop(4) }?.let {
+        val label = if (it.kind == KIND_PELLET) "${it.name} %.3f g".format(it.weight) else "${it.name} %.2f g".format(it.weight)
+        WeightOption(id, it.weight, label, it.kind, isCustom = true)
     }
-    return options
+    else -> null
 }
 
-fun ChronoData.availableWeights(): List<WeightOption> =
-    availableWeights(weightType, customWeights, alwaysShowCustomWeights, diaboloCaliber)
+fun ChronoData.resolve(id: String): WeightOption? = resolve(id, customWeights)
 
-/** Same weight, and for pellets the same pellet (two pellets can weigh the same). */
-fun isSelected(selectedWeight: Float, selectedPellet: String, opt: WeightOption): Boolean {
-    if (!sameWeight(opt.weight, selectedWeight)) return false
-    // A pellet is selected by name; everything else only while no pellet is selected. Otherwise a
-    // custom 0.69 g and the 0.690 g Baracuda Match would both light up.
-    val p = opt.pellet ?: return selectedPellet.isEmpty()
-    return p.name == selectedPellet
+/** Own projectiles are always in the active list of their kind; unknown ids are dropped. */
+fun normalizedActive(ids: List<String>, kind: String, own: List<CustomWeight>): List<String> {
+    val cleaned = ids.distinct().filter { resolve(it, own)?.kind == kind }.toMutableList()
+    own.filter { it.kind == kind }.forEach { if ("own:${it.id}" !in cleaned) cleaned += "own:${it.id}" }
+    return cleaned
 }
 
-fun ChronoData.isSelected(opt: WeightOption): Boolean = isSelected(selectedWeight, selectedPellet, opt)
+/** The active list of the current mode (or [kind]), in the user's order; never empty. */
+fun ChronoData.availableWeights(kind: String = modeKind()): List<WeightOption> {
+    val opts = activeIds(kind).mapNotNull { resolve(it) }
+    if (opts.isNotEmpty()) return opts
+    return listOfNotNull(resolve(if (kind == KIND_BB) bbId(0.20f) else DEFAULT_ACTIVE_PCP.first()))
+}
 
-/** The option to select after the list changed: the current one if still offered, else the first. */
-fun optionToKeep(selectedWeight: Float, selectedPellet: String, options: List<WeightOption>): WeightOption? =
-    options.firstOrNull { isSelected(selectedWeight, selectedPellet, it) }
+/** Library entries of a kind (filtered by caliber and search text). */
+fun library(kind: String, caliber: String = ALL_CALIBERS, query: String = ""): List<WeightOption> {
+    val q = query.trim().lowercase()
+    val items = if (kind == KIND_BB) BB_LIBRARY.mapNotNull { resolve(bbId(it), emptyList()) }
+    else pelletsFor(caliber).mapNotNull { resolve("pellet:${it.name}", emptyList()) }
+    return items.filter { q.isEmpty() || q in it.label.lowercase() }
+}
+
+fun ChronoData.isSelected(opt: WeightOption): Boolean = opt.id == selectedItem
+
+/** The option to select after the list changed: the current one if offered, else same weight, else first. */
+fun optionToKeep(selectedId: String, selectedWeight: Float, options: List<WeightOption>): WeightOption? =
+    options.firstOrNull { it.id == selectedId }
         ?: options.firstOrNull { sameWeight(it.weight, selectedWeight) }
         ?: options.firstOrNull()
-
-/** Keeps [selected] if [options] still offer it, else the first offered weight. */
-fun weightToKeep(selected: Float, options: List<WeightOption>): Float =
-    if (options.isEmpty() || options.any { sameWeight(it.weight, selected) }) selected else options.first().weight
 
 // ---------------------------------------------------------------------------------------------
 // Export: "shots to include" keeps the user's choice when new shots arrive (same rule as desktop).

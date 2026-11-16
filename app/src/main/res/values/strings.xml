@@ -162,7 +162,7 @@
     <string name="confirm_delete_class">Delete the weapon class \'%1$s\'?</string>
     <string name="confirm_reset_classes">Reset all weapon classes to the defaults (BACKUP, AR, LMG, DMR, SNIPER)?</string>
     <string name="over_class_limit">Over the %1$s limit (≤ %2$.2f J)</string>
-    <string name="loaded_weights">Loaded weights (tap to select)</string>
+    <string name="loaded_weights">Selected weight (tap to select)</string>
     <string name="always_show_custom">Always show custom weights</string>
     <string name="always_show_custom_desc">Append your custom weights to the BB / Diablo list</string>
     <string name="pcp_title">PCP Ballistics (pellets &amp; slugs)</string>
@@ -249,4 +249,21 @@
     <string name="pcp_bc_unknown">BC unknown – measure it</string>
     <string name="pcp_slug"> (slug)</string>
     <string name="pcp_bc_unknown_note">%1$s: the maker publishes no BC. The last BC is kept; measure the real one below.</string>
+    <string name="projectiles_title">Projectiles</string>
+    <string name="mode_airsoft">Airsoft (BBs · hop-up)</string>
+    <string name="mode_pcp">PCP (pellets &amp; slugs)</string>
+    <string name="mode_hint_airsoft">BB weights and the hop-up trajectory simulation.</string>
+    <string name="mode_hint_pcp">Pellets &amp; slugs and the PCP ballistics calculator.</string>
+    <string name="active_list_title">Your active list</string>
+    <string name="library_title">Library</string>
+    <string name="library_search">Search…</string>
+    <string name="add_to_active">Add to your active list</string>
+    <string name="in_active">Already in your active list</string>
+    <string name="remove_from_active">Remove from the active list (stays in the library)</string>
+    <string name="own_projectile_new">New own projectile</string>
+    <string name="own_projectile_title">Own projectile</string>
+    <string name="own_projectile_name_hint">e.g. Bio 0.28 or my slugs</string>
+    <string name="own_projectile_has_bc">I know its BC</string>
+    <string name="own_projectile_edit">Edit</string>
+    <string name="own_projectile_confirm_delete">Delete your projectile \'%1$s\'?</string>
 </resources>
