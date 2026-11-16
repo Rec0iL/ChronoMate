@@ -792,6 +792,7 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
     
     val relativeImpactM = bbHeightM - targetHeightM
     val relativeImpactCm = relativeImpactM * 100.0
+    val driftCm = (ptAtDist?.z ?: 0.0) * 100.0   // sideways from the wind, + right
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(
@@ -812,12 +813,37 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
                 drawLine(crosshairColor, Offset(0f, center.y), Offset(size.width, center.y), 1.dp.toPx())
                 drawLine(crosshairColor, Offset(center.x, 0f), Offset(center.x, size.height), 1.dp.toPx())
                 
-                val scale = 5f 
-                val impactY = center.y - (relativeImpactCm.toFloat() * scale)
-                
-                if (impactY in 0f..size.height) {
-                    drawCircle(chronoGreen, 6.dp.toPx(), Offset(center.x, impactY))
-                    drawCircle(surfaceColor, 2.dp.toPx(), Offset(center.x, impactY))
+                // Point of impact: height from the trajectory, sideways from the wind drift
+                val scale = 5f
+                val dx = driftCm.toFloat() * scale
+                val dy = -relativeImpactCm.toFloat() * scale
+                val rIn = size.width / 2 - 8.dp.toPx()
+                val dotColor = if (relativeImpactCm >= 0) chronoGreen else Color(0xFFF44336)
+                if (dx * dx + dy * dy <= rIn * rIn) {
+                    drawCircle(dotColor, 6.dp.toPx(), Offset(center.x + dx, center.y + dy))
+                    drawCircle(surfaceColor, 2.dp.toPx(), Offset(center.x + dx, center.y + dy))
+                } else {
+                    // Off the reticle. The arrow points straight sideways (or straight up / down when
+                    // there is no sideways miss). It sits at the impact height (clamped near the rim when
+                    // the height is off too), with a dotted line at a right angle from the centre line.
+                    val yy = if (abs(dy) <= rIn) dy else if (dy > 0) rIn * 0.85f else -rIn * 0.85f
+                    val edge = kotlin.math.sqrt(rIn * rIn - yy * yy)
+                    val (x, y, dir) = if (abs(dx) > edge || abs(dx) >= 0.5f * scale) {
+                        val sx = if (dx > 0) 1f else -1f
+                        drawLine(dotColor, Offset(center.x, center.y + yy), Offset(center.x + edge * sx, center.y + yy), 2.dp.toPx(),
+                            pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(3f, 6f)))
+                        Triple(edge * sx, yy, Offset(sx, 0f))
+                    } else {
+                        val sy = if (dy > 0) 1f else -1f
+                        Triple(0f, rIn * sy, Offset(0f, sy))
+                    }
+                    val a = 7.dp.toPx()
+                    val tip = Offset(center.x + x + dir.x * a / 2, center.y + y + dir.y * a / 2)
+                    val back = Offset(tip.x - dir.x * 2 * a, tip.y - dir.y * 2 * a)
+                    val side = Offset(-dir.y * a, dir.x * a)
+                    drawPath(androidx.compose.ui.graphics.Path().apply {
+                        moveTo(tip.x, tip.y); lineTo(back.x + side.x, back.y + side.y); lineTo(back.x - side.x, back.y - side.y); close()
+                    }, dotColor)
                 }
             }
         }
@@ -827,8 +853,9 @@ fun TargetViewCanvas(trajectory: List<TrajectoryPoint>, targetDistance: Double, 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val redColor = if (isLight) Color(0xFFB71C1C) else Color.Red
-            val hitText = if (relativeImpactCm >= 0) stringResource(R.string.hit_above).format(relativeImpactCm) 
-                          else stringResource(R.string.hit_below).format(abs(relativeImpactCm))
+            val hitText = (if (relativeImpactCm >= 0) stringResource(R.string.hit_above).format(relativeImpactCm)
+                          else stringResource(R.string.hit_below).format(abs(relativeImpactCm))) +
+                          (if (abs(driftCm) >= 0.05) "  ·  %.1f cm %s".format(abs(driftCm), if (driftCm < 0) "L" else "R") else "")
             Text(
                 text = hitText,
                 color = if (relativeImpactCm >= 0) chronoGreen else redColor,

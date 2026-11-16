@@ -549,7 +549,7 @@ fun JouleGridStatic(
                     val energy = 0.5f * (weight / 1000f) * velocity.pow(2)
                     val selected = index == selectedIndex
 
-                    val (bgColor, borderColor) = when {
+                    val (bgColor, _) = when {
                         velocity <= 0f -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) to MaterialTheme.colorScheme.outline
                         weight < practicalWeight -> Color(0xFF2E7D32) to Color(0xFF88FF11)
                         weight == practicalWeight -> Color(0xFFE65100) to Color(0xFFFFCC80)
@@ -561,7 +561,8 @@ fun JouleGridStatic(
                             .weight(1f)
                             .then(if (onSelect != null) Modifier.clickable { onSelect(index) } else Modifier),
                         colors = CardDefaults.cardColors(containerColor = bgColor),
-                        border = if (selected) BorderStroke(3.dp, borderColor) else null
+                        // Selected weight: the same cyan outline as the active weapon class
+                        border = if (selected) BorderStroke(3.dp, if (isDark) ActiveAccentDark else ActiveAccentLight) else null
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(6.dp),

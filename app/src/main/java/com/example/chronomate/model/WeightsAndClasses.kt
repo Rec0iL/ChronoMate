@@ -57,8 +57,10 @@ fun ChronoData.availableWeights(): List<WeightOption> =
 /** Same weight, and for pellets the same pellet (two pellets can weigh the same). */
 fun isSelected(selectedWeight: Float, selectedPellet: String, opt: WeightOption): Boolean {
     if (!sameWeight(opt.weight, selectedWeight)) return false
-    val p = opt.pellet ?: return true
-    return selectedPellet.isEmpty() || p.name == selectedPellet
+    // A pellet is selected by name; everything else only while no pellet is selected. Otherwise a
+    // custom 0.69 g and the 0.690 g Baracuda Match would both light up.
+    val p = opt.pellet ?: return selectedPellet.isEmpty()
+    return p.name == selectedPellet
 }
 
 fun ChronoData.isSelected(opt: WeightOption): Boolean = isSelected(selectedWeight, selectedPellet, opt)
