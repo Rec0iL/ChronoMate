@@ -60,5 +60,17 @@
 3. Open ChronoMate and connect to the "HT-X3000" Wi-Fi network.
 4. The app will automatically start polling data from the device.
 
+## 📜 License
+
+ChronoMate is source-available under the [PolyForm Shield License 1.0.0](LICENSE), the same as [ChronoMate Desktop](https://github.com/Rec0iL/ChronoMate-Desktop).
+
+- ✅ **Free to use for any purpose** – hobby, clubs, airsoft fields, workshops and technicians (e.g. generating PDF reports for customers), events, research, education
+- ✅ Read, modify and share the code, as long as you keep the license and notices
+- ❌ **Not allowed:** using the code to provide a product that competes with ChronoMate – e.g. rebranding it, selling it, or bundling it with chronographs or other apps (desktop/Android/…)
+
+Want to bundle or resell it? Get in touch for a commercial license.
+
+"ChronoMate" and the ChronoMate logo are trademarks of the author; the license does not grant the right to use them for your own products.
+
 ---
 *Developed for Airsoft enthusiasts and event organizers.*
